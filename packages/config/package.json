@@ -1,7 +1,7 @@
 {
-  "name": "@openagent/llm",
+  "name": "@openagent/config",
   "version": "0.0.0",
-  "description": "LLM abstraction layer for OpenAgent",
+  "description": "Configuration management for OpenAgent",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -17,17 +17,14 @@
   },
   "keywords": [
     "openagent",
-    "llm"
+    "config"
   ],
   "license": "MIT",
-  "devDependencies": {
-    "cross-env": "^10.1.0",
-    "typescript": "^5.9.3"
-  },
   "dependencies": {
-    "@openagent/config": "*",
-    "@openagent/logger": "*",
-    "openai": "^6.16.0",
-    "tiktoken": "^1.0.22"
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
   }
 }

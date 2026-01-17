@@ -74,14 +74,17 @@ describe('Logger', () => {
   });
 
   describe('log levels', () => {
-    const levels: LogLevel[] = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'];
+    const logMethods = ['trace', 'debug', 'info', 'warn', 'error', 'fatal'] as const;
 
     it('should have all log methods', () => {
       const logger = createLogger({ level: 'silent' });
 
-      for (const level of levels) {
-        expect(typeof logger[level]).toBe('function');
-      }
+      expect(typeof logger.trace).toBe('function');
+      expect(typeof logger.debug).toBe('function');
+      expect(typeof logger.info).toBe('function');
+      expect(typeof logger.warn).toBe('function');
+      expect(typeof logger.error).toBe('function');
+      expect(typeof logger.fatal).toBe('function');
     });
 
     it('should not throw when logging at silent level', () => {

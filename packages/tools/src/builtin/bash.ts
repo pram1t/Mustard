@@ -12,15 +12,10 @@ import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
 import { BaseTool } from '../base';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+import { getConfig } from '@openagent/config';
 
-// Default timeout: 2 minutes
-const DEFAULT_TIMEOUT = 120000;
-
-// Maximum timeout: 10 minutes
+// Maximum timeout: 10 minutes (hard limit)
 const MAX_TIMEOUT = 600000;
-
-// Maximum output size: 30000 characters
-const MAX_OUTPUT_SIZE = 30000;
 
 // Background processes map
 const backgroundProcesses = new Map<string, ChildProcess>();
@@ -67,12 +62,17 @@ export class BashTool extends BaseTool {
     context: ExecutionContext
   ): Promise<ToolResult> {
     return this.safeExecute(params, context, async () => {
+      const config = getConfig();
+      const bashConfig = config.tools.bash;
+
       const command = params.command as string;
+      const defaultTimeout = bashConfig.maxTimeout;
       const timeout = Math.min(
-        (params.timeout as number) || DEFAULT_TIMEOUT,
+        (params.timeout as number) || defaultTimeout,
         MAX_TIMEOUT
       );
       const runInBackground = (params.run_in_background as boolean) || false;
+      const maxOutputSize = bashConfig.maxOutputSize;
 
       // Resolve working directory
       const cwd = params.cwd
@@ -90,7 +90,7 @@ export class BashTool extends BaseTool {
         return this.executeInBackground(shell, shellArgs, cwd);
       }
 
-      return this.executeSync(shell, shellArgs, cwd, timeout, context.signal);
+      return this.executeSync(shell, shellArgs, cwd, timeout, maxOutputSize, context.signal);
     });
   }
 
@@ -102,6 +102,7 @@ export class BashTool extends BaseTool {
     args: string[],
     cwd: string,
     timeout: number,
+    maxOutputSize: number,
     signal?: AbortSignal
   ): Promise<ToolResult> {
     return new Promise((resolve) => {
@@ -133,8 +134,8 @@ export class BashTool extends BaseTool {
       child.stdout?.on('data', (data: Buffer) => {
         stdout += data.toString();
         // Truncate if too large
-        if (stdout.length > MAX_OUTPUT_SIZE * 2) {
-          stdout = stdout.substring(0, MAX_OUTPUT_SIZE * 2);
+        if (stdout.length > maxOutputSize * 2) {
+          stdout = stdout.substring(0, maxOutputSize * 2);
         }
       });
 
@@ -142,8 +143,8 @@ export class BashTool extends BaseTool {
       child.stderr?.on('data', (data: Buffer) => {
         stderr += data.toString();
         // Truncate if too large
-        if (stderr.length > MAX_OUTPUT_SIZE * 2) {
-          stderr = stderr.substring(0, MAX_OUTPUT_SIZE * 2);
+        if (stderr.length > maxOutputSize * 2) {
+          stderr = stderr.substring(0, maxOutputSize * 2);
         }
       });
 
@@ -159,8 +160,8 @@ export class BashTool extends BaseTool {
 
         // Truncate final output if needed
         let truncated = false;
-        if (output.length > MAX_OUTPUT_SIZE) {
-          output = output.substring(0, MAX_OUTPUT_SIZE) + '\n...[output truncated]';
+        if (output.length > maxOutputSize) {
+          output = output.substring(0, maxOutputSize) + '\n...[output truncated]';
           truncated = true;
         }
 

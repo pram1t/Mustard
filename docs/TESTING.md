@@ -207,6 +207,12 @@ import {
 
 ## Current Test Coverage
 
+### Config Package (15 tests)
+
+| Test Suite | Tests | Description |
+|------------|-------|-------------|
+| Config | 15 | Schema validation, env loading, caching |
+
 ### Logger Package (11 tests)
 
 | Test Suite | Tests | Description |
@@ -228,7 +234,7 @@ import {
 | EditTool | 6 | String replacement, uniqueness, delete |
 | ToolRegistry | 14 | Registration, execution, defaults |
 
-**Total: 58 tests**
+**Total: 73 tests**
 
 ## Running Specific Tests
 
