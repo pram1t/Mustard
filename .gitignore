@@ -8,10 +8,24 @@ dist/
 build/
 *.tsbuildinfo
 
-# Environment variables
+# Environment variables (NEVER commit these)
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.test
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+credentials.json
+secrets.json
+**/secrets/
+**/.secrets/
 
 # Turborepo
 .turbo
@@ -34,6 +48,10 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Coverage reports
+coverage/
+.nyc_output/
 
 # Optional: Bun lockfile (uncomment if needed)
 # bun.lockb
