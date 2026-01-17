@@ -25,6 +25,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@openagent/logger": "*",
     "openai": "^6.16.0",
     "tiktoken": "^1.0.22"
   }

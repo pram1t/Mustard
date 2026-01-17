@@ -12,6 +12,7 @@ import type {
   ExecuteOptions,
   IToolRegistry,
 } from './types';
+import { getLogger } from '@openagent/logger';
 
 // Import built-in tools
 import { ReadTool } from './builtin/read';
@@ -27,15 +28,17 @@ import { BashTool } from './builtin/bash';
  */
 export class ToolRegistry implements IToolRegistry {
   private tools: Map<string, Tool> = new Map();
+  private logger = getLogger();
 
   /**
    * Register a tool
    */
   register(tool: Tool): void {
     if (this.tools.has(tool.name)) {
-      console.warn(`Tool '${tool.name}' is already registered. Overwriting.`);
+      this.logger.warn(`Tool '${tool.name}' is already registered. Overwriting.`, { toolName: tool.name });
     }
     this.tools.set(tool.name, tool);
+    this.logger.debug(`Registered tool: ${tool.name}`, { toolName: tool.name });
   }
 
   /**
@@ -120,8 +123,18 @@ export class ToolRegistry implements IToolRegistry {
 
     // Execute directly
     try {
-      return await tool.execute(params, context);
+      const startTime = Date.now();
+      this.logger.debug(`Executing tool: ${name}`, { toolName: name, params });
+      const result = await tool.execute(params, context);
+      const duration = Date.now() - startTime;
+      this.logger.debug(`Tool execution completed: ${name}`, {
+        toolName: name,
+        success: result.success,
+        durationMs: duration
+      });
+      return result;
     } catch (error) {
+      this.logger.error(`Tool '${name}' threw an error`, { toolName: name, error: String(error) });
       return {
         success: false,
         output: '',

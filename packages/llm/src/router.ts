@@ -15,6 +15,7 @@ import type {
   Message,
   ValidationResult,
 } from './types';
+import { getLogger } from '@openagent/logger';
 
 /**
  * Default router configuration
@@ -31,6 +32,7 @@ const DEFAULT_CONFIG: Required<Omit<RouterConfig, 'primary'>> = {
 export class LLMRouter {
   private providers: Map<string, LLMProvider> = new Map();
   private config: Required<RouterConfig>;
+  private logger = getLogger();
 
   constructor(config: RouterConfig) {
     this.config = {
@@ -110,7 +112,7 @@ export class LLMRouter {
     for (const providerName of providerOrder) {
       const provider = this.providers.get(providerName);
       if (!provider) {
-        console.warn(`Provider '${providerName}' not registered, skipping`);
+        this.logger.warn(`Provider '${providerName}' not registered, skipping`, { providerName });
         continue;
       }
 
@@ -132,9 +134,9 @@ export class LLMRouter {
           return;
         } catch (error) {
           lastError = error as Error;
-          console.warn(
-            `Provider '${providerName}' attempt ${attempt + 1}/${this.config.retryAttempts} failed:`,
-            error
+          this.logger.warn(
+            `Provider '${providerName}' attempt ${attempt + 1}/${this.config.retryAttempts} failed`,
+            { providerName, attempt: attempt + 1, maxAttempts: this.config.retryAttempts, error: String(error) }
           );
 
           // Check if error is retryable
