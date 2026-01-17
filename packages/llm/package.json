@@ -15,9 +15,16 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
-  "keywords": ["openagent", "llm"],
+  "keywords": [
+    "openagent",
+    "llm"
+  ],
   "license": "MIT",
   "devDependencies": {
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "openai": "^6.16.0",
+    "tiktoken": "^1.0.22"
   }
 }
