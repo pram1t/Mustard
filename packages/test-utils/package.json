@@ -1,0 +1,22 @@
+{
+  "name": "@openagent/test-utils",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Testing utilities for OpenAgent packages",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

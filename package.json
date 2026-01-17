@@ -12,7 +12,9 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "test": "turbo run test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "lint": "turbo run lint"
   },
   "keywords": [],
@@ -20,7 +22,9 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^25.0.9",
+    "@vitest/coverage-v8": "^4.0.17",
     "turbo": "^2.7.5",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
   }
 }
