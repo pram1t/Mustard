@@ -1,0 +1,23 @@
+{
+  "name": "openagent",
+  "version": "1.0.0",
+  "description": "An open-source, LLM-agnostic agentic coding assistant",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "mcp-servers/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "test": "turbo run test",
+    "lint": "turbo run lint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "turbo": "^2.7.5"
+  }
+}
