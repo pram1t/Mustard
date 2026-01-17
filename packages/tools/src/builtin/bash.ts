@@ -13,12 +13,103 @@ import * as path from 'path';
 import { BaseTool } from '../base';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
 import { getConfig } from '@openagent/config';
+import { getLogger } from '@openagent/logger';
 
 // Maximum timeout: 10 minutes (hard limit)
 const MAX_TIMEOUT = 600000;
 
 // Background processes map
 const backgroundProcesses = new Map<string, ChildProcess>();
+
+/**
+ * Default safe environment variables that are always allowed.
+ * These are necessary for basic shell operation but don't contain secrets.
+ */
+const DEFAULT_SAFE_ENV_VARS = [
+  // System paths and shell
+  'PATH', 'HOME', 'USER', 'SHELL', 'TERM', 'PWD',
+  // Locale settings
+  'LANG', 'LC_ALL', 'LC_CTYPE', 'LC_MESSAGES', 'LANGUAGE',
+  // Timezone
+  'TZ',
+  // Node.js environment (for npm/node commands)
+  'NODE_ENV', 'NODE_PATH', 'NODE_OPTIONS',
+  // npm configuration (safe subset)
+  'npm_config_prefix', 'npm_config_registry',
+  // Common development tools
+  'EDITOR', 'VISUAL', 'PAGER',
+  // Git (safe subset - no credentials)
+  'GIT_AUTHOR_NAME', 'GIT_AUTHOR_EMAIL', 'GIT_COMMITTER_NAME', 'GIT_COMMITTER_EMAIL',
+  // Windows-specific
+  'USERPROFILE', 'APPDATA', 'LOCALAPPDATA', 'TEMP', 'TMP', 'SYSTEMROOT', 'WINDIR',
+  'HOMEDRIVE', 'HOMEPATH', 'COMPUTERNAME', 'USERNAME',
+  // Unix-specific
+  'TMPDIR', 'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'XDG_CACHE_HOME',
+];
+
+/**
+ * Environment variables that should NEVER be passed through.
+ * These typically contain secrets or sensitive credentials.
+ */
+const BLOCKED_ENV_VARS = [
+  // API keys and tokens
+  'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY', 'AZURE_API_KEY',
+  'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_SESSION_TOKEN',
+  'GITHUB_TOKEN', 'GITLAB_TOKEN', 'NPM_TOKEN', 'PYPI_TOKEN',
+  // Database credentials
+  'DATABASE_URL', 'DATABASE_PASSWORD', 'DB_PASSWORD', 'POSTGRES_PASSWORD',
+  'MYSQL_PASSWORD', 'REDIS_PASSWORD', 'MONGODB_PASSWORD',
+  // OAuth/Auth secrets
+  'CLIENT_SECRET', 'JWT_SECRET', 'SESSION_SECRET', 'AUTH_SECRET',
+  'COOKIE_SECRET', 'ENCRYPTION_KEY',
+  // Cloud provider credentials
+  'GOOGLE_APPLICATION_CREDENTIALS', 'AZURE_CLIENT_SECRET',
+  // Private keys
+  'PRIVATE_KEY', 'SSH_PRIVATE_KEY', 'SSL_KEY',
+  // Generic patterns
+  'API_KEY', 'SECRET', 'TOKEN', 'PASSWORD', 'CREDENTIAL',
+];
+
+/**
+ * Filter environment variables to only include safe ones.
+ * Never passes API keys, passwords, or other secrets to child processes.
+ */
+function filterEnvVars(allowedVars?: string[]): Record<string, string> {
+  const config = getConfig();
+  const configAllowedVars = config.tools.bash.allowedEnvVars || [];
+  const logger = getLogger();
+
+  // Combine default safe vars with config-specified vars
+  const safeVars = new Set([
+    ...DEFAULT_SAFE_ENV_VARS,
+    ...configAllowedVars,
+    ...(allowedVars || []),
+  ]);
+
+  const filteredEnv: Record<string, string> = {};
+
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value === undefined) continue;
+
+    // Check if explicitly blocked
+    const isBlocked = BLOCKED_ENV_VARS.some((blocked) => {
+      // Exact match or contains pattern
+      return key === blocked || key.includes(blocked);
+    });
+
+    if (isBlocked) {
+      logger.debug(`Blocked env var from bash: ${key}`, { envVar: key });
+      continue;
+    }
+
+    // Check if in safe list
+    if (safeVars.has(key)) {
+      filteredEnv[key] = value;
+    }
+  }
+
+  return filteredEnv;
+}
 
 /**
  * Generate a unique task ID
@@ -110,9 +201,12 @@ export class BashTool extends BaseTool {
       let stderr = '';
       let killed = false;
 
+      // Use filtered environment variables to prevent secret leakage
+      const safeEnv = filterEnvVars();
+
       const child = spawn(shell, args, {
         cwd,
-        env: process.env,
+        env: safeEnv,
         stdio: ['pipe', 'pipe', 'pipe'],
       });
 
@@ -206,9 +300,12 @@ export class BashTool extends BaseTool {
   ): ToolResult {
     const taskId = generateTaskId();
 
+    // Use filtered environment variables to prevent secret leakage
+    const safeEnv = filterEnvVars();
+
     const child = spawn(shell, args, {
       cwd,
-      env: process.env,
+      env: safeEnv,
       stdio: ['pipe', 'pipe', 'pipe'],
       detached: true,
     });

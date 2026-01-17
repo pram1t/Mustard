@@ -64,6 +64,17 @@ export { GrepTool } from './builtin/grep';
 // Shell operations
 export { BashTool } from './builtin/bash';
 
+// ============================================================================
+// Security Utilities
+// ============================================================================
+
+export {
+  sanitizePath,
+  validateRegexPattern,
+  validateCommand,
+  auditLog,
+} from './security';
+
 // Note: The following tools are planned but not yet implemented:
 // export { WebFetchTool } from './builtin/web-fetch';
 // export { AskUserTool } from './builtin/ask-user';

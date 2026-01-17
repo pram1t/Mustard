@@ -225,7 +225,7 @@ import {
 |------------|-------|-------------|
 | LLMRouter | 17 | Router functionality, fallback, retry |
 
-### Tools Package (30 tests)
+### Tools Package (43 tests)
 
 | Test Suite | Tests | Description |
 |------------|-------|-------------|
@@ -233,8 +233,9 @@ import {
 | WriteTool | 4 | File creation, overwrite, directories |
 | EditTool | 6 | String replacement, uniqueness, delete |
 | ToolRegistry | 14 | Registration, execution, defaults |
+| Security | 13 | Path sanitization, regex validation, command validation |
 
-**Total: 73 tests**
+**Total: 86 tests**
 
 ## Running Specific Tests
 

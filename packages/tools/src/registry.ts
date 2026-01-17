@@ -13,6 +13,7 @@ import type {
   IToolRegistry,
 } from './types';
 import { getLogger } from '@openagent/logger';
+import { auditLog } from './security';
 
 // Import built-in tools
 import { ReadTool } from './builtin/read';
@@ -125,6 +126,10 @@ export class ToolRegistry implements IToolRegistry {
     try {
       const startTime = Date.now();
       this.logger.debug(`Executing tool: ${name}`, { toolName: name, params });
+
+      // Audit log the execution (if enabled)
+      auditLog(name, params, context);
+
       const result = await tool.execute(params, context);
       const duration = Date.now() - startTime;
       this.logger.debug(`Tool execution completed: ${name}`, {
