@@ -1,0 +1,250 @@
+/**
+ * Bash Tool
+ *
+ * Executes shell commands with support for:
+ * - Timeout configuration
+ * - Working directory
+ * - Output truncation
+ * - Background execution
+ */
+
+import { spawn, ChildProcess } from 'child_process';
+import * as path from 'path';
+import { BaseTool } from '../base';
+import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+
+// Default timeout: 2 minutes
+const DEFAULT_TIMEOUT = 120000;
+
+// Maximum timeout: 10 minutes
+const MAX_TIMEOUT = 600000;
+
+// Maximum output size: 30000 characters
+const MAX_OUTPUT_SIZE = 30000;
+
+// Background processes map
+const backgroundProcesses = new Map<string, ChildProcess>();
+
+/**
+ * Generate a unique task ID
+ */
+function generateTaskId(): string {
+  return `task_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+
+/**
+ * BashTool - Executes shell commands
+ */
+export class BashTool extends BaseTool {
+  readonly name = 'Bash';
+  readonly description = 'Executes shell commands in a bash shell. Use for system operations, git commands, package management, etc.';
+  readonly parameters: ToolParameters = {
+    type: 'object',
+    properties: {
+      command: {
+        type: 'string',
+        description: 'The command to execute',
+      },
+      timeout: {
+        type: 'number',
+        description: 'Optional timeout in milliseconds (max 600000, default 120000)',
+      },
+      cwd: {
+        type: 'string',
+        description: 'Optional working directory for the command',
+      },
+      run_in_background: {
+        type: 'boolean',
+        description: 'Run the command in the background and return a task ID',
+        default: false,
+      },
+    },
+    required: ['command'],
+  };
+
+  async execute(
+    params: Record<string, unknown>,
+    context: ExecutionContext
+  ): Promise<ToolResult> {
+    return this.safeExecute(params, context, async () => {
+      const command = params.command as string;
+      const timeout = Math.min(
+        (params.timeout as number) || DEFAULT_TIMEOUT,
+        MAX_TIMEOUT
+      );
+      const runInBackground = (params.run_in_background as boolean) || false;
+
+      // Resolve working directory
+      const cwd = params.cwd
+        ? path.isAbsolute(params.cwd as string)
+          ? params.cwd as string
+          : path.resolve(context.cwd, params.cwd as string)
+        : context.cwd;
+
+      // Determine the shell based on platform
+      const isWindows = process.platform === 'win32';
+      const shell = isWindows ? 'cmd.exe' : '/bin/bash';
+      const shellArgs = isWindows ? ['/c', command] : ['-c', command];
+
+      if (runInBackground) {
+        return this.executeInBackground(shell, shellArgs, cwd);
+      }
+
+      return this.executeSync(shell, shellArgs, cwd, timeout, context.signal);
+    });
+  }
+
+  /**
+   * Execute command synchronously with timeout
+   */
+  private async executeSync(
+    shell: string,
+    args: string[],
+    cwd: string,
+    timeout: number,
+    signal?: AbortSignal
+  ): Promise<ToolResult> {
+    return new Promise((resolve) => {
+      let stdout = '';
+      let stderr = '';
+      let killed = false;
+
+      const child = spawn(shell, args, {
+        cwd,
+        env: process.env,
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+
+      // Set up timeout
+      const timeoutId = setTimeout(() => {
+        killed = true;
+        child.kill('SIGKILL');
+      }, timeout);
+
+      // Handle abort signal
+      if (signal) {
+        signal.addEventListener('abort', () => {
+          killed = true;
+          child.kill('SIGKILL');
+        }, { once: true });
+      }
+
+      // Collect stdout
+      child.stdout?.on('data', (data: Buffer) => {
+        stdout += data.toString();
+        // Truncate if too large
+        if (stdout.length > MAX_OUTPUT_SIZE * 2) {
+          stdout = stdout.substring(0, MAX_OUTPUT_SIZE * 2);
+        }
+      });
+
+      // Collect stderr
+      child.stderr?.on('data', (data: Buffer) => {
+        stderr += data.toString();
+        // Truncate if too large
+        if (stderr.length > MAX_OUTPUT_SIZE * 2) {
+          stderr = stderr.substring(0, MAX_OUTPUT_SIZE * 2);
+        }
+      });
+
+      // Handle process completion
+      child.on('close', (code) => {
+        clearTimeout(timeoutId);
+
+        // Combine output
+        let output = stdout;
+        if (stderr) {
+          output += (output ? '\n' : '') + stderr;
+        }
+
+        // Truncate final output if needed
+        let truncated = false;
+        if (output.length > MAX_OUTPUT_SIZE) {
+          output = output.substring(0, MAX_OUTPUT_SIZE) + '\n...[output truncated]';
+          truncated = true;
+        }
+
+        if (killed) {
+          resolve(this.failure(
+            `Command timed out after ${timeout}ms`,
+            output
+          ));
+          return;
+        }
+
+        const exitCode = code ?? 0;
+        const success = exitCode === 0;
+
+        resolve({
+          success,
+          output: output || (success ? '(no output)' : ''),
+          error: success ? undefined : `Command exited with code ${exitCode}`,
+          metadata: {
+            exitCode,
+            truncated,
+            tokensUsed: this.estimateTokens(output),
+          },
+        });
+      });
+
+      // Handle spawn errors
+      child.on('error', (error) => {
+        clearTimeout(timeoutId);
+        resolve(this.failure(`Failed to execute command: ${error.message}`));
+      });
+    });
+  }
+
+  /**
+   * Execute command in background
+   */
+  private executeInBackground(
+    shell: string,
+    args: string[],
+    cwd: string
+  ): ToolResult {
+    const taskId = generateTaskId();
+
+    const child = spawn(shell, args, {
+      cwd,
+      env: process.env,
+      stdio: ['pipe', 'pipe', 'pipe'],
+      detached: true,
+    });
+
+    backgroundProcesses.set(taskId, child);
+
+    // Clean up when process exits
+    child.on('close', () => {
+      backgroundProcesses.delete(taskId);
+    });
+
+    return this.success(
+      `Command started in background with task ID: ${taskId}`,
+      {
+        taskId,
+        pid: child.pid,
+      }
+    );
+  }
+
+  /**
+   * Get a background process by task ID (static method for external use)
+   */
+  static getBackgroundProcess(taskId: string): ChildProcess | undefined {
+    return backgroundProcesses.get(taskId);
+  }
+
+  /**
+   * Kill a background process by task ID
+   */
+  static killBackgroundProcess(taskId: string): boolean {
+    const process = backgroundProcesses.get(taskId);
+    if (process) {
+      process.kill('SIGKILL');
+      backgroundProcesses.delete(taskId);
+      return true;
+    }
+    return false;
+  }
+}

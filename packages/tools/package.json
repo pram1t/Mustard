@@ -15,9 +15,14 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
-  "keywords": ["openagent", "tools"],
+  "keywords": [
+    "openagent",
+    "tools"
+  ],
   "license": "MIT",
   "devDependencies": {
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
