@@ -16,7 +16,7 @@ import type {
   ToolCall,
   ProviderCapabilities,
   ValidationResult,
-} from '../types';
+} from '../types.js';
 
 /**
  * OpenAI provider configuration
@@ -40,7 +40,7 @@ interface PartialToolCall {
  * OpenAI LLM Provider
  */
 export class OpenAIProvider implements LLMProvider {
-  readonly name = 'openai';
+  readonly name: string = 'openai';
   readonly models = [
     'gpt-4o',
     'gpt-4o-mini',
@@ -254,20 +254,34 @@ export class OpenAIProvider implements LLMProvider {
 
       if (msg.role === 'assistant') {
         // Handle multi-modal content for assistant
-        if (Array.isArray(msg.content)) {
-          return {
-            role: 'assistant',
-            content: msg.content.map(part => {
+        const content = Array.isArray(msg.content)
+          ? msg.content.map(part => {
               if (part.type === 'text') {
                 return { type: 'text' as const, text: part.text };
               }
               return { type: 'text' as const, text: '[image]' };
-            }),
+            })
+          : msg.content;
+
+        // Include tool_calls if present (required by OpenAI API)
+        if (msg.tool_calls && msg.tool_calls.length > 0) {
+          return {
+            role: 'assistant',
+            content: content || null,
+            tool_calls: msg.tool_calls.map(tc => ({
+              id: tc.id,
+              type: 'function' as const,
+              function: {
+                name: tc.name,
+                arguments: JSON.stringify(tc.arguments),
+              },
+            })),
           };
         }
+
         return {
           role: 'assistant',
-          content: msg.content,
+          content: content,
         };
       }
 

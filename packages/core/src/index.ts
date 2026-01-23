@@ -1,11 +1,45 @@
 /**
  * @openagent/core
- * Core functionality for OpenAgent
+ *
+ * Core functionality for OpenAgent.
+ * Provides the agent loop, context management, and tool execution orchestration.
  */
 
 export const version = '0.0.0';
 
-// Placeholder export to make the package buildable
-export function init() {
-  return { version };
-}
+// ============================================================================
+// Context Management
+// ============================================================================
+
+export type { ContextConfig, ContextState } from './context/types.js';
+export { DEFAULT_CONTEXT_CONFIG } from './context/types.js';
+export { ContextManager } from './context/manager.js';
+
+// ============================================================================
+// Agent Loop
+// ============================================================================
+
+export type {
+  AgentConfig,
+  AgentEvent,
+  AgentState,
+  RunOptions,
+  TextEvent,
+  ToolCallEvent,
+  ToolResultEvent,
+  ErrorEvent,
+  DoneEvent,
+  ThinkingEvent,
+  CompactionEvent,
+} from './agent/types.js';
+
+export { DEFAULT_AGENT_CONFIG } from './agent/types.js';
+export { AgentLoop, createAgent } from './agent/loop.js';
+export { executeTools, executeSingleTool, validateToolCalls } from './agent/execution.js';
+
+// ============================================================================
+// System Prompt Utilities
+// ============================================================================
+
+export { createSystemPrompt } from './agent/system-prompt.js';
+export type { SystemPromptOptions } from './agent/system-prompt.js';

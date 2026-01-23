@@ -16,7 +16,7 @@ export {
   LLMConfigSchema,
   ToolConfigSchema,
   SecurityConfigSchema,
-} from './schema';
+} from './schema.js';
 
 export type {
   Config,
@@ -27,7 +27,7 @@ export type {
   LLMConfig,
   ToolConfig,
   SecurityConfig,
-} from './schema';
+} from './schema.js';
 
 // Loader
 export {
@@ -38,4 +38,4 @@ export {
   resetConfig,
   getConfigValue,
   ConfigError,
-} from './loader';
+} from './loader.js';

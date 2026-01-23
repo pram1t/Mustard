@@ -9,11 +9,19 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "dev": "tsx --watch src/index.ts",
+    "clean": "rm -rf dist",
+    "start": "tsx src/index.ts"
   },
-  "keywords": ["openagent", "cli"],
+  "keywords": ["openagent", "cli", "agent", "ai"],
   "license": "MIT",
+  "dependencies": {
+    "@openagent/config": "*",
+    "@openagent/core": "*",
+    "@openagent/llm": "*",
+    "@openagent/logger": "*",
+    "@openagent/tools": "*"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.9.3"

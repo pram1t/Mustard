@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "An open-source, LLM-agnostic agentic coding assistant",
   "private": true,
+  "type": "module",
   "packageManager": "npm@10.0.0",
   "workspaces": [
     "apps/*",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@types/node": "^25.0.9",
     "@vitest/coverage-v8": "^4.0.17",
+    "tsx": "^4.21.0",
     "turbo": "^2.7.5",
     "typescript": "^5.9.3",
     "vitest": "^4.0.17"

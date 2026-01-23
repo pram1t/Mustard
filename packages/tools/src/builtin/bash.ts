@@ -10,8 +10,8 @@
 
 import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
-import { BaseTool } from '../base';
-import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+import { BaseTool } from '../base.js';
+import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 import { getConfig } from '@openagent/config';
 import { getLogger } from '@openagent/logger';
 

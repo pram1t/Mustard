@@ -11,8 +11,9 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { BaseTool } from '../base';
-import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+import { BaseTool } from '../base.js';
+import { validateRegexPattern } from '../security.js';
+import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 
 // Maximum files to search
 const MAX_FILES = 500;
@@ -215,6 +216,13 @@ export class GrepTool extends BaseTool {
       const showLineNumbers = params['-n'] !== false;
       const headLimit = (params.head_limit as number) || MAX_RESULTS;
       const offset = (params.offset as number) || 0;
+
+      // Validate regex pattern for ReDoS protection
+      try {
+        validateRegexPattern(pattern);
+      } catch (error) {
+        return this.failure(`Unsafe regex pattern: ${(error as Error).message}`);
+      }
 
       // Create regex
       let regex: RegExp;

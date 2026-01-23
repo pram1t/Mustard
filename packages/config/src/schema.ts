@@ -70,7 +70,7 @@ export const ToolConfigSchema = z.object({
  * Security configuration
  */
 export const SecurityConfigSchema = z.object({
-  auditLogging: z.boolean().default(false),
+  auditLogging: z.boolean().default(true),  // Enabled by default for security
   sanitizeInputs: z.boolean().default(true),
 });
 

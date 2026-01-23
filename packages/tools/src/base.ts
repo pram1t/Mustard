@@ -10,7 +10,7 @@ import type {
   ToolResult,
   ExecutionContext,
   JSONSchema,
-} from './types';
+} from './types.js';
 
 /**
  * Abstract base class for tools

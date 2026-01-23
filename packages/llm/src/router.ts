@@ -14,7 +14,7 @@ import type {
   RouterConfig,
   Message,
   ValidationResult,
-} from './types';
+} from './types.js';
 import { getLogger } from '@openagent/logger';
 
 /**

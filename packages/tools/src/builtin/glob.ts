@@ -9,8 +9,8 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { BaseTool } from '../base';
-import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+import { BaseTool } from '../base.js';
+import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 
 // Maximum number of results to return
 const MAX_RESULTS = 1000;
@@ -56,7 +56,10 @@ function matchGlob(pattern: string, filePath: string): boolean {
   regexStr += '$';
 
   try {
-    const regex = new RegExp(regexStr, 'i');
+    // Use case-insensitive matching only on Windows (where filesystem is case-insensitive)
+    // Unix filesystems are case-sensitive
+    const isWindows = process.platform === 'win32';
+    const regex = new RegExp(regexStr, isWindows ? 'i' : '');
     return regex.test(filePath);
   } catch {
     return false;

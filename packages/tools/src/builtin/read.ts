@@ -10,8 +10,8 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { BaseTool } from '../base';
-import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+import { BaseTool } from '../base.js';
+import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 
 // Maximum characters per line before truncation
 const MAX_LINE_LENGTH = 2000;

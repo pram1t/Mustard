@@ -9,8 +9,9 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { BaseTool } from '../base';
-import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+import { BaseTool } from '../base.js';
+import { sanitizePath } from '../security.js';
+import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 
 /**
  * WriteTool - Writes content to files
@@ -42,9 +43,12 @@ export class WriteTool extends BaseTool {
       const content = params.content as string;
 
       // Resolve path (handle relative paths)
-      const absolutePath = path.isAbsolute(filePath)
+      const resolvedPath = path.isAbsolute(filePath)
         ? filePath
         : path.resolve(context.cwd, filePath);
+
+      // Validate path for security (prevents path traversal and symlink attacks)
+      const absolutePath = sanitizePath(resolvedPath, context.cwd);
 
       // Get the directory path
       const dirPath = path.dirname(absolutePath);

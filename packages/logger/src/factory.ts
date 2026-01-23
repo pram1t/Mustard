@@ -9,7 +9,7 @@
  */
 
 import pino from 'pino';
-import type { LoggerConfig, LogLevel, LogContext, Logger } from './types';
+import type { LoggerConfig, LogLevel, LogContext, Logger } from './types.js';
 
 /**
  * Map string levels to Pino numeric levels

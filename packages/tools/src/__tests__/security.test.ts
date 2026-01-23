@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import {
@@ -11,6 +12,9 @@ import {
   validateCommand,
 } from '../security';
 import { resetConfig } from '@openagent/config';
+import { WriteTool } from '../builtin/write';
+import { EditTool } from '../builtin/edit';
+import { createTestContext } from '../registry';
 
 describe('Security', () => {
   beforeEach(() => {
@@ -91,6 +95,138 @@ describe('Security', () => {
     it('should reject very long commands', () => {
       const longCommand = 'echo ' + 'a'.repeat(40000);
       expect(() => validateCommand(longCommand)).toThrow('exceeds maximum length');
+    });
+  });
+
+  describe('Path Traversal - startsWith bypass prevention', () => {
+    it('should block /home/user-admin when base is /home/user', () => {
+      // This tests the startsWith() bypass vulnerability (SEC-001)
+      // e.g., /home/user-admin.startsWith('/home/user') returns true!
+      const baseDir = '/home/user';
+      const maliciousPath = '/home/user-admin/secret.txt';
+
+      // This should throw because user-admin is NOT inside user directory
+      expect(() => sanitizePath(maliciousPath, baseDir)).toThrow('Path must be within the working directory');
+    });
+
+    it('should block paths that look similar but escape', () => {
+      const baseDir = '/var/www/app';
+      const maliciousPath = '/var/www/app-backup/secrets.txt';
+
+      expect(() => sanitizePath(maliciousPath, baseDir)).toThrow('Path must be within the working directory');
+    });
+
+    it('should allow valid nested paths', () => {
+      const baseDir = os.tmpdir();
+      const validPath = 'nested/deeply/file.txt';
+
+      const result = sanitizePath(validPath, baseDir);
+      expect(result).toBe(path.join(baseDir, validPath));
+    });
+  });
+
+  describe('WriteTool Path Traversal Protection', () => {
+    let testDir: string;
+    let tool: WriteTool;
+
+    beforeEach(async () => {
+      testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'write-security-'));
+      tool = new WriteTool();
+    });
+
+    afterEach(async () => {
+      await fs.rm(testDir, { recursive: true, force: true });
+    });
+
+    it('should block writes outside working directory via relative path', async () => {
+      const context = createTestContext({ cwd: testDir });
+      const result = await tool.execute({
+        file_path: '../../../etc/malicious.txt',
+        content: 'malicious content',
+      }, context);
+
+      expect(result.success).toBe(false);
+      // The path is blocked either by the "path traversal" check or by the "working directory" check
+      expect(result.error?.toLowerCase()).toMatch(/path traversal|working directory/);
+    });
+
+    it('should block writes outside working directory via absolute path', async () => {
+      const context = createTestContext({ cwd: testDir });
+      const outsidePath = path.join(os.tmpdir(), 'some-other-dir', 'malicious.txt');
+
+      const result = await tool.execute({
+        file_path: outsidePath,
+        content: 'malicious content',
+      }, context);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+    });
+
+    it('should allow writes within working directory', async () => {
+      const context = createTestContext({ cwd: testDir });
+      const result = await tool.execute({
+        file_path: 'safe-file.txt',
+        content: 'safe content',
+      }, context);
+
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('EditTool Path Traversal Protection', () => {
+    let testDir: string;
+    let tool: EditTool;
+
+    beforeEach(async () => {
+      testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'edit-security-'));
+      tool = new EditTool();
+    });
+
+    afterEach(async () => {
+      await fs.rm(testDir, { recursive: true, force: true });
+    });
+
+    it('should block edits outside working directory via relative path', async () => {
+      const context = createTestContext({ cwd: testDir });
+      const result = await tool.execute({
+        file_path: '../../../etc/passwd',
+        old_string: 'root',
+        new_string: 'hacked',
+      }, context);
+
+      expect(result.success).toBe(false);
+      // The path is blocked either by the "path traversal" check or by the "working directory" check
+      expect(result.error?.toLowerCase()).toMatch(/path traversal|working directory/);
+    });
+
+    it('should block edits outside working directory via absolute path', async () => {
+      const context = createTestContext({ cwd: testDir });
+      const outsidePath = '/etc/passwd';
+
+      const result = await tool.execute({
+        file_path: outsidePath,
+        old_string: 'root',
+        new_string: 'hacked',
+      }, context);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+    });
+
+    it('should allow edits within working directory', async () => {
+      // Create a file to edit
+      const filePath = path.join(testDir, 'safe-file.txt');
+      await fs.writeFile(filePath, 'original content');
+
+      const context = createTestContext({ cwd: testDir });
+      const result = await tool.execute({
+        file_path: 'safe-file.txt',
+        old_string: 'original',
+        new_string: 'modified',
+      }, context);
+
+      expect(result.success).toBe(true);
     });
   });
 });

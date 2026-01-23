@@ -5,7 +5,7 @@
  */
 
 import { config as loadDotenv } from 'dotenv';
-import { ConfigSchema, Config, LogLevel, LogFormat, LLMProvider } from './schema';
+import { ConfigSchema, Config, LogLevel, LogFormat, LLMProvider } from './schema.js';
 import { ZodError } from 'zod';
 
 /**

@@ -44,17 +44,29 @@ export type {
 
   // Router types
   RouterConfig,
-} from './types';
+} from './types.js';
 
 // ============================================================================
 // Provider Adapters
 // ============================================================================
 
-export { OpenAIProvider } from './adapters/openai';
-export type { OpenAIConfig } from './adapters/openai';
+export { OpenAIProvider } from './adapters/openai.js';
+export type { OpenAIConfig } from './adapters/openai.js';
+
+export { AnthropicProvider } from './adapters/anthropic.js';
+export type { AnthropicConfig } from './adapters/anthropic.js';
+
+export { GeminiProvider } from './adapters/gemini.js';
+export type { GeminiConfig } from './adapters/gemini.js';
+
+export { OllamaProvider } from './adapters/ollama.js';
+export type { OllamaConfig } from './adapters/ollama.js';
+
+export { OpenAICompatibleProvider } from './adapters/openai-compatible.js';
+export type { OpenAICompatibleConfig } from './adapters/openai-compatible.js';
 
 // ============================================================================
 // Router
 // ============================================================================
 
-export { LLMRouter, createRouter } from './router';
+export { LLMRouter, createRouter } from './router.js';

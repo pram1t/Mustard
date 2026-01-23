@@ -8,6 +8,7 @@
  */
 
 import * as path from 'path';
+import * as fs from 'fs';
 import { getConfig } from '@openagent/config';
 import { getLogger } from '@openagent/logger';
 
@@ -73,12 +74,28 @@ export function sanitizePath(filePath: string, baseDir: string): string {
   }
 
   // Resolve to absolute path
-  const absolutePath = path.resolve(baseDir, filePath);
+  let absolutePath = path.resolve(baseDir, filePath);
   const normalizedBase = path.resolve(baseDir);
 
+  // Resolve symlinks to prevent symlink attacks
+  // This ensures we validate the actual target, not the symlink path
+  try {
+    absolutePath = fs.realpathSync(absolutePath);
+  } catch {
+    // File doesn't exist yet (write operation) - validate parent directory
+    const dir = path.dirname(absolutePath);
+    try {
+      const resolvedDir = fs.realpathSync(dir);
+      absolutePath = path.join(resolvedDir, path.basename(absolutePath));
+    } catch {
+      // Parent doesn't exist either, use original resolved path
+    }
+  }
+
   // Verify the resolved path is still within the base directory
-  // This catches cases where '../' wasn't explicitly present but resolution escapes
-  if (!absolutePath.startsWith(normalizedBase)) {
+  // Use path.relative() to properly check containment (prevents /home/user-admin bypass when base is /home/user)
+  const relative = path.relative(normalizedBase, absolutePath);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
     logger.warn('Path escapes base directory', {
       baseDir: normalizedBase,
       resolved: absolutePath.substring(0, 100),

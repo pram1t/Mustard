@@ -10,8 +10,9 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { BaseTool } from '../base';
-import type { ToolResult, ExecutionContext, ToolParameters } from '../types';
+import { BaseTool } from '../base.js';
+import { sanitizePath } from '../security.js';
+import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 
 /**
  * EditTool - Performs exact string replacements in files
@@ -54,9 +55,12 @@ export class EditTool extends BaseTool {
       const replaceAll = (params.replace_all as boolean) || false;
 
       // Resolve path (handle relative paths)
-      const absolutePath = path.isAbsolute(filePath)
+      const resolvedPath = path.isAbsolute(filePath)
         ? filePath
         : path.resolve(context.cwd, filePath);
+
+      // Validate path for security (prevents path traversal and symlink attacks)
+      const absolutePath = sanitizePath(resolvedPath, context.cwd);
 
       // Check if file exists
       try {

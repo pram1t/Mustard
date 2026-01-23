@@ -37,7 +37,7 @@ describe('Config', () => {
       expect(result.tools.bash.maxTimeout).toBe(120000);
       expect(result.tools.bash.maxOutputSize).toBe(30000);
       expect(result.tools.maxOutputSize).toBe(100000);
-      expect(result.security.auditLogging).toBe(false);
+      expect(result.security.auditLogging).toBe(true);  // Default changed for security
       expect(result.security.sanitizeInputs).toBe(true);
     });
 

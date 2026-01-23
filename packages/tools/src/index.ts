@@ -31,38 +31,38 @@ export type {
   // Registry types
   ExecuteOptions,
   IToolRegistry,
-} from './types';
+} from './types.js';
 
 // ============================================================================
 // Base Tool
 // ============================================================================
 
-export { BaseTool, createTool } from './base';
+export { BaseTool, createTool } from './base.js';
 
 // ============================================================================
 // Registry
 // ============================================================================
 
-export { ToolRegistry, createDefaultRegistry, createTestContext } from './registry';
+export { ToolRegistry, createDefaultRegistry, createTestContext } from './registry.js';
 
 // ============================================================================
 // Built-in Tools
 // ============================================================================
 
-export { BUILTIN_TOOL_NAMES } from './builtin';
-export type { BuiltinToolName } from './builtin';
+export { BUILTIN_TOOL_NAMES } from './builtin/index.js';
+export type { BuiltinToolName } from './builtin/index.js';
 
 // File operations
-export { ReadTool } from './builtin/read';
-export { WriteTool } from './builtin/write';
-export { EditTool } from './builtin/edit';
+export { ReadTool } from './builtin/read.js';
+export { WriteTool } from './builtin/write.js';
+export { EditTool } from './builtin/edit.js';
 
 // Search operations
-export { GlobTool } from './builtin/glob';
-export { GrepTool } from './builtin/grep';
+export { GlobTool } from './builtin/glob.js';
+export { GrepTool } from './builtin/grep.js';
 
 // Shell operations
-export { BashTool } from './builtin/bash';
+export { BashTool } from './builtin/bash.js';
 
 // ============================================================================
 // Security Utilities
@@ -73,7 +73,7 @@ export {
   validateRegexPattern,
   validateCommand,
   auditLog,
-} from './security';
+} from './security.js';
 
 // Note: The following tools are planned but not yet implemented:
 // export { WebFetchTool } from './builtin/web-fetch';

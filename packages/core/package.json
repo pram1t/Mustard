@@ -1,7 +1,7 @@
 {
   "name": "@openagent/core",
   "version": "0.0.0",
-  "description": "Core functionality for OpenAgent",
+  "description": "Core functionality for OpenAgent - Agent Loop and Context Management",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -15,8 +15,14 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
-  "keywords": ["openagent", "core"],
+  "keywords": ["openagent", "core", "agent", "llm"],
   "license": "MIT",
+  "dependencies": {
+    "@openagent/config": "*",
+    "@openagent/logger": "*",
+    "@openagent/llm": "*",
+    "@openagent/tools": "*"
+  },
   "devDependencies": {
     "typescript": "^5.9.3"
   }

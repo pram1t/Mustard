@@ -11,17 +11,17 @@ import type {
   ExecutionContext,
   ExecuteOptions,
   IToolRegistry,
-} from './types';
+} from './types.js';
 import { getLogger } from '@openagent/logger';
-import { auditLog } from './security';
+import { auditLog } from './security.js';
 
 // Import built-in tools
-import { ReadTool } from './builtin/read';
-import { WriteTool } from './builtin/write';
-import { EditTool } from './builtin/edit';
-import { GlobTool } from './builtin/glob';
-import { GrepTool } from './builtin/grep';
-import { BashTool } from './builtin/bash';
+import { ReadTool } from './builtin/read.js';
+import { WriteTool } from './builtin/write.js';
+import { EditTool } from './builtin/edit.js';
+import { GlobTool } from './builtin/glob.js';
+import { GrepTool } from './builtin/grep.js';
+import { BashTool } from './builtin/bash.js';
 
 /**
  * Tool Registry

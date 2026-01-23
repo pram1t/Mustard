@@ -7,7 +7,7 @@
 export const version = '0.0.0';
 
 // Types
-export type { LogLevel, LoggerConfig, LogContext, Logger } from './types';
+export type { LogLevel, LoggerConfig, LogContext, Logger } from './types.js';
 
 // Factory
 export {
@@ -15,4 +15,4 @@ export {
   getLogger,
   setDefaultLogger,
   resetDefaultLogger,
-} from './factory';
+} from './factory.js';

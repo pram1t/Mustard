@@ -48,6 +48,7 @@ export interface Message {
   content: string | ContentPart[];
   name?: string;           // For tool messages, the tool name
   tool_call_id?: string;   // For tool result messages
+  tool_calls?: ToolCall[]; // For assistant messages with tool calls
 }
 
 // ============================================================================
