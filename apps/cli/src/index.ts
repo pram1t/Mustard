@@ -7,6 +7,9 @@
  * Connects the agent loop with LLM providers and tools.
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import {
   OpenAIProvider,
   AnthropicProvider,
@@ -16,17 +19,80 @@ import {
   createRouter,
   type LLMProvider,
 } from '@openagent/llm';
-import { createDefaultRegistry } from '@openagent/tools';
+import { createDefaultRegistry, type ToolRegistry } from '@openagent/tools';
 import { AgentLoop } from '@openagent/core';
 import { createLogger, setDefaultLogger } from '@openagent/logger';
-import { loadConfig, validateStartup } from '@openagent/config';
+import { loadConfig, validateStartup, type HooksConfig } from '@openagent/config';
+import { createHookExecutor, type HookExecutor } from '@openagent/hooks';
+import {
+  MCPRegistry,
+  createRegistry,
+  type ServerConfig,
+  type StdioServerConfig,
+  type HttpServerConfig,
+  type AggregatedTool,
+  type CallToolResult,
+  type ContentItem,
+} from '@openagent/mcp';
+import type { Tool, ToolParameters, ToolResult, ExecutionContext } from '@openagent/tools';
 
 const VERSION = '0.0.0';
+
+/**
+ * MCP config file location
+ */
+const MCP_CONFIG_DIR = path.join(os.homedir(), '.openagent');
+const MCP_CONFIG_FILE = path.join(MCP_CONFIG_DIR, 'mcp.json');
+
+/**
+ * MCP configuration format
+ */
+interface MCPConfig {
+  servers: Record<string, ServerConfig>;
+}
+
+/**
+ * Load MCP configuration from file
+ */
+function loadMCPConfig(): MCPConfig {
+  try {
+    if (fs.existsSync(MCP_CONFIG_FILE)) {
+      const content = fs.readFileSync(MCP_CONFIG_FILE, 'utf-8');
+      return JSON.parse(content) as MCPConfig;
+    }
+  } catch {
+    // Ignore errors, return empty config
+  }
+  return { servers: {} };
+}
+
+/**
+ * Save MCP configuration to file
+ */
+function saveMCPConfig(config: MCPConfig): void {
+  if (!fs.existsSync(MCP_CONFIG_DIR)) {
+    fs.mkdirSync(MCP_CONFIG_DIR, { recursive: true });
+  }
+  fs.writeFileSync(MCP_CONFIG_FILE, JSON.stringify(config, null, 2));
+}
 
 /**
  * Supported providers
  */
 type ProviderName = 'openai' | 'anthropic' | 'gemini' | 'ollama' | 'openai-compatible';
+
+/**
+ * MCP subcommand arguments
+ */
+interface MCPSubcommand {
+  action: 'add' | 'remove' | 'list';
+  name?: string;
+  type?: 'stdio' | 'http';
+  command?: string;
+  url?: string;
+  args?: string[];
+  env?: Record<string, string>;
+}
 
 /**
  * Parse command line arguments
@@ -39,6 +105,7 @@ function parseArgs(): {
   baseUrl: string;
   prompt: string;
   verbose: boolean;
+  mcpSubcommand?: MCPSubcommand;
 } {
   const args = process.argv.slice(2);
   let help = false;
@@ -48,6 +115,49 @@ function parseArgs(): {
   let baseUrl = '';
   let verbose = false;
   const promptParts: string[] = [];
+  let mcpSubcommand: MCPSubcommand | undefined;
+
+  // Check for MCP subcommand
+  if (args[0] === 'mcp') {
+    const mcpAction = args[1];
+    if (mcpAction === 'list') {
+      mcpSubcommand = { action: 'list' };
+    } else if (mcpAction === 'add' && args[2]) {
+      const name = args[2];
+      let type: 'stdio' | 'http' = 'stdio';
+      let command = '';
+      let url = '';
+      const serverArgs: string[] = [];
+      const env: Record<string, string> = {};
+
+      for (let i = 3; i < args.length; i++) {
+        if (args[i] === '--type' || args[i] === '-t') {
+          type = args[++i] as 'stdio' | 'http';
+        } else if (args[i] === '--command' || args[i] === '-c') {
+          command = args[++i] || '';
+        } else if (args[i] === '--url' || args[i] === '-u') {
+          url = args[++i] || '';
+        } else if (args[i] === '--arg') {
+          serverArgs.push(args[++i] || '');
+        } else if (args[i] === '--env') {
+          const envPair = args[++i] || '';
+          const [key, value] = envPair.split('=');
+          if (key && value) {
+            env[key] = value;
+          }
+        }
+      }
+
+      mcpSubcommand = { action: 'add', name, type, command, url, args: serverArgs, env };
+    } else if (mcpAction === 'remove' && args[2]) {
+      mcpSubcommand = { action: 'remove', name: args[2] };
+    } else {
+      // Show MCP help
+      help = true;
+    }
+
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand };
+  }
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -77,6 +187,7 @@ function parseArgs(): {
     baseUrl,
     prompt: promptParts.join(' '),
     verbose,
+    mcpSubcommand,
   };
 }
 
@@ -88,6 +199,7 @@ function printHelp(): void {
 OpenAgent CLI v${VERSION}
 
 Usage: openagent [options] <prompt>
+       openagent mcp <subcommand> [options]
 
 Options:
   -h, --help        Show this help message
@@ -104,6 +216,16 @@ Providers:
   ollama            Local Ollama models (default: qwen2.5-coder:7b)
   openai-compatible Any OpenAI-compatible API (requires --base-url)
 
+MCP Subcommands:
+  mcp list                              List configured MCP servers
+  mcp add <name> [options]              Add an MCP server
+    --type, -t <stdio|http>             Server type (default: stdio)
+    --command, -c <command>             Command for stdio servers
+    --url, -u <url>                     URL for http servers
+    --arg <value>                       Additional argument (can repeat)
+    --env <KEY=VALUE>                   Environment variable (can repeat)
+  mcp remove <name>                     Remove an MCP server
+
 Environment Variables:
   OPENAI_API_KEY     For openai and openai-compatible providers
   ANTHROPIC_API_KEY  For anthropic provider
@@ -116,6 +238,12 @@ Examples:
   openagent --provider gemini -m gemini-1.5-flash "Hello"
   openagent --provider ollama --model llama3.2 "Hello"
   openagent --provider openai-compatible --base-url http://localhost:1234/v1 "Hi"
+
+MCP Examples:
+  openagent mcp add filesystem --type stdio --command "npx @modelcontextprotocol/server-filesystem"
+  openagent mcp add api-server --type http --url http://localhost:3000
+  openagent mcp list
+  openagent mcp remove filesystem
 `);
 }
 
@@ -185,6 +313,184 @@ function createProvider(
 }
 
 /**
+ * Handle MCP subcommands
+ */
+async function handleMCPSubcommand(subcommand: MCPSubcommand): Promise<void> {
+  const mcpConfig = loadMCPConfig();
+
+  switch (subcommand.action) {
+    case 'list': {
+      const servers = Object.entries(mcpConfig.servers);
+      if (servers.length === 0) {
+        console.log('No MCP servers configured.');
+        console.log('Use "openagent mcp add <name> ..." to add a server.');
+      } else {
+        console.log('Configured MCP servers:\n');
+        for (const [name, config] of servers) {
+          if (config.type === 'stdio') {
+            const stdioConfig = config as StdioServerConfig;
+            console.log(`  ${name} (stdio)`);
+            console.log(`    Command: ${stdioConfig.command}`);
+            if (stdioConfig.args?.length) {
+              console.log(`    Args: ${stdioConfig.args.join(' ')}`);
+            }
+            if (stdioConfig.env && Object.keys(stdioConfig.env).length) {
+              console.log(`    Env: ${Object.keys(stdioConfig.env).join(', ')}`);
+            }
+          } else {
+            const httpConfig = config as HttpServerConfig;
+            console.log(`  ${name} (http)`);
+            console.log(`    URL: ${httpConfig.url}`);
+          }
+          console.log('');
+        }
+      }
+      break;
+    }
+
+    case 'add': {
+      if (!subcommand.name) {
+        console.error('Error: Server name is required.');
+        process.exit(1);
+      }
+
+      if (mcpConfig.servers[subcommand.name]) {
+        console.error(`Error: Server '${subcommand.name}' already exists. Remove it first.`);
+        process.exit(1);
+      }
+
+      let config: ServerConfig;
+      if (subcommand.type === 'http') {
+        if (!subcommand.url) {
+          console.error('Error: --url is required for http servers.');
+          process.exit(1);
+        }
+        config = {
+          type: 'http',
+          url: subcommand.url,
+        } as HttpServerConfig;
+      } else {
+        if (!subcommand.command) {
+          console.error('Error: --command is required for stdio servers.');
+          process.exit(1);
+        }
+        config = {
+          type: 'stdio',
+          command: subcommand.command,
+          args: subcommand.args?.length ? subcommand.args : undefined,
+          env: subcommand.env && Object.keys(subcommand.env).length ? subcommand.env : undefined,
+        } as StdioServerConfig;
+      }
+
+      mcpConfig.servers[subcommand.name] = config;
+      saveMCPConfig(mcpConfig);
+      console.log(`Added MCP server '${subcommand.name}'.`);
+      break;
+    }
+
+    case 'remove': {
+      if (!subcommand.name) {
+        console.error('Error: Server name is required.');
+        process.exit(1);
+      }
+
+      if (!mcpConfig.servers[subcommand.name]) {
+        console.error(`Error: Server '${subcommand.name}' not found.`);
+        process.exit(1);
+      }
+
+      delete mcpConfig.servers[subcommand.name];
+      saveMCPConfig(mcpConfig);
+      console.log(`Removed MCP server '${subcommand.name}'.`);
+      break;
+    }
+  }
+}
+
+/**
+ * Wrapper class for MCP tools to work with ToolRegistry
+ */
+class MCPToolWrapper implements Tool {
+  readonly name: string;
+  readonly description: string;
+  readonly parameters: ToolParameters;
+
+  constructor(
+    private mcpTool: AggregatedTool,
+    private registry: MCPRegistry
+  ) {
+    this.name = mcpTool.name;
+    this.description = mcpTool.description;
+    this.parameters = mcpTool.parameters as ToolParameters;
+  }
+
+  async execute(params: Record<string, unknown>, _context: ExecutionContext): Promise<ToolResult> {
+    try {
+      const result: CallToolResult = await this.registry.callTool(this.name, params);
+
+      // Convert MCP content to string output
+      const output = result.content
+        .map((item: ContentItem) => {
+          if (item.type === 'text') {
+            return item.text;
+          } else if (item.type === 'image') {
+            return `[Image: ${item.mimeType}]`;
+          } else if (item.type === 'resource') {
+            return item.resource.text || `[Resource: ${item.resource.uri}]`;
+          }
+          return '';
+        })
+        .join('\n');
+
+      return {
+        success: !result.isError,
+        output,
+        error: result.isError ? output : undefined,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        output: '',
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
+}
+
+/**
+ * Create MCP registry and connect to servers
+ */
+async function createMCPRegistry(verbose: boolean): Promise<MCPRegistry | null> {
+  const mcpConfig = loadMCPConfig();
+
+  if (Object.keys(mcpConfig.servers).length === 0) {
+    return null;
+  }
+
+  const registry = createRegistry(mcpConfig.servers);
+
+  if (verbose) {
+    console.log(`[MCP] Connecting to ${Object.keys(mcpConfig.servers).length} server(s)...`);
+  }
+
+  await registry.connectAll();
+
+  const tools = registry.getAllTools();
+  if (verbose && tools.length > 0) {
+    console.log(`[MCP] Loaded ${tools.length} tool(s) from MCP servers`);
+  }
+
+  return registry;
+}
+
+/**
+ * Get wrapped MCP tools as Tool instances
+ */
+function getMCPTools(registry: MCPRegistry): Tool[] {
+  return registry.getAllTools().map((tool) => new MCPToolWrapper(tool, registry));
+}
+
+/**
  * Main entry point
  */
 async function main(): Promise<void> {
@@ -198,6 +504,12 @@ async function main(): Promise<void> {
 
   if (args.version) {
     console.log(`OpenAgent CLI v${VERSION}`);
+    process.exit(0);
+  }
+
+  // Handle MCP subcommands
+  if (args.mcpSubcommand) {
+    await handleMCPSubcommand(args.mcpSubcommand);
     process.exit(0);
   }
 
@@ -248,12 +560,52 @@ async function main(): Promise<void> {
     // Create tool registry
     const tools = createDefaultRegistry();
 
-    logger.debug('Tools registered', { count: tools.count, tools: tools.getNames() });
+    logger.debug('Built-in tools registered', { count: tools.count, tools: tools.getNames() });
+
+    // Load MCP tools
+    let mcpRegistry: MCPRegistry | null = null;
+    try {
+      mcpRegistry = await createMCPRegistry(args.verbose);
+      if (mcpRegistry) {
+        const mcpTools = getMCPTools(mcpRegistry);
+        tools.registerAll(mcpTools);
+        logger.debug('MCP tools registered', {
+          count: mcpTools.length,
+          tools: mcpTools.map((t) => t.name),
+        });
+      }
+    } catch (error) {
+      logger.warn('Failed to load MCP tools', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      if (args.verbose) {
+        console.warn(`[MCP] Warning: Failed to load MCP tools: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
+    // Create hook executor if hooks are configured
+    let hookExecutor: HookExecutor | undefined;
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+    if (config.hooks && Object.values(config.hooks).some(arr => arr && arr.length > 0)) {
+      hookExecutor = createHookExecutor(config.hooks, {
+        sessionId,
+        cwd: process.cwd(),
+      });
+
+      const hookCount = Object.values(config.hooks).reduce((sum, arr) => sum + (arr?.length || 0), 0);
+      logger.debug('Hooks loaded', { count: hookCount });
+      if (args.verbose) {
+        console.log(`[Hooks] Loaded ${hookCount} hook(s)`);
+      }
+    }
 
     // Create agent - system prompt is auto-generated with OS awareness by @openagent/core
     const agent = new AgentLoop(router, {
       tools,
       cwd: process.cwd(),
+      sessionId,
+      hooks: hookExecutor,
       // systemPrompt is automatically generated with:
       // - OS detection (Windows/macOS/Linux)
       // - Shell information (cmd.exe vs Bash)
@@ -306,6 +658,25 @@ async function main(): Promise<void> {
           }
           break;
 
+        case 'hook_triggered':
+          if (args.verbose) {
+            console.log(`\n[Hook: ${event.event} (${event.hookCount} hook(s))]`);
+          }
+          break;
+
+        case 'hook_blocked':
+          console.log(`\n[Hook blocked: ${event.event}]`);
+          if (event.reason) {
+            console.log(`  Reason: ${event.reason}`);
+          }
+          break;
+
+        case 'hook_output':
+          if (args.verbose && event.output) {
+            console.log(`[Hook output: ${event.output}]`);
+          }
+          break;
+
         case 'done':
           // Ensure output ends with newline
           console.log('');
@@ -314,6 +685,11 @@ async function main(): Promise<void> {
           }
           break;
       }
+    }
+
+    // Cleanup MCP connections
+    if (mcpRegistry) {
+      await mcpRegistry.disconnectAll();
     }
 
   } catch (error) {

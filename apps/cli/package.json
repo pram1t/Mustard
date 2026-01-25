@@ -18,8 +18,10 @@
   "dependencies": {
     "@openagent/config": "*",
     "@openagent/core": "*",
+    "@openagent/hooks": "*",
     "@openagent/llm": "*",
     "@openagent/logger": "*",
+    "@openagent/mcp": "*",
     "@openagent/tools": "*"
   },
   "devDependencies": {

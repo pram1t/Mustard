@@ -16,6 +16,9 @@ export {
   LLMConfigSchema,
   ToolConfigSchema,
   SecurityConfigSchema,
+  HookMatcherSchema,
+  HookConfigSchema,
+  HooksConfigSchema,
 } from './schema.js';
 
 export type {
@@ -27,6 +30,9 @@ export type {
   LLMConfig,
   ToolConfig,
   SecurityConfig,
+  HookMatcher,
+  HookConfig,
+  HooksConfig,
 } from './schema.js';
 
 // Loader

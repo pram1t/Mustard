@@ -6,6 +6,10 @@
 
 import type { Message, ToolCall, ToolDefinition } from '@openagent/llm';
 import type { ToolResult, IToolRegistry } from '@openagent/tools';
+import type { HookExecutor, HookEvent as HookEventType } from '@openagent/hooks';
+
+// Re-export HookEvent for convenience
+export type { HookEventType as HookEvent };
 import type { ContextConfig } from '../context/types';
 import { createSystemPrompt } from './system-prompt.js';
 
@@ -52,6 +56,11 @@ export interface AgentConfig {
    * Home directory for tools
    */
   homeDir?: string;
+
+  /**
+   * Hook executor for lifecycle events
+   */
+  hooks?: HookExecutor;
 }
 
 /**
@@ -135,6 +144,33 @@ export interface CompactionEvent {
 }
 
 /**
+ * Hook triggered event - when a hook is executed
+ */
+export interface HookTriggeredEvent {
+  type: 'hook_triggered';
+  event: HookEventType;
+  hookCount: number;
+}
+
+/**
+ * Hook blocked event - when a hook blocks an action
+ */
+export interface HookBlockedEvent {
+  type: 'hook_blocked';
+  event: HookEventType;
+  reason?: string;
+}
+
+/**
+ * Hook output event - when a hook produces output
+ */
+export interface HookOutputEvent {
+  type: 'hook_output';
+  event: HookEventType;
+  output: string;
+}
+
+/**
  * Union type for all agent events
  */
 export type AgentEvent =
@@ -144,7 +180,10 @@ export type AgentEvent =
   | ErrorEvent
   | DoneEvent
   | ThinkingEvent
-  | CompactionEvent;
+  | CompactionEvent
+  | HookTriggeredEvent
+  | HookBlockedEvent
+  | HookOutputEvent;
 
 // ============================================================================
 // Agent State

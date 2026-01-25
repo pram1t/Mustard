@@ -9,6 +9,7 @@ import { randomUUID } from 'crypto';
 import type { Message, ChatParams, ToolCall, StreamChunk, ToolDefinition } from '@openagent/llm';
 import type { LLMRouter } from '@openagent/llm';
 import type { ToolResult, ExecutionContext } from '@openagent/tools';
+import type { HookExecutor, HookResult } from '@openagent/hooks';
 import { getLogger } from '@openagent/logger';
 import { ContextManager } from '../context/manager.js';
 import type {
@@ -20,6 +21,16 @@ import type {
 import { DEFAULT_AGENT_CONFIG } from './types.js';
 import { executeTools } from './execution.js';
 import { createSystemPrompt } from './system-prompt.js';
+
+/**
+ * Result from tool execution with hooks
+ */
+interface ToolExecutionResult {
+  toolCallId: string;
+  toolName: string;
+  result: ToolResult;
+  hookEvents: AgentEvent[];
+}
 
 /**
  * Agent Loop
@@ -41,6 +52,7 @@ interface ResolvedAgentConfig {
   cwd: string;
   sessionId: string;
   homeDir: string;
+  hooks?: HookExecutor;
 }
 
 export class AgentLoop {
@@ -74,6 +86,7 @@ export class AgentLoop {
       cwd,
       sessionId: config.sessionId || this.generateSessionId(),
       homeDir: config.homeDir || process.env.HOME || process.env.USERPROFILE || '',
+      hooks: config.hooks,
     };
 
     // Create context manager using the router's primary provider
@@ -113,6 +126,7 @@ export class AgentLoop {
     const logger = getLogger();
     const maxIterations = options.maxIterations || this.config.maxIterations;
     const signal = options.signal;
+    const hooks = this.config.hooks;
 
     // Initialize if needed
     await this.initialize();
@@ -124,13 +138,38 @@ export class AgentLoop {
       isRunning: true,
     };
 
+    // Trigger session_start hook
+    if (hooks?.hasHooks('session_start')) {
+      const hookResult = await hooks.trigger('session_start', {});
+      yield* this.emitHookEvents('session_start', hookResult, hooks.getHookCount('session_start'));
+      if (hookResult.blocked) {
+        yield { type: 'error', error: hookResult.output || 'Blocked by session_start hook', recoverable: false };
+        return;
+      }
+    }
+
+    // Trigger user_prompt_submit hook (can modify message)
+    let processedMessage = userMessage;
+    if (hooks?.hasHooks('user_prompt_submit')) {
+      const hookResult = await hooks.trigger('user_prompt_submit', { message: userMessage });
+      yield* this.emitHookEvents('user_prompt_submit', hookResult, hooks.getHookCount('user_prompt_submit'));
+      if (hookResult.blocked) {
+        yield { type: 'error', error: hookResult.output || 'Blocked by user_prompt_submit hook', recoverable: false };
+        return;
+      }
+      if (hookResult.modifiedMessage !== undefined) {
+        processedMessage = hookResult.modifiedMessage;
+        logger.debug('Message modified by hook', { original: userMessage.slice(0, 50), modified: processedMessage.slice(0, 50) });
+      }
+    }
+
     // Add user message to context
-    const userMsg: Message = { role: 'user', content: userMessage };
+    const userMsg: Message = { role: 'user', content: processedMessage };
     await this.context.addMessage(userMsg);
 
     logger.info('Agent run started', {
       sessionId: this.config.sessionId,
-      messageLength: userMessage.length,
+      messageLength: processedMessage.length,
     });
 
     try {
@@ -212,13 +251,15 @@ export class AgentLoop {
           yield { type: 'tool_call', tool_call: toolCall };
         }
 
-        // Execute tools
-        const results = await this.executeToolCalls(toolCalls, signal);
+        // Execute tools with pre/post hooks
+        const results = await this.executeToolCallsWithHooks(toolCalls, signal);
 
         // Add tool results to context and emit events
-        for (const [toolCallId, result] of results) {
-          const toolCall = toolCalls.find(tc => tc.id === toolCallId);
-          const toolName = toolCall?.name || 'unknown';
+        for (const { toolCallId, toolName, result, hookEvents } of results) {
+          // Emit any hook events first
+          for (const event of hookEvents) {
+            yield event;
+          }
 
           // Emit tool result event
           yield {
@@ -264,6 +305,18 @@ export class AgentLoop {
       };
 
     } finally {
+      // Trigger stop hook
+      if (hooks?.hasHooks('stop')) {
+        const hookResult = await hooks.trigger('stop', {});
+        // Emit hook events but don't block on stop
+        for (const event of this.collectHookEvents('stop', hookResult, hooks.getHookCount('stop'))) {
+          // We can't yield in finally, so just log
+          if (event.type === 'hook_output') {
+            logger.info('Stop hook output', { output: event.output });
+          }
+        }
+      }
+
       this.state.isRunning = false;
       logger.info('Agent run completed', {
         sessionId: this.config.sessionId,
@@ -347,7 +400,144 @@ export class AgentLoop {
   }
 
   /**
-   * Execute tool calls and return results.
+   * Execute tool calls with pre/post hooks.
+   */
+  private async executeToolCallsWithHooks(
+    toolCalls: ToolCall[],
+    signal?: AbortSignal
+  ): Promise<Array<ToolExecutionResult>> {
+    const logger = getLogger();
+    const hooks = this.config.hooks;
+    const results: ToolExecutionResult[] = [];
+
+    const executionContext: ExecutionContext = {
+      cwd: this.config.cwd,
+      sessionId: this.config.sessionId,
+      homeDir: this.config.homeDir,
+      config: {},
+      signal,
+    };
+
+    for (const toolCall of toolCalls) {
+      const hookEvents: AgentEvent[] = [];
+      let params = toolCall.arguments;
+
+      // Pre-tool hook
+      if (hooks?.hasHooks('pre_tool_use')) {
+        const hookResult = await hooks.trigger('pre_tool_use', {
+          tool: toolCall.name,
+          params,
+        });
+        hookEvents.push(...this.collectHookEvents('pre_tool_use', hookResult, hooks.getHookCount('pre_tool_use')));
+
+        if (hookResult.blocked) {
+          // Tool was blocked by hook
+          results.push({
+            toolCallId: toolCall.id,
+            toolName: toolCall.name,
+            result: {
+              success: false,
+              output: '',
+              error: hookResult.output || `Tool ${toolCall.name} blocked by pre_tool_use hook`,
+            },
+            hookEvents,
+          });
+          continue;
+        }
+
+        // Apply modified params if any
+        if (hookResult.modifiedParams !== undefined) {
+          params = hookResult.modifiedParams as Record<string, unknown>;
+          logger.debug('Tool params modified by hook', { tool: toolCall.name });
+        }
+      }
+
+      // Execute the tool
+      const tool = this.config.tools.get(toolCall.name);
+      let result: ToolResult;
+
+      if (!tool) {
+        result = {
+          success: false,
+          output: '',
+          error: `Tool not found: ${toolCall.name}`,
+        };
+      } else {
+        try {
+          result = await tool.execute(params, executionContext);
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          result = {
+            success: false,
+            output: '',
+            error: `Tool execution error: ${errorMsg}`,
+          };
+        }
+      }
+
+      // Post-tool hook
+      if (hooks?.hasHooks('post_tool_use')) {
+        const hookResult = await hooks.trigger('post_tool_use', {
+          tool: toolCall.name,
+          params,
+          result,
+        });
+        hookEvents.push(...this.collectHookEvents('post_tool_use', hookResult, hooks.getHookCount('post_tool_use')));
+        // Post hooks can't block, but could add output
+      }
+
+      results.push({
+        toolCallId: toolCall.id,
+        toolName: toolCall.name,
+        result,
+        hookEvents,
+      });
+    }
+
+    return results;
+  }
+
+  /**
+   * Emit hook events as a generator.
+   */
+  private *emitHookEvents(
+    event: import('@openagent/hooks').HookEvent,
+    hookResult: HookResult,
+    hookCount: number
+  ): Generator<AgentEvent> {
+    for (const e of this.collectHookEvents(event, hookResult, hookCount)) {
+      yield e;
+    }
+  }
+
+  /**
+   * Collect hook events into an array.
+   */
+  private collectHookEvents(
+    event: import('@openagent/hooks').HookEvent,
+    hookResult: HookResult,
+    hookCount: number
+  ): AgentEvent[] {
+    const events: AgentEvent[] = [];
+
+    // Always emit triggered event
+    events.push({ type: 'hook_triggered', event, hookCount });
+
+    // Emit blocked event if blocked
+    if (hookResult.blocked) {
+      events.push({ type: 'hook_blocked', event, reason: hookResult.output });
+    }
+
+    // Emit output event if there's output
+    if (hookResult.output) {
+      events.push({ type: 'hook_output', event, output: hookResult.output });
+    }
+
+    return events;
+  }
+
+  /**
+   * Execute tool calls and return results (legacy method, use executeToolCallsWithHooks).
    */
   private async executeToolCalls(
     toolCalls: ToolCall[],

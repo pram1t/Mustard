@@ -2,6 +2,7 @@
   "name": "@openagent/hooks",
   "version": "0.0.0",
   "description": "Hook system for OpenAgent",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -17,6 +18,9 @@
   },
   "keywords": ["openagent", "hooks"],
   "license": "MIT",
+  "dependencies": {
+    "@openagent/logger": "*"
+  },
   "devDependencies": {
     "typescript": "^5.9.3"
   }

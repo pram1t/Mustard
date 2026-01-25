@@ -75,6 +75,36 @@ export const SecurityConfigSchema = z.object({
 });
 
 /**
+ * Hook matcher configuration
+ */
+export const HookMatcherSchema = z.object({
+  tool: z.string().optional(),
+  toolPattern: z.string().optional(),
+});
+
+/**
+ * Individual hook configuration
+ */
+export const HookConfigSchema = z.object({
+  command: z.string(),
+  timeout: z.number().int().min(100).max(300000).default(10000),
+  matcher: HookMatcherSchema.optional(),
+  env: z.record(z.string()).optional(),
+  cwd: z.string().optional(),
+});
+
+/**
+ * Hooks configuration by event type
+ */
+export const HooksConfigSchema = z.object({
+  session_start: z.array(HookConfigSchema).default([]),
+  user_prompt_submit: z.array(HookConfigSchema).default([]),
+  pre_tool_use: z.array(HookConfigSchema).default([]),
+  post_tool_use: z.array(HookConfigSchema).default([]),
+  stop: z.array(HookConfigSchema).default([]),
+});
+
+/**
  * Full application configuration
  */
 export const ConfigSchema = z.object({
@@ -82,6 +112,7 @@ export const ConfigSchema = z.object({
   llm: LLMConfigSchema.default({}),
   tools: ToolConfigSchema.default({}),
   security: SecurityConfigSchema.default({}),
+  hooks: HooksConfigSchema.default({}),
 });
 
 /**
@@ -94,4 +125,7 @@ export type LoggingConfig = z.infer<typeof LoggingConfigSchema>;
 export type LLMConfig = z.infer<typeof LLMConfigSchema>;
 export type ToolConfig = z.infer<typeof ToolConfigSchema>;
 export type SecurityConfig = z.infer<typeof SecurityConfigSchema>;
+export type HookMatcher = z.infer<typeof HookMatcherSchema>;
+export type HookConfig = z.infer<typeof HookConfigSchema>;
+export type HooksConfig = z.infer<typeof HooksConfigSchema>;
 export type Config = z.infer<typeof ConfigSchema>;
