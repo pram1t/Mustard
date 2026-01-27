@@ -45,11 +45,12 @@ describe('HookExecutor', () => {
     }
   });
 
-  // Helper to create a test script
+  // Helper to create a test script (cross-platform compatible)
   function createTestScript(name: string, content: string): string {
     const scriptPath = path.join(tempDir, name);
     fs.writeFileSync(scriptPath, content);
-    return scriptPath;
+    // Normalize path for shell commands (forward slashes work on both platforms)
+    return scriptPath.replace(/\\/g, '/');
   }
 
   describe('constructor and basic methods', () => {
