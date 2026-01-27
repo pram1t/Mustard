@@ -61,10 +61,11 @@ describe('BashTool', () => {
   it('should truncate large output', async () => {
     const context = createTestContext({ cwd: process.cwd() });
 
-    // Generate a lot of output
+    // Generate a lot of output - use platform-specific commands
+    // Windows for loop is slow, Linux seq is fast
     const command = process.platform === 'win32'
-      ? 'for /L %i in (1,1,1000) do @echo line %i'
-      : 'for i in $(seq 1 1000); do echo "line $i"; done';
+      ? 'powershell -Command "1..1000 | ForEach-Object { Write-Output $_ }"'
+      : 'seq 1 1000';
 
     const result = await tool.execute({ command }, context);
 
@@ -73,7 +74,7 @@ describe('BashTool', () => {
     if (String(result.output).length > 30000) {
       expect(String(result.output)).toContain('truncated');
     }
-  });
+  }, 60000); // Increase timeout for CI
 
   describe('Security - Environment Variable Filtering', () => {
     it('should pass safe environment variables', async () => {
