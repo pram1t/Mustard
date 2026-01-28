@@ -7,81 +7,57 @@ on:
     branches: [main, master]
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  build:
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npm run build
 
-      - name: Build
-        run: npm run build
+  test:
+    name: Test (${{ matrix.os }})
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
-      - name: Lint
-        run: npm run lint
-        continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build
 
       - name: Run tests
-        run: npm run test -- --coverage --reporter=verbose
+        run: npm test
+        env:
+          CI: true
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        with:
-          fail_ci_if_error: false
-        continue-on-error: true
-
-  security-tests:
-    name: Security Tests
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Run security tests
-        run: npm run test -- --grep "Security" --reporter=verbose
-
-  windows-build:
-    name: Build (Windows)
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Run tests
-        run: npm run test
+      - run: npm ci
+      - run: npm run build
+      - run: npm run lint
+        continue-on-error: true
