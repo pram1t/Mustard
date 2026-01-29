@@ -10,6 +10,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import * as readline from 'readline';
 import {
   OpenAIProvider,
   AnthropicProvider,
@@ -20,7 +21,12 @@ import {
   type LLMProvider,
 } from '@openagent/llm';
 import { createDefaultRegistry, type ToolRegistry } from '@openagent/tools';
-import { AgentLoop } from '@openagent/core';
+import {
+  AgentLoop,
+  PermissionManager,
+  type PermissionMode,
+  type ApprovalCallback,
+} from '@openagent/core';
 import { createLogger, setDefaultLogger } from '@openagent/logger';
 import { loadConfig, validateStartup, type HooksConfig } from '@openagent/config';
 import { createHookExecutor, type HookExecutor } from '@openagent/hooks';
@@ -106,6 +112,9 @@ function parseArgs(): {
   prompt: string;
   verbose: boolean;
   mcpSubcommand?: MCPSubcommand;
+  permissionMode: PermissionMode;
+  allowTools: string[];
+  denyTools: string[];
 } {
   const args = process.argv.slice(2);
   let help = false;
@@ -116,6 +125,9 @@ function parseArgs(): {
   let verbose = false;
   const promptParts: string[] = [];
   let mcpSubcommand: MCPSubcommand | undefined;
+  let permissionMode: PermissionMode = 'default';
+  const allowTools: string[] = [];
+  const denyTools: string[] = [];
 
   // Check for MCP subcommand
   if (args[0] === 'mcp') {
@@ -156,7 +168,7 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, permissionMode, allowTools, denyTools };
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -174,6 +186,17 @@ function parseArgs(): {
       provider = (args[++i] || 'openai') as ProviderName;
     } else if (arg === '--base-url') {
       baseUrl = args[++i] || '';
+    } else if (arg === '--permission-mode' || arg === '-P') {
+      const mode = args[++i] || 'default';
+      if (['permissive', 'default', 'strict'].includes(mode)) {
+        permissionMode = mode as PermissionMode;
+      }
+    } else if (arg === '--allow-tool') {
+      const tool = args[++i];
+      if (tool) allowTools.push(tool);
+    } else if (arg === '--deny-tool') {
+      const tool = args[++i];
+      if (tool) denyTools.push(tool);
     } else if (!arg.startsWith('-')) {
       promptParts.push(arg);
     }
@@ -188,6 +211,9 @@ function parseArgs(): {
     prompt: promptParts.join(' '),
     verbose,
     mcpSubcommand,
+    permissionMode,
+    allowTools,
+    denyTools,
   };
 }
 
@@ -202,12 +228,15 @@ Usage: openagent [options] <prompt>
        openagent mcp <subcommand> [options]
 
 Options:
-  -h, --help        Show this help message
-  -v, --version     Show version number
-  -m, --model       Model to use (provider-specific defaults)
-  -p, --provider    LLM provider: openai, anthropic, gemini, ollama, openai-compatible
-  --base-url        Base URL for ollama or openai-compatible providers
-  -V, --verbose     Enable verbose output
+  -h, --help                    Show this help message
+  -v, --version                 Show version number
+  -m, --model                   Model to use (provider-specific defaults)
+  -p, --provider                LLM provider: openai, anthropic, gemini, ollama, openai-compatible
+  --base-url                    Base URL for ollama or openai-compatible providers
+  -V, --verbose                 Enable verbose output
+  -P, --permission-mode <mode>  Permission mode: permissive, default, strict
+  --allow-tool <name>           Always allow a tool (repeatable)
+  --deny-tool <name>            Always deny a tool (repeatable)
 
 Providers:
   openai            OpenAI GPT models (default: gpt-4o)
@@ -215,6 +244,11 @@ Providers:
   gemini            Google Gemini models (default: gemini-1.5-pro)
   ollama            Local Ollama models (default: qwen2.5-coder:7b)
   openai-compatible Any OpenAI-compatible API (requires --base-url)
+
+Permission Modes:
+  permissive        Allow everything not explicitly denied
+  default           Allow safe tools (Read, Glob, Grep), ask for others
+  strict            Ask for everything not explicitly allowed
 
 MCP Subcommands:
   mcp list                              List configured MCP servers
@@ -238,6 +272,8 @@ Examples:
   openagent --provider gemini -m gemini-1.5-flash "Hello"
   openagent --provider ollama --model llama3.2 "Hello"
   openagent --provider openai-compatible --base-url http://localhost:1234/v1 "Hi"
+  openagent --permission-mode strict "read package.json"
+  openagent --allow-tool Write --allow-tool Edit "Create a new file"
 
 MCP Examples:
   openagent mcp add filesystem --type stdio --command "npx @modelcontextprotocol/server-filesystem"
@@ -600,12 +636,68 @@ async function main(): Promise<void> {
       }
     }
 
+    // Create permission manager
+    const permissions = new PermissionManager({
+      mode: args.permissionMode,
+    });
+
+    // Add custom allow rules
+    for (const tool of args.allowTools) {
+      permissions.addAllowRule({ tool, reason: `Allowed via --allow-tool ${tool}` });
+    }
+
+    // Add custom deny rules
+    for (const tool of args.denyTools) {
+      permissions.addDenyRule({ tool, reason: `Denied via --deny-tool ${tool}` });
+    }
+
+    // Set up approval callback for interactive prompts
+    const approvalCallback: ApprovalCallback = async (tool, params, reason) => {
+      return new Promise((resolve) => {
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout,
+        });
+
+        console.log(`\n[Permission Required]`);
+        console.log(`  Tool: ${tool}`);
+        console.log(`  Reason: ${reason}`);
+        if (args.verbose) {
+          console.log(`  Params: ${JSON.stringify(params).slice(0, 200)}`);
+        }
+
+        rl.question('  Allow? (y/N): ', (answer) => {
+          rl.close();
+          resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
+        });
+      });
+    };
+
+    permissions.setApprovalCallback(approvalCallback);
+
+    logger.debug('Permission manager created', {
+      mode: args.permissionMode,
+      allowTools: args.allowTools,
+      denyTools: args.denyTools,
+    });
+
+    if (args.verbose) {
+      console.log(`[Permissions] Mode: ${args.permissionMode}`);
+      if (args.allowTools.length) {
+        console.log(`[Permissions] Allowed: ${args.allowTools.join(', ')}`);
+      }
+      if (args.denyTools.length) {
+        console.log(`[Permissions] Denied: ${args.denyTools.join(', ')}`);
+      }
+    }
+
     // Create agent - system prompt is auto-generated with OS awareness by @openagent/core
     const agent = new AgentLoop(router, {
       tools,
       cwd: process.cwd(),
       sessionId,
       hooks: hookExecutor,
+      permissions,
       // systemPrompt is automatically generated with:
       // - OS detection (Windows/macOS/Linux)
       // - Shell information (cmd.exe vs Bash)
@@ -674,6 +766,17 @@ async function main(): Promise<void> {
         case 'hook_output':
           if (args.verbose && event.output) {
             console.log(`[Hook output: ${event.output}]`);
+          }
+          break;
+
+        case 'permission_denied':
+          console.log(`\n[Permission Denied] ${event.tool}: ${event.reason}`);
+          break;
+
+        case 'permission_ask':
+          if (args.verbose) {
+            const status = event.approved ? 'Approved' : 'Denied';
+            console.log(`[Permission ${status}] ${event.tool}: ${event.reason}`);
           }
           break;
 

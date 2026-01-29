@@ -7,6 +7,7 @@
 import type { Message, ToolCall, ToolDefinition } from '@openagent/llm';
 import type { ToolResult, IToolRegistry } from '@openagent/tools';
 import type { HookExecutor, HookEvent as HookEventType } from '@openagent/hooks';
+import type { PermissionManager } from '../permissions/index.js';
 
 // Re-export HookEvent for convenience
 export type { HookEventType as HookEvent };
@@ -61,6 +62,11 @@ export interface AgentConfig {
    * Hook executor for lifecycle events
    */
   hooks?: HookExecutor;
+
+  /**
+   * Permission manager for controlling tool access
+   */
+  permissions?: PermissionManager;
 }
 
 /**
@@ -171,6 +177,25 @@ export interface HookOutputEvent {
 }
 
 /**
+ * Permission denied event - when a tool is denied by permission rules
+ */
+export interface PermissionDeniedEvent {
+  type: 'permission_denied';
+  tool: string;
+  reason: string;
+}
+
+/**
+ * Permission ask event - when user approval is requested for a tool
+ */
+export interface PermissionAskEvent {
+  type: 'permission_ask';
+  tool: string;
+  reason: string;
+  approved?: boolean;
+}
+
+/**
  * Union type for all agent events
  */
 export type AgentEvent =
@@ -183,7 +208,9 @@ export type AgentEvent =
   | CompactionEvent
   | HookTriggeredEvent
   | HookBlockedEvent
-  | HookOutputEvent;
+  | HookOutputEvent
+  | PermissionDeniedEvent
+  | PermissionAskEvent;
 
 // ============================================================================
 // Agent State

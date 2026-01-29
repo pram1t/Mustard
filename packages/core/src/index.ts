@@ -31,6 +31,8 @@ export type {
   DoneEvent,
   ThinkingEvent,
   CompactionEvent,
+  PermissionDeniedEvent,
+  PermissionAskEvent,
 } from './agent/types.js';
 
 export { DEFAULT_AGENT_CONFIG } from './agent/types.js';
@@ -43,3 +45,24 @@ export { executeTools, executeSingleTool, validateToolCalls } from './agent/exec
 
 export { createSystemPrompt } from './agent/system-prompt.js';
 export type { SystemPromptOptions } from './agent/system-prompt.js';
+
+// ============================================================================
+// Permission System
+// ============================================================================
+
+export type {
+  PermissionMode,
+  PermissionDecision,
+  PermissionRuleType,
+  PermissionRule,
+  PermissionResult,
+  PermissionContext,
+  ApprovalCallback,
+  PermissionConfig,
+} from './permissions/index.js';
+
+export {
+  PermissionManager,
+  createPermissionManager,
+  BUILTIN_RULES,
+} from './permissions/index.js';

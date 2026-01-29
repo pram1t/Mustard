@@ -10,6 +10,7 @@ import type { Message, ChatParams, ToolCall, StreamChunk, ToolDefinition } from 
 import type { LLMRouter } from '@openagent/llm';
 import type { ToolResult, ExecutionContext } from '@openagent/tools';
 import type { HookExecutor, HookResult } from '@openagent/hooks';
+import type { PermissionManager } from '../permissions/index.js';
 import { getLogger } from '@openagent/logger';
 import { ContextManager } from '../context/manager.js';
 import type {
@@ -53,6 +54,7 @@ interface ResolvedAgentConfig {
   sessionId: string;
   homeDir: string;
   hooks?: HookExecutor;
+  permissions?: PermissionManager;
 }
 
 export class AgentLoop {
@@ -87,6 +89,7 @@ export class AgentLoop {
       sessionId: config.sessionId || this.generateSessionId(),
       homeDir: config.homeDir || process.env.HOME || process.env.USERPROFILE || '',
       hooks: config.hooks,
+      permissions: config.permissions,
     };
 
     // Create context manager using the router's primary provider
@@ -400,7 +403,7 @@ export class AgentLoop {
   }
 
   /**
-   * Execute tool calls with pre/post hooks.
+   * Execute tool calls with pre/post hooks and permission checks.
    */
   private async executeToolCallsWithHooks(
     toolCalls: ToolCall[],
@@ -408,6 +411,7 @@ export class AgentLoop {
   ): Promise<Array<ToolExecutionResult>> {
     const logger = getLogger();
     const hooks = this.config.hooks;
+    const permissions = this.config.permissions;
     const results: ToolExecutionResult[] = [];
 
     const executionContext: ExecutionContext = {
@@ -449,6 +453,68 @@ export class AgentLoop {
         if (hookResult.modifiedParams !== undefined) {
           params = hookResult.modifiedParams as Record<string, unknown>;
           logger.debug('Tool params modified by hook', { tool: toolCall.name });
+        }
+      }
+
+      // Permission check (after pre-hook, before tool execution)
+      if (permissions) {
+        const permResult = await permissions.check({
+          tool: toolCall.name,
+          params,
+          sessionId: this.config.sessionId,
+        });
+
+        if (permResult.decision === 'deny') {
+          // Tool was denied by permission system
+          hookEvents.push({
+            type: 'permission_denied',
+            tool: toolCall.name,
+            reason: permResult.reason,
+          });
+          results.push({
+            toolCallId: toolCall.id,
+            toolName: toolCall.name,
+            result: {
+              success: false,
+              output: '',
+              error: `Permission denied: ${permResult.reason}`,
+            },
+            hookEvents,
+          });
+          logger.debug('Tool blocked by permission system', {
+            tool: toolCall.name,
+            reason: permResult.reason,
+          });
+          continue;
+        }
+
+        if (permResult.decision === 'ask') {
+          // Emit ask event
+          hookEvents.push({
+            type: 'permission_ask',
+            tool: toolCall.name,
+            reason: permResult.reason,
+            approved: permResult.userApproved,
+          });
+
+          if (!permResult.userApproved) {
+            // User declined or no callback to ask
+            results.push({
+              toolCallId: toolCall.id,
+              toolName: toolCall.name,
+              result: {
+                success: false,
+                output: '',
+                error: `Requires approval: ${permResult.reason}`,
+              },
+              hookEvents,
+            });
+            logger.debug('Tool requires user approval', {
+              tool: toolCall.name,
+              reason: permResult.reason,
+            });
+            continue;
+          }
         }
       }
 
