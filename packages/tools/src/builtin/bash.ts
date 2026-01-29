@@ -14,6 +14,7 @@ import { BaseTool } from '../base.js';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 import { getConfig } from '@openagent/config';
 import { getLogger } from '@openagent/logger';
+import { validateCommand } from '../security.js';
 
 // Maximum timeout: 10 minutes (hard limit)
 const MAX_TIMEOUT = 600000;
@@ -157,6 +158,10 @@ export class BashTool extends BaseTool {
       const bashConfig = config.tools.bash;
 
       const command = params.command as string;
+
+      // Validate command before execution
+      validateCommand(command);
+
       const defaultTimeout = bashConfig.maxTimeout;
       const timeout = Math.min(
         (params.timeout as number) || defaultTimeout,
