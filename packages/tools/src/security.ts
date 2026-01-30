@@ -23,6 +23,52 @@ const MAX_PATH_LENGTH = 4096;
 const MAX_REGEX_LENGTH = 1000;
 
 /**
+ * Maximum command length
+ */
+const MAX_COMMAND_LENGTH = 32768;
+
+/**
+ * Dangerous command patterns that indicate potential injection or harmful operations.
+ * These patterns detect common attack vectors and dangerous shell constructs.
+ */
+const DANGEROUS_COMMAND_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
+  // Command substitution
+  { pattern: /\$\([^)]+\)/, reason: 'Command substitution $(...) detected' },
+  { pattern: /`[^`]+`/, reason: 'Backtick command substitution detected' },
+
+  // Piping to shell interpreters
+  { pattern: /\|\s*sh\b/i, reason: 'Piping to sh detected' },
+  { pattern: /\|\s*bash\b/i, reason: 'Piping to bash detected' },
+  { pattern: /\|\s*zsh\b/i, reason: 'Piping to zsh detected' },
+  { pattern: /\|\s*powershell\b/i, reason: 'Piping to PowerShell detected' },
+  { pattern: /\|\s*cmd\b/i, reason: 'Piping to cmd detected' },
+
+  // Download and execute patterns
+  { pattern: /curl\s+[^|]*\|\s*(sh|bash)/i, reason: 'Download and execute pattern detected' },
+  { pattern: /wget\s+[^|]*\|\s*(sh|bash)/i, reason: 'Download and execute pattern detected' },
+  { pattern: /curl\s+[^|]*-o\s*-\s*\|/i, reason: 'Download and execute pattern detected' },
+
+  // Writing to block devices
+  { pattern: />\s*\/dev\/sd[a-z]/i, reason: 'Writing to block device detected' },
+  { pattern: />\s*\/dev\/hd[a-z]/i, reason: 'Writing to block device detected' },
+  { pattern: />\s*\/dev\/nvme/i, reason: 'Writing to NVMe device detected' },
+
+  // Dangerous chained commands
+  { pattern: /;\s*rm\s+-[rRf]*\s+\//i, reason: 'Chained rm with root path detected' },
+  { pattern: /&&\s*rm\s+-[rRf]*\s+\//i, reason: 'Chained rm with root path detected' },
+
+  // Base64 decode to shell (common obfuscation)
+  { pattern: /base64\s+(-d|--decode)\s*\|\s*(sh|bash)/i, reason: 'Base64 decode to shell detected' },
+  { pattern: /echo\s+[^|]+\|\s*base64\s+(-d|--decode)/i, reason: 'Encoded command execution detected' },
+
+  // Network exfiltration patterns
+  { pattern: /nc\s+-[^|]*\s+\d+\s*</, reason: 'Netcat file exfiltration detected' },
+
+  // Fork bombs
+  { pattern: /:\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;?\s*:/, reason: 'Fork bomb detected' },
+];
+
+/**
  * Patterns that indicate potential path traversal
  */
 const PATH_TRAVERSAL_PATTERNS = [
@@ -161,14 +207,16 @@ export function validateRegexPattern(pattern: string): boolean {
 }
 
 /**
- * Sanitize command arguments.
- * Basic validation to prevent obvious command injection.
+ * Validate a command for safety.
+ * Detects common command injection patterns and dangerous shell constructs.
  *
- * Note: This is NOT a complete solution for command injection.
+ * Note: This provides defense-in-depth but is not a complete solution.
  * The BashTool should be used with extreme caution regardless.
+ * The permission system provides additional protection via builtin deny rules.
  *
  * @param command - The command string
- * @returns true if command appears safe
+ * @returns true if command passes validation
+ * @throws Error if command contains dangerous patterns
  */
 export function validateCommand(command: string): boolean {
   const config = getConfig();
@@ -178,9 +226,7 @@ export function validateCommand(command: string): boolean {
     return true;
   }
 
-  // Maximum command length
-  const MAX_COMMAND_LENGTH = 32768;
-
+  // Check command length
   if (command.length > MAX_COMMAND_LENGTH) {
     throw new Error(`Command exceeds maximum length of ${MAX_COMMAND_LENGTH} characters`);
   }
@@ -189,6 +235,17 @@ export function validateCommand(command: string): boolean {
   if (command.includes('\0')) {
     logger.warn('Command contains null byte');
     throw new Error('Command contains invalid characters');
+  }
+
+  // Check for dangerous patterns
+  for (const { pattern, reason } of DANGEROUS_COMMAND_PATTERNS) {
+    if (pattern.test(command)) {
+      logger.warn('Dangerous command pattern detected', {
+        reason,
+        command: command.substring(0, 100),
+      });
+      throw new Error(`Command blocked: ${reason}`);
+    }
   }
 
   return true;

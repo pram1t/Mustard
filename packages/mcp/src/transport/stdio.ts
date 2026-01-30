@@ -17,6 +17,7 @@ import type {
 import { TransportError, ConnectionError, TimeoutError } from '../types.js';
 import type { Transport, TransportState } from './types.js';
 import { DEFAULT_TIMEOUT } from './types.js';
+import { filterEnvVars } from '@openagent/core';
 
 /**
  * Pending request tracker
@@ -63,10 +64,13 @@ export class StdioTransport implements Transport {
       const [command, ...defaultArgs] = this.config.command.split(' ');
       const args = [...defaultArgs, ...(this.config.args || [])];
 
-      // Spawn the process
+      // Use filtered environment to prevent credential leakage to MCP servers
+      const safeEnv = filterEnvVars();
+
+      // Spawn the process with safe environment
       this.process = spawn(command, args, {
         cwd: this.config.cwd,
-        env: { ...process.env, ...this.config.env },
+        env: { ...safeEnv, ...this.config.env },
         stdio: ['pipe', 'pipe', 'pipe'],
       });
 

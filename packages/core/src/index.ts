@@ -66,3 +66,27 @@ export {
   createPermissionManager,
   BUILTIN_RULES,
 } from './permissions/index.js';
+
+// ============================================================================
+// Session Management
+// ============================================================================
+
+export type {
+  SessionMetadata,
+  SessionData,
+  SessionListItem,
+} from './session/index.js';
+
+export { SessionManager } from './session/index.js';
+
+// ============================================================================
+// Utilities
+// ============================================================================
+
+export {
+  DEFAULT_SAFE_ENV_VARS,
+  BLOCKED_ENV_VARS,
+  filterEnvVars,
+} from './utils/index.js';
+
+export type { FilterEnvOptions } from './utils/index.js';

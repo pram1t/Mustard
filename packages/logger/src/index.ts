@@ -16,3 +16,11 @@ export {
   setDefaultLogger,
   resetDefaultLogger,
 } from './factory.js';
+
+// Environment variable filter
+export {
+  filterEnvVars,
+  DEFAULT_SAFE_ENV_VARS,
+  BLOCKED_ENV_VARS,
+} from './env-filter.js';
+export type { FilterEnvOptions } from './env-filter.js';

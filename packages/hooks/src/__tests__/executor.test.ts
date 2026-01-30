@@ -17,6 +17,8 @@ vi.mock('@openagent/logger', () => ({
     warn: vi.fn(),
     error: vi.fn(),
   }),
+  // filterEnvVars is now exported from logger, so include it in the mock
+  filterEnvVars: () => ({ ...process.env }),
 }));
 
 describe('HookExecutor', () => {

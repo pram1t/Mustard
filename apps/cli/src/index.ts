@@ -24,8 +24,10 @@ import { createDefaultRegistry, type ToolRegistry } from '@openagent/tools';
 import {
   AgentLoop,
   PermissionManager,
+  SessionManager,
   type PermissionMode,
   type ApprovalCallback,
+  type SessionData,
 } from '@openagent/core';
 import { createLogger, setDefaultLogger } from '@openagent/logger';
 import { loadConfig, validateStartup, type HooksConfig } from '@openagent/config';
@@ -101,6 +103,14 @@ interface MCPSubcommand {
 }
 
 /**
+ * Session subcommand arguments
+ */
+interface SessionSubcommand {
+  action: 'list' | 'show' | 'delete';
+  id?: string;
+}
+
+/**
  * Parse command line arguments
  */
 function parseArgs(): {
@@ -112,6 +122,9 @@ function parseArgs(): {
   prompt: string;
   verbose: boolean;
   mcpSubcommand?: MCPSubcommand;
+  sessionSubcommand?: SessionSubcommand;
+  resume?: string;
+  noSave: boolean;
   permissionMode: PermissionMode;
   allowTools: string[];
   denyTools: string[];
@@ -125,6 +138,9 @@ function parseArgs(): {
   let verbose = false;
   const promptParts: string[] = [];
   let mcpSubcommand: MCPSubcommand | undefined;
+  let sessionSubcommand: SessionSubcommand | undefined;
+  let resume: string | undefined;
+  let noSave = false;
   let permissionMode: PermissionMode = 'default';
   const allowTools: string[] = [];
   const denyTools: string[] = [];
@@ -168,7 +184,24 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+  }
+
+  // Check for session subcommand
+  if (args[0] === 'session' || args[0] === 'sessions') {
+    const sessionAction = args[1];
+    if (sessionAction === 'list' || !sessionAction) {
+      sessionSubcommand = { action: 'list' };
+    } else if (sessionAction === 'show' && args[2]) {
+      sessionSubcommand = { action: 'show', id: args[2] };
+    } else if (sessionAction === 'delete' && args[2]) {
+      sessionSubcommand = { action: 'delete', id: args[2] };
+    } else {
+      // Show session help
+      help = true;
+    }
+
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -197,6 +230,10 @@ function parseArgs(): {
     } else if (arg === '--deny-tool') {
       const tool = args[++i];
       if (tool) denyTools.push(tool);
+    } else if (arg === '--resume' || arg === '-r') {
+      resume = args[++i];
+    } else if (arg === '--no-save') {
+      noSave = true;
     } else if (!arg.startsWith('-')) {
       promptParts.push(arg);
     }
@@ -211,6 +248,9 @@ function parseArgs(): {
     prompt: promptParts.join(' '),
     verbose,
     mcpSubcommand,
+    sessionSubcommand,
+    resume,
+    noSave,
     permissionMode,
     allowTools,
     denyTools,
@@ -226,6 +266,7 @@ OpenAgent CLI v${VERSION}
 
 Usage: openagent [options] <prompt>
        openagent mcp <subcommand> [options]
+       openagent session <subcommand> [options]
 
 Options:
   -h, --help                    Show this help message
@@ -234,6 +275,8 @@ Options:
   -p, --provider                LLM provider: openai, anthropic, gemini, ollama, openai-compatible
   --base-url                    Base URL for ollama or openai-compatible providers
   -V, --verbose                 Enable verbose output
+  -r, --resume <id>             Resume a previous session
+  --no-save                     Don't save the session
   -P, --permission-mode <mode>  Permission mode: permissive, default, strict
   --allow-tool <name>           Always allow a tool (repeatable)
   --deny-tool <name>            Always deny a tool (repeatable)
@@ -249,6 +292,11 @@ Permission Modes:
   permissive        Allow everything not explicitly denied
   default           Allow safe tools (Read, Glob, Grep), ask for others
   strict            Ask for everything not explicitly allowed
+
+Session Subcommands:
+  session list                          List saved sessions
+  session show <id>                     Show session details
+  session delete <id>                   Delete a session
 
 MCP Subcommands:
   mcp list                              List configured MCP servers
@@ -274,6 +322,13 @@ Examples:
   openagent --provider openai-compatible --base-url http://localhost:1234/v1 "Hi"
   openagent --permission-mode strict "read package.json"
   openagent --allow-tool Write --allow-tool Edit "Create a new file"
+
+Session Examples:
+  openagent "Remember the number 42"
+  openagent --resume <sessionId> "What number did I mention?"
+  openagent session list
+  openagent session show <sessionId>
+  openagent session delete <sessionId>
 
 MCP Examples:
   openagent mcp add filesystem --type stdio --command "npx @modelcontextprotocol/server-filesystem"
@@ -444,6 +499,63 @@ async function handleMCPSubcommand(subcommand: MCPSubcommand): Promise<void> {
 }
 
 /**
+ * Handle session subcommands
+ */
+async function handleSessionSubcommand(subcommand: SessionSubcommand): Promise<void> {
+  const sessionManager = new SessionManager();
+
+  switch (subcommand.action) {
+    case 'list': {
+      const sessions = sessionManager.list();
+      if (sessions.length === 0) {
+        console.log('No saved sessions found.');
+        console.log('Sessions are automatically saved when you run openagent.');
+      } else {
+        console.log('Saved sessions:\n');
+        for (const session of sessions) {
+          console.log(`  ${session.id}`);
+          console.log(`    Messages: ${session.messageCount}`);
+          console.log(`    Updated: ${session.updatedAt}`);
+          console.log(`    CWD: ${session.cwd}\n`);
+        }
+      }
+      break;
+    }
+
+    case 'show': {
+      if (!subcommand.id) {
+        console.error('Error: Session ID is required.');
+        process.exit(1);
+      }
+
+      const data = sessionManager.load(subcommand.id);
+      if (!data) {
+        console.error(`Session not found: ${subcommand.id}`);
+        process.exit(1);
+      }
+
+      console.log(JSON.stringify(data, null, 2));
+      break;
+    }
+
+    case 'delete': {
+      if (!subcommand.id) {
+        console.error('Error: Session ID is required.');
+        process.exit(1);
+      }
+
+      if (sessionManager.delete(subcommand.id)) {
+        console.log(`Deleted session: ${subcommand.id}`);
+      } else {
+        console.error(`Session not found: ${subcommand.id}`);
+        process.exit(1);
+      }
+      break;
+    }
+  }
+}
+
+/**
  * Wrapper class for MCP tools to work with ToolRegistry
  */
 class MCPToolWrapper implements Tool {
@@ -549,6 +661,12 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
+  // Handle session subcommands
+  if (args.sessionSubcommand) {
+    await handleSessionSubcommand(args.sessionSubcommand);
+    process.exit(0);
+  }
+
   // Require a prompt
   if (!args.prompt) {
     console.error('Error: No prompt provided. Use --help for usage information.');
@@ -619,9 +737,29 @@ async function main(): Promise<void> {
       }
     }
 
+    // Session management
+    const sessionManager = new SessionManager();
+    let existingSession: SessionData | null = null;
+    let sessionId: string;
+
+    // Handle session resume
+    if (args.resume) {
+      existingSession = sessionManager.load(args.resume);
+      if (!existingSession) {
+        console.error(`Session not found: ${args.resume}`);
+        process.exit(1);
+      }
+      sessionId = args.resume;
+      console.log(`Resuming session: ${sessionId}\n`);
+    } else {
+      sessionId = sessionManager.generateId();
+      if (!args.noSave) {
+        console.log(`Session: ${sessionId}\n`);
+      }
+    }
+
     // Create hook executor if hooks are configured
     let hookExecutor: HookExecutor | undefined;
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
     if (config.hooks && Object.values(config.hooks).some(arr => arr && arr.length > 0)) {
       hookExecutor = createHookExecutor(config.hooks, {
@@ -705,6 +843,14 @@ async function main(): Promise<void> {
       // - Cross-platform tool preferences
     });
 
+    // Restore session context if resuming
+    if (existingSession) {
+      await agent.getContext().restore(existingSession.context);
+      logger.debug('Session context restored', {
+        messageCount: existingSession.metadata.messageCount,
+      });
+    }
+
     // Run the agent and stream output
     for await (const event of agent.run(args.prompt)) {
       switch (event.type) {
@@ -785,6 +931,30 @@ async function main(): Promise<void> {
           console.log('');
           if (args.verbose) {
             console.log(`[Done: ${event.totalIterations} iterations, ${event.totalToolCalls} tool calls]`);
+          }
+
+          // Auto-save session
+          if (!args.noSave) {
+            const contextState = agent.getContext().getState();
+            const createdAt = existingSession?.metadata.createdAt || new Date().toISOString();
+
+            sessionManager.save({
+              id: sessionId,
+              version: 1,
+              metadata: {
+                cwd: process.cwd(),
+                createdAt,
+                updatedAt: new Date().toISOString(),
+                messageCount: contextState.messages.length,
+                provider: provider.name,
+                model: provider.model,
+              },
+              context: contextState,
+            });
+
+            if (args.verbose) {
+              console.log(`[Session saved: ${sessionId}]`);
+            }
           }
           break;
       }

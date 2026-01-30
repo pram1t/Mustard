@@ -139,7 +139,7 @@ FOUNDATION (Phases 1-6)     PHASE A (MVP)           PHASE B              PHASE C
 |---------|--------|---------|
 | `@openagent/config` | ✅ Done | Configuration loading, validation |
 | `@openagent/logger` | ✅ Done | Pino-based structured logging |
-| `@openagent/hooks` | 📝 Placeholder | Future event hooks |
+| `@openagent/hooks` | ✅ Done | Lifecycle event hooks |
 | `@openagent/test-utils` | ✅ Done | Shared test utilities |
 
 ---
@@ -165,16 +165,80 @@ openagent mcp add myserver --command "npx @some/mcp-server"
 
 ---
 
+### Phase 7: Hook System ✅
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Hook types & interfaces | ✅ Done | `packages/hooks/src/types.ts` |
+| HookExecutor class | ✅ Done | Script execution with timeout |
+| Hook matching | ✅ Done | Tool name and pattern matching |
+| Fail-open behavior | ✅ Done | Errors don't block execution |
+| CLI integration | ✅ Done | Hooks config loading |
+
+**Artifacts:**
+- `@openagent/hooks` package
+- 6 hook event types: session_start, stop, user_prompt_submit, pre_tool_use, post_tool_use, notification
+
+---
+
+### Phase 8: Permission System ✅
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Permission types | ✅ Done | Tool-based, path-based permissions |
+| PermissionManager | ✅ Done | Grant, check, persist, batch operations |
+| Session scope | ✅ Done | Permissions reset each session |
+| Bash parsing | ✅ Done | Semantic grouping (git *, npm *, etc.) |
+| UI integration | ✅ Done | CLI permission prompts |
+
+**Artifacts:**
+- `packages/core/src/permissions/` module
+- `PermissionManager` class
+- Default allow tools configuration
+- Path-based permissions (glob patterns)
+
+---
+
+### Phase 8.5: Security Hardening ✅
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Environment filtering | ✅ Done | `filterEnvVars()` in logger package |
+| Command validation | ✅ Done | Block dangerous patterns |
+| Path sanitization | ✅ Done | Prevent traversal attacks |
+| Test coverage | ✅ Done | 22 security tests |
+
+---
+
+### Phase 9: Session Management ✅
+
+| Task | Status | Notes |
+|------|--------|-------|
+| Session types | ✅ Done | `packages/core/src/session/types.ts` |
+| SessionManager | ✅ Done | save/load/list/delete operations |
+| ContextManager.restore() | ✅ Done | Resume session context |
+| CLI session commands | ✅ Done | `session list/show/delete` |
+| CLI --resume flag | ✅ Done | Resume previous session |
+| Auto-save | ✅ Done | Save on agent completion |
+
+**Artifacts:**
+- `packages/core/src/session/` module
+- `SessionManager` class
+- Sessions stored in `~/.openagent/sessions/`
+- 24 session management tests
+
+---
+
 ## Foundation Verification
 
 **Build Status:** ✅ All 9 packages build successfully
-**Test Status:** ✅ 125 tests passing
-**Last Verified:** 2026-01-24
+**Test Status:** ✅ 214 tests passing
+**Last Verified:** 2026-01-30
 
 ```
- Test Files  11 passed (11)
-      Tests  125 passed (125)
-   Duration  11.59s
+ Test Files  14 passed (14)
+      Tests  214 passed (214)
+   Duration  11.71s
 ```
 
 ---

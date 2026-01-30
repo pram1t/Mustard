@@ -6,7 +6,7 @@
  */
 
 import { spawn } from 'child_process';
-import { getLogger } from '@openagent/logger';
+import { getLogger, filterEnvVars } from '@openagent/logger';
 import type {
   HookEvent,
   HookConfig,
@@ -182,10 +182,13 @@ export class HookExecutor {
 
     return new Promise((resolve) => {
       try {
+        // Use filtered environment to prevent credential leakage to hook processes
+        const safeEnv = filterEnvVars();
+
         // Use shell: true for cross-platform compatibility
         const proc = spawn(hook.command, [], {
           cwd: hook.cwd || this.context.cwd,
-          env: { ...process.env, ...hook.env },
+          env: { ...safeEnv, ...hook.env },
           stdio: ['pipe', 'pipe', 'pipe'],
           shell: true,
         });

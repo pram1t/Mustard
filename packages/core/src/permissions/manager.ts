@@ -25,7 +25,9 @@ import type {
  * These cannot be overridden by configuration.
  */
 const BUILTIN_DENY_RULES: PermissionRule[] = [
-  // Block writes to system directories
+  // ==========================================================================
+  // Unix/Linux System Directories
+  // ==========================================================================
   {
     type: 'builtin_deny',
     tool: 'Write',
@@ -38,20 +40,26 @@ const BUILTIN_DENY_RULES: PermissionRule[] = [
     pathPattern: '^/(bin|sbin|usr|etc|var|boot|lib|lib64|opt|root|sys|proc)(/|$)',
     reason: 'Editing system directories is not allowed',
   },
-  // Block Windows system directories
+
+  // ==========================================================================
+  // Windows System Directories (expanded)
+  // ==========================================================================
   {
     type: 'builtin_deny',
     tool: 'Write',
-    pathPattern: '^[A-Za-z]:\\\\(Windows|Program Files|ProgramData|System32)\\\\',
+    pathPattern: '^[A-Za-z]:[\\\\/](Windows|Program Files|Program Files \\(x86\\)|ProgramData|System32|SysWOW64|System|drivers|Boot|Recovery)($|[\\\\/])',
     reason: 'Writing to Windows system directories is not allowed',
   },
   {
     type: 'builtin_deny',
     tool: 'Edit',
-    pathPattern: '^[A-Za-z]:\\\\(Windows|Program Files|ProgramData|System32)\\\\',
+    pathPattern: '^[A-Za-z]:[\\\\/](Windows|Program Files|Program Files \\(x86\\)|ProgramData|System32|SysWOW64|System|drivers|Boot|Recovery)($|[\\\\/])',
     reason: 'Editing Windows system directories is not allowed',
   },
-  // Block dangerous rm commands
+
+  // ==========================================================================
+  // Dangerous Shell Commands
+  // ==========================================================================
   {
     type: 'builtin_deny',
     tool: 'Bash',
@@ -64,44 +72,121 @@ const BUILTIN_DENY_RULES: PermissionRule[] = [
     commandPattern: 'rm\\s+-[rRf]*\\s+--no-preserve-root',
     reason: 'Dangerous rm command with --no-preserve-root is not allowed',
   },
-  // Block reading sensitive credential files
-  {
-    type: 'builtin_deny',
-    tool: 'Read',
-    pathPattern: '\\.env(\\.local|\\.production|\\.secret)?$',
-    reason: 'Reading .env files may expose secrets',
-  },
-  {
-    type: 'builtin_deny',
-    tool: 'Read',
-    pathPattern: '\\.(pem|key|p12|pfx|secret)$',
-    reason: 'Reading private key files is not allowed',
-  },
-  {
-    type: 'builtin_deny',
-    tool: 'Read',
-    pathPattern: '/\\.ssh/(id_|known_hosts|authorized_keys)',
-    reason: 'Reading SSH credential files is not allowed',
-  },
-  {
-    type: 'builtin_deny',
-    tool: 'Read',
-    pathPattern: '(^|/)credentials(\\.json|\\.yaml|\\.yml|\\.xml)?$',
-    reason: 'Reading credential files is not allowed',
-  },
-  // Block format/partition commands
   {
     type: 'builtin_deny',
     tool: 'Bash',
     commandPattern: '(mkfs|fdisk|parted|dd\\s+if=.+\\s+of=/dev/)',
     reason: 'Disk formatting/partitioning commands are not allowed',
   },
-  // Block sudo/su elevation
   {
     type: 'builtin_deny',
     tool: 'Bash',
     commandPattern: '^\\s*(sudo|su)\\s+',
     reason: 'Privilege escalation commands are not allowed',
+  },
+
+  // ==========================================================================
+  // Environment/Secret Files
+  // ==========================================================================
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '\\.env(\\.local|\\.production|\\.secret|\\.development|\\.test)?$',
+    reason: 'Reading .env files may expose secrets',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '\\.(pem|key|p12|pfx|secret|p7b|cer|crt|der)$',
+    reason: 'Reading private key/certificate files is not allowed',
+  },
+
+  // ==========================================================================
+  // SSH Credentials
+  // ==========================================================================
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.ssh[\\\\/](id_|known_hosts|authorized_keys|config)',
+    reason: 'Reading SSH credential files is not allowed',
+  },
+
+  // ==========================================================================
+  // Cloud Provider Credentials
+  // ==========================================================================
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.aws[\\\\/](credentials|config)$',
+    reason: 'Reading AWS credential files is not allowed',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.gcloud[\\\\/]',
+    reason: 'Reading GCloud configuration is not allowed',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.azure[\\\\/]',
+    reason: 'Reading Azure configuration is not allowed',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: 'service[_-]?account[^/\\\\]*\\.json$',
+    reason: 'Reading service account files is not allowed',
+  },
+
+  // ==========================================================================
+  // Container/Orchestration Credentials
+  // ==========================================================================
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.docker[\\\\/]config\\.json$',
+    reason: 'Reading Docker credentials is not allowed',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.kube[\\\\/]config$',
+    reason: 'Reading Kubernetes configuration is not allowed',
+  },
+
+  // ==========================================================================
+  // Generic Credential Files
+  // ==========================================================================
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '(^|[\\\\/])credentials(\\.json|\\.yaml|\\.yml|\\.xml)?$',
+    reason: 'Reading credential files is not allowed',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]_netrc$',
+    reason: 'Reading netrc files is not allowed',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.netrc$',
+    reason: 'Reading netrc files is not allowed',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.npmrc$',
+    reason: 'Reading npmrc may expose auth tokens',
+  },
+  {
+    type: 'builtin_deny',
+    tool: 'Read',
+    pathPattern: '[\\\\/]\\.pypirc$',
+    reason: 'Reading pypirc may expose auth tokens',
   },
 ];
 

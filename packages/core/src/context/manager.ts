@@ -239,4 +239,36 @@ export class ContextManager {
   updateConfig(config: Partial<ContextConfig>): void {
     this.config = { ...this.config, ...config };
   }
+
+  /**
+   * Restore context from a saved state.
+   * Used for session resumption.
+   *
+   * @param state - The context state to restore
+   */
+  async restore(state: ContextState): Promise<void> {
+    const logger = getLogger();
+
+    // Restore messages
+    this.messages = [...state.messages];
+    this.wasCompacted = state.wasCompacted;
+    this.messagesRemoved = state.messagesRemoved;
+
+    // Recalculate token count for accuracy (model may have changed)
+    this.tokenCount = await this.provider.countTokens(this.messages);
+
+    // Find and count system message tokens
+    const systemMsg = this.messages.find((m) => m.role === 'system');
+    if (systemMsg) {
+      this.systemTokens = await this.provider.countTokens([systemMsg]);
+    } else {
+      this.systemTokens = 0;
+    }
+
+    logger.info('Context restored', {
+      messageCount: this.messages.length,
+      tokenCount: this.tokenCount,
+      wasCompacted: this.wasCompacted,
+    });
+  }
 }

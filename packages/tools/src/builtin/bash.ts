@@ -13,103 +13,40 @@ import * as path from 'path';
 import { BaseTool } from '../base.js';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
 import { getConfig } from '@openagent/config';
-import { getLogger } from '@openagent/logger';
+import { filterEnvVars } from '@openagent/logger';
 import { validateCommand } from '../security.js';
 
 // Maximum timeout: 10 minutes (hard limit)
 const MAX_TIMEOUT = 600000;
 
-// Background processes map
-const backgroundProcesses = new Map<string, ChildProcess>();
+// Maximum number of background processes allowed
+const MAX_BACKGROUND_PROCESSES = 100;
+
+// Background process timeout: 1 hour
+const PROCESS_TIMEOUT_MS = 3600000;
 
 /**
- * Default safe environment variables that are always allowed.
- * These are necessary for basic shell operation but don't contain secrets.
+ * Entry in the background processes map with timestamp for cleanup
  */
-const DEFAULT_SAFE_ENV_VARS = [
-  // System paths and shell
-  'PATH', 'HOME', 'USER', 'SHELL', 'TERM', 'PWD',
-  // Locale settings
-  'LANG', 'LC_ALL', 'LC_CTYPE', 'LC_MESSAGES', 'LANGUAGE',
-  // Timezone
-  'TZ',
-  // Node.js environment (for npm/node commands)
-  'NODE_ENV', 'NODE_PATH', 'NODE_OPTIONS',
-  // npm configuration (safe subset)
-  'npm_config_prefix', 'npm_config_registry',
-  // Common development tools
-  'EDITOR', 'VISUAL', 'PAGER',
-  // Git (safe subset - no credentials)
-  'GIT_AUTHOR_NAME', 'GIT_AUTHOR_EMAIL', 'GIT_COMMITTER_NAME', 'GIT_COMMITTER_EMAIL',
-  // Windows-specific
-  'USERPROFILE', 'APPDATA', 'LOCALAPPDATA', 'TEMP', 'TMP', 'SYSTEMROOT', 'WINDIR',
-  'HOMEDRIVE', 'HOMEPATH', 'COMPUTERNAME', 'USERNAME',
-  // Unix-specific
-  'TMPDIR', 'XDG_RUNTIME_DIR', 'XDG_CONFIG_HOME', 'XDG_DATA_HOME', 'XDG_CACHE_HOME',
-];
+interface BackgroundProcessEntry {
+  process: ChildProcess;
+  startedAt: number;
+}
+
+// Background processes map with timestamps
+const backgroundProcesses = new Map<string, BackgroundProcessEntry>();
 
 /**
- * Environment variables that should NEVER be passed through.
- * These typically contain secrets or sensitive credentials.
+ * Clean up stale background processes.
+ * Removes entries that are older than timeout or have killed processes.
  */
-const BLOCKED_ENV_VARS = [
-  // API keys and tokens
-  'OPENAI_API_KEY', 'ANTHROPIC_API_KEY', 'GOOGLE_API_KEY', 'AZURE_API_KEY',
-  'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_SESSION_TOKEN',
-  'GITHUB_TOKEN', 'GITLAB_TOKEN', 'NPM_TOKEN', 'PYPI_TOKEN',
-  // Database credentials
-  'DATABASE_URL', 'DATABASE_PASSWORD', 'DB_PASSWORD', 'POSTGRES_PASSWORD',
-  'MYSQL_PASSWORD', 'REDIS_PASSWORD', 'MONGODB_PASSWORD',
-  // OAuth/Auth secrets
-  'CLIENT_SECRET', 'JWT_SECRET', 'SESSION_SECRET', 'AUTH_SECRET',
-  'COOKIE_SECRET', 'ENCRYPTION_KEY',
-  // Cloud provider credentials
-  'GOOGLE_APPLICATION_CREDENTIALS', 'AZURE_CLIENT_SECRET',
-  // Private keys
-  'PRIVATE_KEY', 'SSH_PRIVATE_KEY', 'SSL_KEY',
-  // Generic patterns
-  'API_KEY', 'SECRET', 'TOKEN', 'PASSWORD', 'CREDENTIAL',
-];
-
-/**
- * Filter environment variables to only include safe ones.
- * Never passes API keys, passwords, or other secrets to child processes.
- */
-function filterEnvVars(allowedVars?: string[]): Record<string, string> {
-  const config = getConfig();
-  const configAllowedVars = config.tools.bash.allowedEnvVars || [];
-  const logger = getLogger();
-
-  // Combine default safe vars with config-specified vars
-  const safeVars = new Set([
-    ...DEFAULT_SAFE_ENV_VARS,
-    ...configAllowedVars,
-    ...(allowedVars || []),
-  ]);
-
-  const filteredEnv: Record<string, string> = {};
-
-  for (const [key, value] of Object.entries(process.env)) {
-    if (value === undefined) continue;
-
-    // Check if explicitly blocked
-    const isBlocked = BLOCKED_ENV_VARS.some((blocked) => {
-      // Exact match or contains pattern
-      return key === blocked || key.includes(blocked);
-    });
-
-    if (isBlocked) {
-      logger.debug(`Blocked env var from bash: ${key}`, { envVar: key });
-      continue;
-    }
-
-    // Check if in safe list
-    if (safeVars.has(key)) {
-      filteredEnv[key] = value;
+function cleanupStaleProcesses(): void {
+  const now = Date.now();
+  for (const [taskId, entry] of backgroundProcesses) {
+    if (now - entry.startedAt > PROCESS_TIMEOUT_MS || entry.process.killed) {
+      backgroundProcesses.delete(taskId);
     }
   }
-
-  return filteredEnv;
 }
 
 /**
@@ -303,6 +240,17 @@ export class BashTool extends BaseTool {
     args: string[],
     cwd: string
   ): ToolResult {
+    // Check if we've hit the process limit
+    if (backgroundProcesses.size >= MAX_BACKGROUND_PROCESSES) {
+      cleanupStaleProcesses();
+      if (backgroundProcesses.size >= MAX_BACKGROUND_PROCESSES) {
+        return this.failure(
+          `Too many background processes running (max: ${MAX_BACKGROUND_PROCESSES}). ` +
+          'Wait for some to complete or kill existing processes.'
+        );
+      }
+    }
+
     const taskId = generateTaskId();
 
     // Use filtered environment variables to prevent secret leakage
@@ -315,7 +263,10 @@ export class BashTool extends BaseTool {
       detached: true,
     });
 
-    backgroundProcesses.set(taskId, child);
+    backgroundProcesses.set(taskId, {
+      process: child,
+      startedAt: Date.now(),
+    });
 
     // Clean up when process exits
     child.on('close', () => {
@@ -335,19 +286,28 @@ export class BashTool extends BaseTool {
    * Get a background process by task ID (static method for external use)
    */
   static getBackgroundProcess(taskId: string): ChildProcess | undefined {
-    return backgroundProcesses.get(taskId);
+    const entry = backgroundProcesses.get(taskId);
+    return entry?.process;
   }
 
   /**
    * Kill a background process by task ID
    */
   static killBackgroundProcess(taskId: string): boolean {
-    const process = backgroundProcesses.get(taskId);
-    if (process) {
-      process.kill('SIGKILL');
+    const entry = backgroundProcesses.get(taskId);
+    if (entry) {
+      entry.process.kill('SIGKILL');
       backgroundProcesses.delete(taskId);
       return true;
     }
     return false;
+  }
+
+  /**
+   * Get the number of active background processes
+   */
+  static getBackgroundProcessCount(): number {
+    cleanupStaleProcesses();
+    return backgroundProcesses.size;
   }
 }
