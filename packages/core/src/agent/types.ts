@@ -67,6 +67,12 @@ export interface AgentConfig {
    * Permission manager for controlling tool access
    */
   permissions?: PermissionManager;
+
+  /**
+   * Enable subagent support (Task tool).
+   * When true, a SubagentManager will be created and made available to tools.
+   */
+  enableSubagents?: boolean;
 }
 
 /**

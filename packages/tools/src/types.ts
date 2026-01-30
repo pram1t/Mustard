@@ -55,6 +55,32 @@ export interface ToolConfig {
 }
 
 /**
+ * Subagent manager interface for Task tool
+ */
+export interface ISubagentManager {
+  spawn(config: {
+    description: string;
+    prompt: string;
+    subagent_type: string;
+    run_in_background?: boolean;
+    max_turns?: number;
+    model?: string;
+    resume?: string;
+  }): Promise<{
+    agentId: string;
+    output: string;
+    success: boolean;
+    error?: string;
+  }>;
+  getResult(agentId: string): {
+    agentId: string;
+    output: string;
+    success: boolean;
+    error?: string;
+  } | null;
+}
+
+/**
  * Context provided to tool execution
  */
 export interface ExecutionContext {
@@ -72,6 +98,9 @@ export interface ExecutionContext {
 
   /** Abort signal for cancellation */
   signal?: AbortSignal;
+
+  /** Subagent manager for Task tool */
+  subagentManager?: ISubagentManager;
 }
 
 // ============================================================================

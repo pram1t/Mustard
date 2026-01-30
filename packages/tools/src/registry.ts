@@ -22,6 +22,18 @@ import { EditTool } from './builtin/edit.js';
 import { GlobTool } from './builtin/glob.js';
 import { GrepTool } from './builtin/grep.js';
 import { BashTool } from './builtin/bash.js';
+import { TaskTool } from './builtin/task.js';
+
+/**
+ * Options for creating a default registry
+ */
+export interface CreateRegistryOptions {
+  /**
+   * Include the Task tool for subagent support.
+   * Requires SubagentManager to be passed in ExecutionContext.
+   */
+  includeTaskTool?: boolean;
+}
 
 /**
  * Tool Registry
@@ -214,8 +226,10 @@ export class ToolRegistry implements IToolRegistry {
 
 /**
  * Create a default registry with all built-in tools
+ *
+ * @param options - Options for customizing the registry
  */
-export function createDefaultRegistry(): ToolRegistry {
+export function createDefaultRegistry(options: CreateRegistryOptions = {}): ToolRegistry {
   const registry = new ToolRegistry();
 
   // File operations
@@ -230,10 +244,14 @@ export function createDefaultRegistry(): ToolRegistry {
   // Shell operations
   registry.register(new BashTool());
 
+  // Subagent operations (optional)
+  if (options.includeTaskTool) {
+    registry.register(new TaskTool());
+  }
+
   // Note: These tools are planned but not yet implemented
   // registry.register(new WebFetchTool());
   // registry.register(new AskUserTool());
-  // registry.register(new TaskTool());
 
   return registry;
 }

@@ -711,8 +711,8 @@ async function main(): Promise<void> {
     // Create router
     const router = createRouter(provider);
 
-    // Create tool registry
-    const tools = createDefaultRegistry();
+    // Create tool registry with Task tool for subagent support
+    const tools = createDefaultRegistry({ includeTaskTool: true });
 
     logger.debug('Built-in tools registered', { count: tools.count, tools: tools.getNames() });
 
@@ -836,6 +836,7 @@ async function main(): Promise<void> {
       sessionId,
       hooks: hookExecutor,
       permissions,
+      enableSubagents: true, // Enable Task tool for spawning subagents
       // systemPrompt is automatically generated with:
       // - OS detection (Windows/macOS/Linux)
       // - Shell information (cmd.exe vs Bash)

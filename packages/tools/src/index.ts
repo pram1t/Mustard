@@ -19,6 +19,7 @@ export type {
   // Execution types
   ToolConfig,
   ExecutionContext,
+  ISubagentManager,
 
   // Result types
   ToolResultMetadata,
@@ -44,6 +45,7 @@ export { BaseTool, createTool } from './base.js';
 // ============================================================================
 
 export { ToolRegistry, createDefaultRegistry, createTestContext } from './registry.js';
+export type { CreateRegistryOptions } from './registry.js';
 
 // ============================================================================
 // Built-in Tools
@@ -64,6 +66,9 @@ export { GrepTool } from './builtin/grep.js';
 // Shell operations
 export { BashTool } from './builtin/bash.js';
 
+// Subagent operations
+export { TaskTool } from './builtin/task.js';
+
 // ============================================================================
 // Security Utilities
 // ============================================================================
@@ -78,4 +83,3 @@ export {
 // Note: The following tools are planned but not yet implemented:
 // export { WebFetchTool } from './builtin/web-fetch';
 // export { AskUserTool } from './builtin/ask-user';
-// export { TaskTool } from './builtin/task';

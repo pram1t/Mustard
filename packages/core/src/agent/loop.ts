@@ -8,11 +8,12 @@
 import { randomUUID } from 'crypto';
 import type { Message, ChatParams, ToolCall, StreamChunk, ToolDefinition } from '@openagent/llm';
 import type { LLMRouter } from '@openagent/llm';
-import type { ToolResult, ExecutionContext } from '@openagent/tools';
+import type { ToolResult, ExecutionContext, ISubagentManager } from '@openagent/tools';
 import type { HookExecutor, HookResult } from '@openagent/hooks';
 import type { PermissionManager } from '../permissions/index.js';
 import { getLogger } from '@openagent/logger';
 import { ContextManager } from '../context/manager.js';
+import { SubagentManager } from './subagent.js';
 import type {
   AgentConfig,
   AgentEvent,
@@ -55,6 +56,7 @@ interface ResolvedAgentConfig {
   homeDir: string;
   hooks?: HookExecutor;
   permissions?: PermissionManager;
+  enableSubagents: boolean;
 }
 
 export class AgentLoop {
@@ -63,6 +65,7 @@ export class AgentLoop {
   private context: ContextManager;
   private state: AgentState;
   private initialized = false;
+  private subagentManager?: SubagentManager;
 
   /**
    * Create a new agent loop.
@@ -80,17 +83,31 @@ export class AgentLoop {
     const systemPrompt = config.systemPrompt
       || createSystemPrompt({ cwd });
 
+    const homeDir = config.homeDir || process.env.HOME || process.env.USERPROFILE || '';
+    const sessionId = config.sessionId || this.generateSessionId();
+
     this.config = {
       tools: config.tools,
       systemPrompt,
       maxIterations: config.maxIterations || DEFAULT_AGENT_CONFIG.maxIterations,
       contextConfig: config.contextConfig || {},
       cwd,
-      sessionId: config.sessionId || this.generateSessionId(),
-      homeDir: config.homeDir || process.env.HOME || process.env.USERPROFILE || '',
+      sessionId,
+      homeDir,
       hooks: config.hooks,
       permissions: config.permissions,
+      enableSubagents: config.enableSubagents ?? false,
     };
+
+    // Create subagent manager if enabled
+    if (this.config.enableSubagents) {
+      this.subagentManager = new SubagentManager(
+        router,
+        config.tools,
+        cwd,
+        homeDir
+      );
+    }
 
     // Create context manager using the router's primary provider
     const provider = router.getPrimaryProvider();
@@ -420,6 +437,7 @@ export class AgentLoop {
       homeDir: this.config.homeDir,
       config: {},
       signal,
+      subagentManager: this.subagentManager as ISubagentManager | undefined,
     };
 
     for (const toolCall of toolCalls) {

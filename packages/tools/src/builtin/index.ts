@@ -16,14 +16,14 @@ export { GrepTool } from './grep.js';
 // Shell operations
 export { BashTool } from './bash.js';
 
+// Subagent operations
+export { TaskTool } from './task.js';
+
 // Web operations
 // export { WebFetchTool } from './web-fetch';
 
 // Interaction
 // export { AskUserTool } from './ask-user';
-
-// Subagents
-// export { TaskTool } from './task';
 
 /**
  * List of all built-in tool names

@@ -21,3 +21,13 @@ export type {
 export { DEFAULT_AGENT_CONFIG } from './types.js';
 export { AgentLoop, createAgent } from './loop.js';
 export { executeTools, executeSingleTool, validateToolCalls } from './execution.js';
+
+// Subagent system
+export type {
+  SubagentType,
+  SubagentConfig,
+  SubagentResult,
+  SubagentTypeDefinition,
+} from './subagent-types.js';
+export { SUBAGENT_TYPES, isValidSubagentType, getSubagentTypeDefinition } from './subagent-types.js';
+export { SubagentManager } from './subagent.js';
