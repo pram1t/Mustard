@@ -18,7 +18,7 @@
   "keywords": ["openagent", "mcp"],
   "license": "MIT",
   "dependencies": {
-    "@openagent/core": "workspace:*"
+    "@openagent/core": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
