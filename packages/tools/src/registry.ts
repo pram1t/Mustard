@@ -2,6 +2,7 @@
  * Tool Registry
  *
  * Manages registration and execution of tools.
+ * Phase 11: Extended Tools - 21 tools total
  */
 
 import type {
@@ -15,7 +16,7 @@ import type {
 import { getLogger } from '@openagent/logger';
 import { auditLog } from './security.js';
 
-// Import built-in tools
+// Import built-in tools - Core
 import { ReadTool } from './builtin/read.js';
 import { WriteTool } from './builtin/write.js';
 import { EditTool } from './builtin/edit.js';
@@ -23,6 +24,22 @@ import { GlobTool } from './builtin/glob.js';
 import { GrepTool } from './builtin/grep.js';
 import { BashTool } from './builtin/bash.js';
 import { TaskTool } from './builtin/task.js';
+
+// Import Phase 11 tools - Extended
+import { MultiEditTool } from './builtin/multi-edit.js';
+import { NotebookEditTool } from './builtin/notebook.js';
+import { KillShellTool, ListShellsTool } from './builtin/shell-control.js';
+import { TaskOutputTool, TaskStopTool } from './builtin/task-control.js';
+import { WebFetchTool } from './builtin/web-fetch.js';
+import { WebSearchTool } from './builtin/web-search.js';
+import { TodoWriteTool, TodoReadTool } from './builtin/todo.js';
+import { AskUserQuestionTool } from './builtin/ask-user.js';
+
+// Import Phase 11 tools - Innovation
+import { DiffTool } from './builtin/diff.js';
+import { GitTool } from './builtin/git.js';
+import { TestRunnerTool } from './builtin/test-runner.js';
+import { APIClientTool } from './builtin/api-client.js';
 
 /**
  * Options for creating a default registry
@@ -33,6 +50,24 @@ export interface CreateRegistryOptions {
    * Requires SubagentManager to be passed in ExecutionContext.
    */
   includeTaskTool?: boolean;
+
+  /**
+   * Include extended tools (Phase 11).
+   * Defaults to true.
+   */
+  includeExtendedTools?: boolean;
+
+  /**
+   * Include innovation tools (Diff, Git, TestRunner, APIClient).
+   * Defaults to true.
+   */
+  includeInnovationTools?: boolean;
+
+  /**
+   * Include interactive tools (AskUserQuestion).
+   * Requires CLI environment to work properly.
+   */
+  includeInteractiveTools?: boolean;
 }
 
 /**
@@ -230,7 +265,18 @@ export class ToolRegistry implements IToolRegistry {
  * @param options - Options for customizing the registry
  */
 export function createDefaultRegistry(options: CreateRegistryOptions = {}): ToolRegistry {
+  const {
+    includeTaskTool = true,
+    includeExtendedTools = true,
+    includeInnovationTools = true,
+    includeInteractiveTools = false, // Off by default (needs CLI environment)
+  } = options;
+
   const registry = new ToolRegistry();
+
+  // ============================================================
+  // Core Tools (always included)
+  // ============================================================
 
   // File operations
   registry.register(new ReadTool());
@@ -244,14 +290,55 @@ export function createDefaultRegistry(options: CreateRegistryOptions = {}): Tool
   // Shell operations
   registry.register(new BashTool());
 
-  // Subagent operations (optional)
-  if (options.includeTaskTool) {
+  // Subagent operations
+  if (includeTaskTool) {
     registry.register(new TaskTool());
   }
 
-  // Note: These tools are planned but not yet implemented
-  // registry.register(new WebFetchTool());
-  // registry.register(new AskUserTool());
+  // ============================================================
+  // Extended Tools - Phase 11 (optional, default: true)
+  // ============================================================
+
+  if (includeExtendedTools) {
+    // File operations (extended)
+    registry.register(new MultiEditTool());
+    registry.register(new NotebookEditTool());
+
+    // Shell control
+    registry.register(new KillShellTool());
+    registry.register(new ListShellsTool());
+
+    // Task control
+    registry.register(new TaskOutputTool());
+    registry.register(new TaskStopTool());
+
+    // Web operations
+    registry.register(new WebFetchTool());
+    registry.register(new WebSearchTool());
+
+    // Task management
+    registry.register(new TodoWriteTool());
+    registry.register(new TodoReadTool());
+  }
+
+  // ============================================================
+  // Interactive Tools (optional, default: false)
+  // ============================================================
+
+  if (includeInteractiveTools) {
+    registry.register(new AskUserQuestionTool());
+  }
+
+  // ============================================================
+  // Innovation Tools (optional, default: true)
+  // ============================================================
+
+  if (includeInnovationTools) {
+    registry.register(new DiffTool());
+    registry.register(new GitTool());
+    registry.register(new TestRunnerTool());
+    registry.register(new APIClientTool());
+  }
 
   return registry;
 }
