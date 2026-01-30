@@ -211,9 +211,21 @@ export class HookExecutor {
           stderr += data.toString();
         });
 
+        // Handle stdin errors (EPIPE if process exits before we write)
+        proc.stdin.on('error', (err) => {
+          // Ignore EPIPE - process exited before we could write, which is fine
+          if ((err as NodeJS.ErrnoException).code !== 'EPIPE') {
+            logger.debug('Hook stdin error', { error: err.message });
+          }
+        });
+
         // Send input via stdin
-        proc.stdin.write(JSON.stringify(input));
-        proc.stdin.end();
+        try {
+          proc.stdin.write(JSON.stringify(input));
+          proc.stdin.end();
+        } catch {
+          // Ignore write errors - process may have already exited
+        }
 
         // Timeout handler
         const timeoutId = setTimeout(() => {
