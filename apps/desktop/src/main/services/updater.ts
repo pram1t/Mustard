@@ -41,6 +41,25 @@ export type UpdateStatus =
   | 'error';
 
 // =============================================================================
+// DYNAMIC IMPORT HELPER
+// =============================================================================
+
+/**
+ * Attempt to load electron-updater at runtime.
+ * Returns null if not installed (development mode).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function tryLoadUpdater(): any | null {
+  try {
+    // Use require for optional dependency — electron-updater may not be installed
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('electron-updater');
+  } catch {
+    return null;
+  }
+}
+
+// =============================================================================
 // UPDATE SERVICE
 // =============================================================================
 
@@ -53,7 +72,7 @@ export class UpdateService {
    * Initialize the update service.
    * Skips initialization in development mode.
    */
-  async initialize(mainWindow: BrowserWindow): Promise<void> {
+  initialize(mainWindow: BrowserWindow): void {
     this.mainWindow = mainWindow;
 
     if (!app.isPackaged) {
@@ -61,108 +80,107 @@ export class UpdateService {
       return;
     }
 
-    try {
-      // Dynamic import to handle cases where electron-updater isn't installed
-      const { autoUpdater } = await import('electron-updater');
-
-      // Configure updater
-      autoUpdater.autoDownload = false; // Let user decide
-      autoUpdater.autoInstallOnAppQuit = true;
-      autoUpdater.allowDowngrade = false;
-
-      // Event handlers
-      autoUpdater.on('checking-for-update', () => {
-        this.setStatus('checking');
-      });
-
-      autoUpdater.on('update-available', (info) => {
-        this.updateInfo = {
-          version: info.version,
-          releaseNotes: typeof info.releaseNotes === 'string' ? info.releaseNotes : undefined,
-          releaseDate: info.releaseDate,
-        };
-        this.setStatus('available');
-        this.sendToRenderer('update:available', this.updateInfo);
-      });
-
-      autoUpdater.on('update-not-available', () => {
-        this.setStatus('not-available');
-        this.sendToRenderer('update:not-available', null);
-      });
-
-      autoUpdater.on('download-progress', (progress) => {
-        this.setStatus('downloading');
-        this.sendToRenderer('update:progress', {
-          percent: progress.percent,
-          bytesPerSecond: progress.bytesPerSecond,
-          total: progress.total,
-          transferred: progress.transferred,
-        } as UpdateProgress);
-      });
-
-      autoUpdater.on('update-downloaded', () => {
-        this.setStatus('downloaded');
-        this.sendToRenderer('update:downloaded', this.updateInfo);
-      });
-
-      autoUpdater.on('error', (error) => {
-        this.setStatus('error');
-        this.sendToRenderer('update:error', { message: error.message });
-        console.error('[Updater] Error:', error);
-      });
-
-      // Check for updates on startup (delayed to not slow down boot)
-      setTimeout(() => {
-        this.checkForUpdates();
-      }, 10000); // 10 second delay
-
-      console.log('[Updater] Initialized');
-    } catch (error) {
-      console.log('[Updater] electron-updater not available:', (error as Error).message);
+    const updaterModule = tryLoadUpdater();
+    if (!updaterModule) {
+      console.log('[Updater] electron-updater not installed — skipping');
+      return;
     }
+
+    const { autoUpdater } = updaterModule;
+
+    // Configure updater
+    autoUpdater.autoDownload = false; // Let user decide
+    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.allowDowngrade = false;
+
+    // Event handlers
+    autoUpdater.on('checking-for-update', () => {
+      this.setStatus('checking');
+    });
+
+    autoUpdater.on('update-available', (info: { version: string; releaseNotes?: string | unknown; releaseDate?: string }) => {
+      this.updateInfo = {
+        version: info.version,
+        releaseNotes: typeof info.releaseNotes === 'string' ? info.releaseNotes : undefined,
+        releaseDate: info.releaseDate,
+      };
+      this.setStatus('available');
+      this.sendToRenderer('update:available', this.updateInfo);
+    });
+
+    autoUpdater.on('update-not-available', () => {
+      this.setStatus('not-available');
+      this.sendToRenderer('update:not-available', null);
+    });
+
+    autoUpdater.on('download-progress', (progress: { percent: number; bytesPerSecond: number; total: number; transferred: number }) => {
+      this.setStatus('downloading');
+      this.sendToRenderer('update:progress', {
+        percent: progress.percent,
+        bytesPerSecond: progress.bytesPerSecond,
+        total: progress.total,
+        transferred: progress.transferred,
+      } as UpdateProgress);
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+      this.setStatus('downloaded');
+      this.sendToRenderer('update:downloaded', this.updateInfo);
+    });
+
+    autoUpdater.on('error', (error: Error) => {
+      this.setStatus('error');
+      this.sendToRenderer('update:error', { message: error.message });
+      console.error('[Updater] Error:', error);
+    });
+
+    // Check for updates on startup (delayed to not slow down boot)
+    setTimeout(() => {
+      this.checkForUpdates();
+    }, 10000); // 10 second delay
+
+    console.log('[Updater] Initialized');
   }
 
   /**
    * Check for available updates.
    */
-  async checkForUpdates(): Promise<void> {
+  checkForUpdates(): void {
     if (!app.isPackaged) return;
 
-    try {
-      const { autoUpdater } = await import('electron-updater');
-      await autoUpdater.checkForUpdates();
-    } catch (error) {
+    const updaterModule = tryLoadUpdater();
+    if (!updaterModule) return;
+
+    updaterModule.autoUpdater.checkForUpdates().catch((error: Error) => {
       console.error('[Updater] Check failed:', error);
-    }
+    });
   }
 
   /**
    * Download the available update.
    */
-  async downloadUpdate(): Promise<void> {
+  downloadUpdate(): void {
     if (!app.isPackaged) return;
 
-    try {
-      const { autoUpdater } = await import('electron-updater');
-      await autoUpdater.downloadUpdate();
-    } catch (error) {
+    const updaterModule = tryLoadUpdater();
+    if (!updaterModule) return;
+
+    updaterModule.autoUpdater.downloadUpdate().catch((error: Error) => {
       console.error('[Updater] Download failed:', error);
       this.setStatus('error');
-    }
+    });
   }
 
   /**
    * Install the downloaded update and restart.
    */
-  async installUpdate(): Promise<void> {
+  installUpdate(): void {
     if (!app.isPackaged) return;
 
-    try {
-      const { autoUpdater } = await import('electron-updater');
-      autoUpdater.quitAndInstall(false, true);
-    } catch (error) {
-      console.error('[Updater] Install failed:', error);
-    }
+    const updaterModule = tryLoadUpdater();
+    if (!updaterModule) return;
+
+    updaterModule.autoUpdater.quitAndInstall(false, true);
   }
 
   /**

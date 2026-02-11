@@ -28,7 +28,7 @@ describe('UpdateService', () => {
     expect(updateInfo).toBeNull();
   });
 
-  it('skips initialization in development mode', async () => {
+  it('skips initialization in development mode', () => {
     const mockWindow = {
       isDestroyed: vi.fn(() => false),
       webContents: {
@@ -37,23 +37,23 @@ describe('UpdateService', () => {
     } as unknown as Electron.BrowserWindow;
 
     // Should not throw
-    await service.initialize(mockWindow);
+    service.initialize(mockWindow);
     expect(service.getStatus().status).toBe('idle');
   });
 
-  it('skips checkForUpdates in development mode', async () => {
+  it('skips checkForUpdates in development mode', () => {
     // Should not throw
-    await service.checkForUpdates();
+    service.checkForUpdates();
     expect(service.getStatus().status).toBe('idle');
   });
 
-  it('skips downloadUpdate in development mode', async () => {
-    await service.downloadUpdate();
+  it('skips downloadUpdate in development mode', () => {
+    service.downloadUpdate();
     expect(service.getStatus().status).toBe('idle');
   });
 
-  it('skips installUpdate in development mode', async () => {
-    await service.installUpdate();
+  it('skips installUpdate in development mode', () => {
+    service.installUpdate();
     expect(service.getStatus().status).toBe('idle');
   });
 });
