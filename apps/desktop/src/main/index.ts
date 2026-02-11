@@ -8,6 +8,7 @@ import { createSecureWindow } from './window/factory';
 import { setMainWindow, getMainWindow } from './window';
 import { loadWindowState, saveWindowState } from './window/state';
 import { registerIpcHandlers } from './ipc';
+import { initializeServices, disposeServices } from './services';
 
 // ── Pre-ready security (must run before app.whenReady) ──────────────────────
 configureAppSecurity();
@@ -82,8 +83,13 @@ async function createMainWindow(): Promise<void> {
 // ── App lifecycle ───────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
   configureWebSecurity();
+  await initializeServices();
   registerIpcHandlers();
   await createMainWindow();
+});
+
+app.on('before-quit', () => {
+  disposeServices();
 });
 
 app.on('window-all-closed', () => {

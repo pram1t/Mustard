@@ -12,19 +12,23 @@
     "sbom": "cyclonedx-npm --output-format json --output-file sbom.json"
   },
   "dependencies": {
-    "@openagent/core": "*",
     "@openagent/config": "*",
+    "@openagent/core": "*",
+    "@openagent/llm": "*",
+    "@openagent/mcp": "*",
+    "@openagent/tools": "*",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
-    "electron": "34.1.0",
-    "electron-vite": "^4.0.1",
-    "electron-builder": "^24.13.3",
-    "@vitejs/plugin-react": "^4.3.0",
+    "@cyclonedx/cyclonedx-npm": "^4.1.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.9.3",
-    "@cyclonedx/cyclonedx-npm": "^4.1.2"
+    "@vitejs/plugin-react": "^4.3.0",
+    "electron": "34.1.0",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^4.0.1",
+    "typescript": "^5.9.3"
   }
 }

@@ -1,33 +1,30 @@
 import { ipcMain } from 'electron';
 import { IPC_CHANNELS } from '../../../shared/ipc-channels';
 import { validateSender } from '../validate-sender';
+import { getConfigService } from '../../services';
 
 /**
  * Registers configuration IPC handlers.
- * Stub implementations — real config service comes in Phase 5+.
+ * Each handler: validateSender first, then delegate to ConfigService.
  */
 export function registerConfigHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.CONFIG_GET, async (event) => {
     validateSender(event);
-    // TODO(phase-5): Forward to configService.get()
-    return { provider: '', model: '', theme: 'system' as const };
+    return getConfigService().get();
   });
 
-  ipcMain.handle(IPC_CHANNELS.CONFIG_SET, async (event, _payload: { config: Record<string, unknown> }) => {
+  ipcMain.handle(IPC_CHANNELS.CONFIG_SET, async (event, payload: { config: Record<string, unknown> }) => {
     validateSender(event);
-    // TODO(phase-5): Forward to configService.set(payload.config)
-    return { success: true };
+    return getConfigService().set(payload.config);
   });
 
   ipcMain.handle(IPC_CHANNELS.CONFIG_GET_PROVIDERS, async (event) => {
     validateSender(event);
-    // TODO(phase-5): Forward to configService.getProviders()
-    return [];
+    return getConfigService().getProviders();
   });
 
-  ipcMain.handle(IPC_CHANNELS.CONFIG_GET_MODELS, async (event, _payload: { provider: string }) => {
+  ipcMain.handle(IPC_CHANNELS.CONFIG_GET_MODELS, async (event, payload: { provider: string }) => {
     validateSender(event);
-    // TODO(phase-5): Forward to configService.getModels(payload.provider)
-    return [];
+    return getConfigService().getModels(payload.provider);
   });
 }
