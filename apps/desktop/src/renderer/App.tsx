@@ -3,8 +3,12 @@ import type { ReactNode } from 'react';
 function App(): ReactNode {
   return (
     <div className="app">
-      <h1>OpenAgent Desktop</h1>
-      <p>Phase 1 - Setup Complete</p>
+      <header className="app-header">
+        <h1>OpenAgent</h1>
+      </header>
+      <main className="app-main">
+        <p className="app-placeholder">Ready</p>
+      </main>
     </div>
   );
 }

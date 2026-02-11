@@ -34,12 +34,22 @@ export default defineConfig({
     },
   },
   renderer: {
-    plugins: [react()],
+    plugins: [
+      react({
+        jsxRuntime: 'automatic',
+      }),
+    ],
     root: resolve(__dirname, 'src/renderer'),
     build: {
+      minify: 'esbuild',
+      target: 'esnext',
+      assetsInlineLimit: 0,
       rollupOptions: {
         input: {
           index: resolve(__dirname, 'src/renderer/index.html'),
+        },
+        output: {
+          inlineDynamicImports: false,
         },
       },
     },

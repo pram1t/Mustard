@@ -40,6 +40,19 @@ See `src/main/process-model.md` for trust boundary documentation.
 - Remote debugging port disabled in production
 - Autoplay requires user gesture
 
+### 9. Content Security Policy
+- Belt-and-suspenders: CSP meta tag in HTML + CSP HTTP header from main process
+- Production: no `unsafe-eval`, no `unsafe-inline` for scripts
+- Development: relaxed for Vite HMR (`unsafe-inline` scripts, `ws:`/`wss:`)
+- `unsafe-inline` allowed for `style-src` only (React requirement)
+- CSP violations logged to renderer console via `securitypolicyviolation` listener
+- See `docs/RENDERER-SECURITY.md` for full policy details
+
+### 10. Permission Handler (Upgraded)
+- 17 explicit permission decisions (grant/deny/prompt)
+- WebContents origin verification (rejects non-main-window requests)
+- Default deny for unknown permissions
+
 ## Module Layout
 
 ```
@@ -50,7 +63,7 @@ src/main/
     devtools.ts         - DevTools access control
     sandbox.ts          - Global sandbox enforcement
     verify-isolation.ts - Dev-mode context isolation verification
-    web-security.ts     - Session security (headers, permission handler)
+    web-security.ts     - Session security (CSP + headers, permission handler)
   window/
     defaults.ts         - Secure BrowserWindow defaults
     factory.ts          - Window creation factory (validates security)
@@ -59,6 +72,11 @@ src/main/
   ipc/
     index.ts            - IPC handler registration
   index.ts              - Slim orchestrator
+src/shared/
+  csp.ts                - CSP directives, builder, environment selector
+src/renderer/
+  utils/csp-reporter.ts - CSP violation console logging
+  components/ErrorBoundary.tsx - React error boundary
 ```
 
 ## Verification
@@ -76,7 +94,7 @@ npm run dev --workspace=openagent-desktop
 
 Expected console output in dev mode:
 - "Sandbox mode enforced for all renderers"
-- "Web security configured"
+- "Web security configured (CSP + security headers)"
 - "Permission handler configured"
 - "Context isolation verified: ['getAppInfo']"
 
@@ -88,8 +106,10 @@ Expected console output in dev mode:
 - [ ] webSecurity: true
 - [ ] webviewTag: false
 - [ ] DevTools disabled in production
-- [ ] CSP configured (in renderer/index.html)
+- [ ] CSP meta tag in renderer/index.html (production)
+- [ ] CSP HTTP header from main process (environment-aware)
+- [ ] No unsafe-eval in production CSP
 - [ ] Navigation restricted
-- [ ] Permission handler default-deny
+- [ ] Permission handler default-deny with origin verification
 - [ ] Single instance enforced in production
 - [ ] ELECTRON_RUN_AS_NODE deleted

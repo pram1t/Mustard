@@ -31,6 +31,13 @@ export function getSecureWindowDefaults(
     // Window defaults
     show: false, // Show after ready-to-show
     backgroundColor: '#1e1e1e',
+
+    // Platform-specific styling
+    frame: process.platform !== 'darwin',
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : undefined,
+    trafficLightPosition: process.platform === 'darwin'
+      ? { x: 12, y: 12 }
+      : undefined,
   };
 }
 

@@ -1,7 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { setupCSPReporter } from './utils/csp-reporter';
 import App from './App';
 import './styles/index.css';
+
+setupCSPReporter();
 
 const container = document.getElementById('root');
 if (!container) {
@@ -10,6 +14,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>
 );
