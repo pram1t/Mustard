@@ -11,6 +11,8 @@ import { registerIpcHandlers } from './ipc';
 import { initializeServices, disposeServices } from './services';
 import { initAllowedPaths } from './security/path-validation';
 import { registerProtocol, parseDeepLink, extractDeepLinkFromArgs } from './protocol/deep-link';
+import { createTray, destroyTray } from './window/tray';
+import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './window/shortcuts';
 
 // ── Pre-ready security (must run before app.whenReady) ──────────────────────
 configureAppSecurity();
@@ -96,9 +98,18 @@ app.whenReady().then(async () => {
   await initializeServices();
   registerIpcHandlers();
   await createMainWindow();
+
+  // Set up tray and global shortcuts after window creation
+  const mainWindow = getMainWindow();
+  if (mainWindow) {
+    createTray(mainWindow);
+    registerGlobalShortcuts(mainWindow);
+  }
 });
 
 app.on('before-quit', () => {
+  unregisterGlobalShortcuts();
+  destroyTray();
   disposeServices();
 });
 
