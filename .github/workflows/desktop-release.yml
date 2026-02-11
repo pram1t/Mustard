@@ -1,0 +1,79 @@
+name: Desktop Release
+
+on:
+  push:
+    tags:
+      - 'desktop-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npx vitest run --config apps/desktop/vitest.config.ts
+
+      - name: Type check
+        run: npm run typecheck --workspace=openagent-desktop
+
+      - name: Build application
+        run: npm run build --workspace=openagent-desktop
+
+      - name: Generate SBOM
+        run: npm run sbom --workspace=openagent-desktop
+        continue-on-error: true
+
+      - name: Build & Publish (macOS)
+        if: matrix.os == 'macos-latest'
+        run: npx electron-builder --config apps/desktop/electron-builder.yml --mac --publish always
+        working-directory: apps/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - name: Build & Publish (Windows)
+        if: matrix.os == 'windows-latest'
+        run: npx electron-builder --config apps/desktop/electron-builder.yml --win --publish always
+        working-directory: apps/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+
+      - name: Build & Publish (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: npx electron-builder --config apps/desktop/electron-builder.yml --linux --publish always
+        working-directory: apps/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload SBOM
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: apps/desktop/sbom.json
+          retention-days: 90

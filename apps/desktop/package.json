@@ -9,7 +9,14 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
-    "sbom": "cyclonedx-npm --output-format json --output-file sbom.json"
+    "sbom": "cyclonedx-npm --output-format json --output-file sbom.json",
+    "pack": "electron-builder --config electron-builder.yml --dir",
+    "dist": "electron-builder --config electron-builder.yml",
+    "dist:win": "electron-builder --config electron-builder.yml --win",
+    "dist:mac": "electron-builder --config electron-builder.yml --mac",
+    "dist:linux": "electron-builder --config electron-builder.yml --linux",
+    "audit:native": "npx tsx scripts/audit-native-modules.ts",
+    "audit:security": "npm audit --audit-level=high"
   },
   "dependencies": {
     "@openagent/config": "*",
