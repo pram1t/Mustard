@@ -1,0 +1,27 @@
+appId: com.openagent.desktop
+productName: OpenAgent
+directories:
+  buildResources: resources
+  output: release
+files:
+  - out/**/*
+  - "!node_modules"
+extraMetadata:
+  main: out/main/index.js
+win:
+  target:
+    - nsis
+  icon: resources/icon.ico
+mac:
+  target:
+    - dmg
+  icon: resources/icon.png
+  category: public.app-category.developer-tools
+linux:
+  target:
+    - AppImage
+  icon: resources/icon.png
+  category: Development
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

@@ -1,0 +1,30 @@
+{
+  "name": "openagent-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenAgent Desktop application",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit",
+    "sbom": "cyclonedx-npm --output-format json --output-file sbom.json"
+  },
+  "dependencies": {
+    "@openagent/core": "*",
+    "@openagent/config": "*",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "electron": "34.1.0",
+    "electron-vite": "^4.0.1",
+    "electron-builder": "^24.13.3",
+    "@vitejs/plugin-react": "^4.3.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.3",
+    "@cyclonedx/cyclonedx-npm": "^4.1.2"
+  }
+}

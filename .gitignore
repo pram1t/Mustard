@@ -53,5 +53,12 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# Electron
+apps/desktop/release/
+apps/desktop/sbom.json
+*.dmg
+*.AppImage
+*.snap
+
 # Optional: Bun lockfile (uncomment if needed)
 # bun.lockb

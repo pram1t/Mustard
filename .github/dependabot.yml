@@ -1,0 +1,28 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    groups:
+      electron:
+        patterns:
+          - "electron"
+          - "electron-*"
+          - "@electron/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      vite:
+        patterns:
+          - "vite"
+          - "electron-vite"
+          - "@vitejs/*"
+    ignore:
+      - dependency-name: "electron"
+        update-types: ["version-update:semver-major"]
