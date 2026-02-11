@@ -10,11 +10,13 @@ import { loadWindowState, saveWindowState } from './window/state';
 import { registerIpcHandlers } from './ipc';
 import { initializeServices, disposeServices } from './services';
 import { initAllowedPaths } from './security/path-validation';
+import { registerProtocol, parseDeepLink, extractDeepLinkFromArgs } from './protocol/deep-link';
 
 // ── Pre-ready security (must run before app.whenReady) ──────────────────────
 configureAppSecurity();
 configureSecureSwitches();
 enforceSandbox();
+registerProtocol();
 
 // ── Single instance lock (production only) ──────────────────────────────────
 if (app.isPackaged) {
@@ -22,11 +24,17 @@ if (app.isPackaged) {
   if (!gotTheLock) {
     app.quit();
   } else {
-    app.on('second-instance', () => {
+    app.on('second-instance', (_event, argv) => {
       const win = getMainWindow();
       if (win) {
         if (win.isMinimized()) win.restore();
         win.focus();
+
+        // Handle deep link from second instance (Windows/Linux)
+        const deepLink = extractDeepLinkFromArgs(argv);
+        if (deepLink) {
+          handleDeepLink(deepLink);
+        }
       }
     });
   }
@@ -105,3 +113,23 @@ app.on('activate', async () => {
     await createMainWindow();
   }
 });
+
+// ── Deep link handling (macOS) ──────────────────────────────────────────────
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  handleDeepLink(url);
+});
+
+function handleDeepLink(rawUrl: string): void {
+  const result = parseDeepLink(rawUrl);
+  if (!result) return;
+
+  const win = getMainWindow();
+  if (!win) return;
+
+  // Navigate to the deep link route via hash
+  const params = new URLSearchParams(result.params).toString();
+  const hash = params ? `${result.route}?${params}` : result.route;
+  win.webContents.send('navigate', hash);
+  console.log(`[DeepLink] Navigated to: ${hash}`);
+}
