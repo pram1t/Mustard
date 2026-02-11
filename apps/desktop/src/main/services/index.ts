@@ -1,13 +1,14 @@
 /**
  * Service Layer — Initialization & Singleton Access
  *
- * Creates LLMRouter, ToolRegistry, MCPRegistry, and the three services.
+ * Creates LLMRouter, ToolRegistry, MCPRegistry, CredentialService, and the three services.
  * Must be called before IPC handlers are registered.
  */
 
 import { AgentService } from './agent';
-import { ConfigService } from './config';
+import { ConfigService, ENV_KEY_MAP } from './config';
 import { MCPService } from './mcp';
+import { CredentialService } from './credentials';
 import { getConfig } from '@openagent/config';
 import {
   LLMRouter,
@@ -24,6 +25,7 @@ import { createDefaultRegistry } from '@openagent/tools';
 let agentService: AgentService | null = null;
 let configService: ConfigService | null = null;
 let mcpService: MCPService | null = null;
+let credentialService: CredentialService | null = null;
 
 // ── Getter functions (throw if not initialized) ──────────────────────────────
 
@@ -42,10 +44,20 @@ export function getMCPService(): MCPService {
   return mcpService;
 }
 
+export function getCredentialService(): CredentialService {
+  if (!credentialService) throw new Error('CredentialService not initialized');
+  return credentialService;
+}
+
 // ── Initialization ───────────────────────────────────────────────────────────
 
 export async function initializeServices(): Promise<void> {
   console.log('[Services] Initializing...');
+
+  // 0. Initialize credential store and load saved API keys
+  credentialService = new CredentialService();
+  await credentialService.initialize();
+  await loadSavedApiKeys(credentialService);
 
   const config = getConfig();
 
@@ -63,13 +75,16 @@ export async function initializeServices(): Promise<void> {
 
   // 4. Create services
   agentService = new AgentService(router, tools);
-  configService = new ConfigService(router);
+  configService = new ConfigService(router, credentialService);
   mcpService = new MCPService(mcpRegistry);
 
+  const backend = credentialService.getStorageBackend();
   console.log('[Services] Initialized', {
     provider: config.llm.provider,
     model: config.llm.model,
     hasApiKey: !!config.llm.apiKey,
+    credentialBackend: backend.backend,
+    secureStorage: backend.secure,
   });
 }
 
@@ -80,6 +95,7 @@ export function disposeServices(): void {
   agentService = null;
   configService = null;
   mcpService = null;
+  credentialService = null;
   console.log('[Services] Disposed');
 }
 
@@ -146,4 +162,29 @@ function createRouterFromConfig(config: ReturnType<typeof getConfig>): LLMRouter
   }
 
   return router;
+}
+
+// ── Boot-time API Key Loading ────────────────────────────────────────────────
+
+async function loadSavedApiKeys(credentials: CredentialService): Promise<void> {
+  const storedKeys = credentials.list('api_key');
+  if (storedKeys.length === 0) {
+    console.log('[Services] No saved API keys found');
+    return;
+  }
+
+  for (const meta of storedKeys) {
+    const envVar = ENV_KEY_MAP[meta.id];
+    if (!envVar || process.env[envVar]) continue; // Skip if env already set
+
+    try {
+      const apiKey = await credentials.retrieve('api_key', meta.id);
+      if (apiKey) {
+        process.env[envVar] = apiKey;
+        console.log(`[Services] Loaded saved API key for ${meta.id}`);
+      }
+    } catch (error) {
+      console.error(`[Services] Failed to load API key for ${meta.id}:`, error);
+    }
+  }
 }

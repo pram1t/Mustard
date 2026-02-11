@@ -54,6 +54,7 @@ coverage/
 .nyc_output/
 
 # Electron
+apps/desktop/out/
 apps/desktop/release/
 apps/desktop/sbom.json
 *.dmg

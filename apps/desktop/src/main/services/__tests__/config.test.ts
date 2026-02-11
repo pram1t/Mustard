@@ -21,10 +21,12 @@ vi.mock('@openagent/config', () => ({
 
 import { ConfigService } from '../config';
 import type { LLMRouter, LLMProvider } from '@openagent/llm';
+import type { CredentialService } from '../credentials';
 
 describe('ConfigService', () => {
   let service: ConfigService;
   let mockRouter: LLMRouter;
+  let mockCredentials: CredentialService;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -45,7 +47,18 @@ describe('ConfigService', () => {
       })),
     } as unknown as LLMRouter;
 
-    service = new ConfigService(mockRouter);
+    mockCredentials = {
+      store: vi.fn(async () => {}),
+      retrieve: vi.fn(async () => null),
+      delete: vi.fn(async () => {}),
+      has: vi.fn(() => false),
+      list: vi.fn(() => []),
+      initialize: vi.fn(async () => {}),
+      isSecureStorageAvailable: vi.fn(() => true),
+      getStorageBackend: vi.fn(() => ({ backend: 'Test', secure: true })),
+    } as unknown as CredentialService;
+
+    service = new ConfigService(mockRouter, mockCredentials);
   });
 
   it('get() returns SafeConfig with hasApiKey but no actual key', () => {

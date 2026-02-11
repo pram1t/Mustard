@@ -3,6 +3,7 @@
  *
  * Wraps @openagent/config as a thin delegation layer.
  * Critical: API keys are NEVER exposed to the renderer.
+ * API key storage is delegated to CredentialService.
  */
 
 import { getConfig } from '@openagent/config';
@@ -13,12 +14,22 @@ import type {
   ProviderInfo,
   ModelInfo,
 } from '../../shared/preload-api';
+import type { CredentialService } from './credentials';
+
+export const ENV_KEY_MAP: Record<string, string> = {
+  openai: 'OPENAI_API_KEY',
+  anthropic: 'ANTHROPIC_API_KEY',
+  gemini: 'GEMINI_API_KEY',
+  ollama: '',
+};
 
 export class ConfigService {
   private router: LLMRouter;
+  private credentials: CredentialService;
 
-  constructor(router: LLMRouter) {
+  constructor(router: LLMRouter, credentials: CredentialService) {
     this.router = router;
+    this.credentials = credentials;
   }
 
   /**
@@ -112,20 +123,54 @@ export class ConfigService {
     }
   }
 
+  /**
+   * Stores an API key via CredentialService.
+   * Also sets the environment variable for immediate use.
+   */
+  async setApiKey(provider: string, apiKey: string): Promise<{ success: boolean }> {
+    try {
+      await this.credentials.store('api_key', provider, apiKey, `API key for ${provider}`);
+
+      const envVar = ENV_KEY_MAP[provider];
+      if (envVar) {
+        process.env[envVar] = apiKey;
+      }
+      return { success: true };
+    } catch (error) {
+      console.error('[ConfigService] setApiKey failed:', error);
+      return { success: false };
+    }
+  }
+
+  /**
+   * Removes a stored API key and clears the environment variable.
+   */
+  async removeApiKey(provider: string): Promise<{ success: boolean }> {
+    try {
+      await this.credentials.delete('api_key', provider);
+
+      const envVar = ENV_KEY_MAP[provider];
+      if (envVar) {
+        delete process.env[envVar];
+      }
+      return { success: true };
+    } catch (error) {
+      console.error('[ConfigService] removeApiKey failed:', error);
+      return { success: false };
+    }
+  }
+
   private checkHasApiKey(providerName: string): boolean {
     const config = getConfig();
-    // If this is the configured provider, check config apiKey
     if (providerName === config.llm.provider && config.llm.apiKey) {
       return true;
     }
-    // Check environment variables
-    const envKeyMap: Record<string, string> = {
-      openai: 'OPENAI_API_KEY',
-      anthropic: 'ANTHROPIC_API_KEY',
-      gemini: 'GEMINI_API_KEY',
-      ollama: '', // No key needed
-    };
-    const envVar = envKeyMap[providerName];
+    // Check credential store
+    if (this.credentials.has('api_key', providerName)) {
+      return true;
+    }
+    // Check environment
+    const envVar = ENV_KEY_MAP[providerName];
     if (!envVar) return providerName === 'ollama';
     return !!process.env[envVar];
   }
