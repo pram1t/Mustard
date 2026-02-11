@@ -30,7 +30,13 @@ import {
   type SessionData,
 } from '@openagent/core';
 import { createLogger, setDefaultLogger } from '@openagent/logger';
-import { loadConfig, validateStartup, type HooksConfig } from '@openagent/config';
+import {
+  loadConfig,
+  validateStartup,
+  loadResolvedConfig,
+  type HooksConfig,
+} from '@openagent/config';
+import { initCommand, configCommand, plansCommand } from './commands/index.js';
 import { createHookExecutor, type HookExecutor } from '@openagent/hooks';
 import {
   MCPRegistry,
@@ -111,6 +117,34 @@ interface SessionSubcommand {
 }
 
 /**
+ * Init subcommand arguments
+ */
+interface InitSubcommand {
+  global?: boolean;
+  model?: string;
+  provider?: string;
+}
+
+/**
+ * Config subcommand arguments
+ */
+interface ConfigSubcommand {
+  action: 'list' | 'get' | 'set' | 'edit' | 'path';
+  key?: string;
+  value?: string;
+  global?: boolean;
+}
+
+/**
+ * Plans subcommand arguments
+ */
+interface PlansSubcommand {
+  action: 'list' | 'show' | 'delete';
+  id?: string;
+  status?: 'draft' | 'approved' | 'completed' | 'abandoned';
+}
+
+/**
  * Parse command line arguments
  */
 function parseArgs(): {
@@ -123,6 +157,9 @@ function parseArgs(): {
   verbose: boolean;
   mcpSubcommand?: MCPSubcommand;
   sessionSubcommand?: SessionSubcommand;
+  initSubcommand?: InitSubcommand;
+  configSubcommand?: ConfigSubcommand;
+  plansSubcommand?: PlansSubcommand;
   resume?: string;
   noSave: boolean;
   permissionMode: PermissionMode;
@@ -139,6 +176,9 @@ function parseArgs(): {
   const promptParts: string[] = [];
   let mcpSubcommand: MCPSubcommand | undefined;
   let sessionSubcommand: SessionSubcommand | undefined;
+  let initSubcommand: InitSubcommand | undefined;
+  let configSubcommand: ConfigSubcommand | undefined;
+  let plansSubcommand: PlansSubcommand | undefined;
   let resume: string | undefined;
   let noSave = false;
   let permissionMode: PermissionMode = 'default';
@@ -184,7 +224,7 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
   }
 
   // Check for session subcommand
@@ -201,7 +241,64 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+  }
+
+  // Check for init subcommand
+  if (args[0] === 'init') {
+    const initOpts: InitSubcommand = {};
+    for (let i = 1; i < args.length; i++) {
+      if (args[i] === '--global' || args[i] === '-g') {
+        initOpts.global = true;
+      } else if (args[i] === '--model' || args[i] === '-m') {
+        initOpts.model = args[++i];
+      } else if (args[i] === '--provider' || args[i] === '-p') {
+        initOpts.provider = args[++i];
+      }
+    }
+    initSubcommand = initOpts;
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+  }
+
+  // Check for config subcommand
+  if (args[0] === 'config') {
+    const action = args[1] as ConfigSubcommand['action'] || 'list';
+    const configOpts: ConfigSubcommand = { action };
+
+    if (action === 'get' || action === 'set') {
+      configOpts.key = args[2];
+      if (action === 'set') {
+        configOpts.value = args[3];
+      }
+    }
+
+    for (let i = 2; i < args.length; i++) {
+      if (args[i] === '--global' || args[i] === '-g') {
+        configOpts.global = true;
+      }
+    }
+
+    configSubcommand = configOpts;
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+  }
+
+  // Check for plans subcommand
+  if (args[0] === 'plans' || args[0] === 'plan') {
+    const action = (args[1] || 'list') as PlansSubcommand['action'];
+    const plansOpts: PlansSubcommand = { action };
+
+    if (action === 'show' || action === 'delete') {
+      plansOpts.id = args[2];
+    }
+
+    for (let i = 2; i < args.length; i++) {
+      if (args[i] === '--status' || args[i] === '-s') {
+        plansOpts.status = args[++i] as PlansSubcommand['status'];
+      }
+    }
+
+    plansSubcommand = plansOpts;
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -249,6 +346,9 @@ function parseArgs(): {
     verbose,
     mcpSubcommand,
     sessionSubcommand,
+    initSubcommand,
+    configSubcommand,
+    plansSubcommand,
     resume,
     noSave,
     permissionMode,
@@ -265,6 +365,9 @@ function printHelp(): void {
 OpenAgent CLI v${VERSION}
 
 Usage: openagent [options] <prompt>
+       openagent init [options]
+       openagent config <subcommand> [options]
+       openagent plans [subcommand] [options]
        openagent mcp <subcommand> [options]
        openagent session <subcommand> [options]
 
@@ -292,6 +395,29 @@ Permission Modes:
   permissive        Allow everything not explicitly denied
   default           Allow safe tools (Read, Glob, Grep), ask for others
   strict            Ask for everything not explicitly allowed
+
+Init Subcommand:
+  init                                  Create .openagent/ in current directory
+  init --global                         Create ~/.openagent/ if missing
+  init --model <model>                  Set default model
+  init --provider <provider>            Set default provider
+
+Config Subcommands:
+  config list                           Show merged config with sources
+  config get <key>                      Get specific value
+  config set <key> <value>              Set in project config
+  config set <key> <value> --global     Set in global config
+  config edit                           Open project config in editor
+  config edit --global                  Open global config in editor
+  config path                           Show project config path
+  config path --global                  Show global config path
+
+Plans Subcommands:
+  plans                                 List all plans
+  plans list                            List all plans
+  plans list --status <status>          List plans by status
+  plans show <id>                       Show plan content
+  plans delete <id>                     Delete plan
 
 Session Subcommands:
   session list                          List saved sessions
@@ -335,6 +461,12 @@ MCP Examples:
   openagent mcp add api-server --type http --url http://localhost:3000
   openagent mcp list
   openagent mcp remove filesystem
+
+Project Config Examples:
+  openagent init                        # Initialize project config
+  openagent config list                 # Show all settings
+  openagent config set model claude-3-opus
+  openagent plans                       # List plans
 `);
 }
 
@@ -664,6 +796,39 @@ async function main(): Promise<void> {
   // Handle session subcommands
   if (args.sessionSubcommand) {
     await handleSessionSubcommand(args.sessionSubcommand);
+    process.exit(0);
+  }
+
+  // Handle init subcommand
+  if (args.initSubcommand) {
+    await initCommand(process.cwd(), {
+      global: args.initSubcommand.global,
+      model: args.initSubcommand.model,
+      provider: args.initSubcommand.provider,
+    });
+    process.exit(0);
+  }
+
+  // Handle config subcommand
+  if (args.configSubcommand) {
+    await configCommand(
+      process.cwd(),
+      args.configSubcommand.action,
+      args.configSubcommand.key,
+      args.configSubcommand.value,
+      { global: args.configSubcommand.global }
+    );
+    process.exit(0);
+  }
+
+  // Handle plans subcommand
+  if (args.plansSubcommand) {
+    await plansCommand(
+      process.cwd(),
+      args.plansSubcommand.action,
+      args.plansSubcommand.id,
+      { status: args.plansSubcommand.status }
+    );
     process.exit(0);
   }
 

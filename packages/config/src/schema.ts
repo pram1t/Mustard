@@ -115,6 +115,66 @@ export const ConfigSchema = z.object({
   hooks: HooksConfigSchema.default({}),
 });
 
+// ============================================================================
+// Project Configuration Schema (Phase 11.5)
+// ============================================================================
+
+/**
+ * Permission configuration for project
+ */
+export const PermissionsConfigSchema = z.object({
+  allowedTools: z.array(z.string()).optional(),
+  blockedTools: z.array(z.string()).optional(),
+  allowedPaths: z.array(z.string()).optional(),
+  blockedPaths: z.array(z.string()).optional(),
+});
+
+/**
+ * MCP server configuration reference
+ */
+export const MCPServerRefSchema = z.object({
+  command: z.string().optional(),
+  args: z.array(z.string()).optional(),
+  url: z.string().url().optional(),
+  env: z.record(z.string()).optional(),
+});
+
+/**
+ * History settings
+ */
+export const HistoryConfigSchema = z.object({
+  enabled: z.boolean().default(true),
+  maxSizeBytes: z.number().int().min(0).optional(),
+  maxAgeDays: z.number().int().min(0).optional(),
+});
+
+/**
+ * Project-specific configuration
+ * Stored in .openagent/config.json or ~/.openagent/config.json
+ */
+export const ProjectConfigSchema = z.object({
+  // Model defaults
+  model: z.string().optional(),
+  provider: LLMProviderSchema.optional(),
+
+  // Permissions
+  permissions: PermissionsConfigSchema.optional(),
+
+  // MCP servers for this project
+  mcpServers: z.record(MCPServerRefSchema).optional(),
+
+  // Custom system prompt addition
+  systemPrompt: z.string().optional(),
+
+  // Session settings
+  historyEnabled: z.boolean().default(true),
+  todoPersistence: z.boolean().default(true),
+  history: HistoryConfigSchema.optional(),
+
+  // Hooks (can be project-specific)
+  hooks: HooksConfigSchema.optional(),
+});
+
 /**
  * Type definitions derived from schema
  */
@@ -129,3 +189,9 @@ export type HookMatcher = z.infer<typeof HookMatcherSchema>;
 export type HookConfig = z.infer<typeof HookConfigSchema>;
 export type HooksConfig = z.infer<typeof HooksConfigSchema>;
 export type Config = z.infer<typeof ConfigSchema>;
+
+// Project config types (Phase 11.5)
+export type PermissionsConfig = z.infer<typeof PermissionsConfigSchema>;
+export type MCPServerRef = z.infer<typeof MCPServerRefSchema>;
+export type HistoryConfig = z.infer<typeof HistoryConfigSchema>;
+export type ProjectConfig = z.infer<typeof ProjectConfigSchema>;

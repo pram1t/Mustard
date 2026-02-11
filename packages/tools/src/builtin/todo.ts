@@ -3,12 +3,17 @@
  *
  * TodoWrite - Create and manage task lists
  * TodoRead - Read current task list
+ *
+ * Todos are stored in:
+ * - .openagent/todos.json (if in a project)
+ * - ~/.openagent/todos.json (global fallback)
  */
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { BaseTool } from '../base.js';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
+import { getTodosPath as getConfigTodosPath } from '@openagent/config';
 
 /**
  * Todo item structure
@@ -29,16 +34,17 @@ interface TodoState {
 
 /**
  * Get the path to the todos file
+ * Uses project-specific path if in a project, otherwise global
  */
-function getTodosPath(homeDir: string): string {
-  return path.join(homeDir, '.openagent', 'todos.json');
+async function getTodosPath(cwd: string): Promise<string> {
+  return getConfigTodosPath(cwd);
 }
 
 /**
- * Ensure the .openagent directory exists
+ * Ensure the parent directory exists
  */
-async function ensureDir(homeDir: string): Promise<void> {
-  const dir = path.join(homeDir, '.openagent');
+async function ensureDir(todosPath: string): Promise<void> {
+  const dir = path.dirname(todosPath);
   try {
     await fs.mkdir(dir, { recursive: true });
   } catch {
@@ -49,8 +55,8 @@ async function ensureDir(homeDir: string): Promise<void> {
 /**
  * Load todos from file
  */
-async function loadTodos(homeDir: string): Promise<TodoState> {
-  const todosPath = getTodosPath(homeDir);
+async function loadTodos(cwd: string): Promise<TodoState> {
+  const todosPath = await getTodosPath(cwd);
   try {
     const content = await fs.readFile(todosPath, 'utf-8');
     return JSON.parse(content);
@@ -66,9 +72,9 @@ async function loadTodos(homeDir: string): Promise<TodoState> {
 /**
  * Save todos to file
  */
-async function saveTodos(homeDir: string, state: TodoState): Promise<void> {
-  await ensureDir(homeDir);
-  const todosPath = getTodosPath(homeDir);
+async function saveTodos(cwd: string, state: TodoState): Promise<void> {
+  const todosPath = await getTodosPath(cwd);
+  await ensureDir(todosPath);
   await fs.writeFile(todosPath, JSON.stringify(state, null, 2), 'utf-8');
 }
 
@@ -150,12 +156,12 @@ IMPORTANT: Exactly ONE task must be in_progress at any time when actively workin
         }
       }
 
-      // Save todos
+      // Save todos (uses project-specific path if in a project)
       const state: TodoState = {
         todos,
         lastUpdated: new Date().toISOString(),
       };
-      await saveTodos(context.homeDir, state);
+      await saveTodos(context.cwd, state);
 
       // Generate summary
       const completed = todos.filter(t => t.status === 'completed').length;
@@ -201,7 +207,7 @@ export class TodoReadTool extends BaseTool {
     context: ExecutionContext
   ): Promise<ToolResult> {
     return this.safeExecute(params, context, async () => {
-      const state = await loadTodos(context.homeDir);
+      const state = await loadTodos(context.cwd);
       const todos = state.todos;
 
       if (todos.length === 0) {

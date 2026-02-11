@@ -58,6 +58,8 @@ export type { BuiltinToolName } from './builtin/index.js';
 export { ReadTool } from './builtin/read.js';
 export { WriteTool } from './builtin/write.js';
 export { EditTool } from './builtin/edit.js';
+export { MultiEditTool } from './builtin/multi-edit.js';
+export { NotebookEditTool } from './builtin/notebook.js';
 
 // Search operations
 export { GlobTool } from './builtin/glob.js';
@@ -65,9 +67,42 @@ export { GrepTool } from './builtin/grep.js';
 
 // Shell operations
 export { BashTool } from './builtin/bash.js';
+export { KillShellTool, ListShellsTool } from './builtin/shell-control.js';
 
 // Subagent operations
 export { TaskTool } from './builtin/task.js';
+export { TaskOutputTool, TaskStopTool } from './builtin/task-control.js';
+
+// Web operations (Phase 11)
+export { WebFetchTool } from './builtin/web-fetch.js';
+export { WebSearchTool } from './builtin/web-search.js';
+
+// Task management (Phase 11)
+export { TodoWriteTool, TodoReadTool } from './builtin/todo.js';
+
+// User interaction (Phase 11)
+export { AskUserQuestionTool } from './builtin/ask-user.js';
+
+// Innovation tools (Phase 11 - beyond Claude Code)
+export { DiffTool } from './builtin/diff.js';
+export { GitTool } from './builtin/git.js';
+export { TestRunnerTool } from './builtin/test-runner.js';
+export { APIClientTool } from './builtin/api-client.js';
+
+// ============================================================================
+// Helper Exports
+// ============================================================================
+
+export {
+  registerTaskController,
+  updateTaskOutput,
+} from './builtin/task-control.js';
+
+export {
+  registerShellProcess,
+  unregisterShellProcess,
+  getActiveShells,
+} from './builtin/shell-control.js';
 
 // ============================================================================
 // Security Utilities
@@ -79,7 +114,3 @@ export {
   validateCommand,
   auditLog,
 } from './security.js';
-
-// Note: The following tools are planned but not yet implemented:
-// export { WebFetchTool } from './builtin/web-fetch';
-// export { AskUserTool } from './builtin/ask-user';
