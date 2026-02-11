@@ -13,6 +13,7 @@ import { initAllowedPaths } from './security/path-validation';
 import { registerProtocol, parseDeepLink, extractDeepLinkFromArgs } from './protocol/deep-link';
 import { createTray, destroyTray } from './window/tray';
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './window/shortcuts';
+import { enforceHTTPS } from './security/network-security';
 
 // ── Pre-ready security (must run before app.whenReady) ──────────────────────
 configureAppSecurity();
@@ -94,6 +95,7 @@ async function createMainWindow(): Promise<void> {
 // ── App lifecycle ───────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
   configureWebSecurity();
+  enforceHTTPS();
   initAllowedPaths();
   await initializeServices();
   registerIpcHandlers();
