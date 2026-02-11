@@ -1,9 +1,16 @@
 import type { ReactNode } from 'react';
+import { MCPServerList } from '../components/MCP/MCPServerList';
+import { MCPAddServer } from '../components/MCP/MCPAddServer';
+import './MCPView.css';
 
 export function MCPView(): ReactNode {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)' }}>
-      MCP Servers
+    <div className="mcp-view">
+      <header className="mcp-header">
+        <h2>MCP Servers</h2>
+        <MCPAddServer />
+      </header>
+      <MCPServerList />
     </div>
   );
 }
