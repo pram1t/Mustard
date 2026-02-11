@@ -45,10 +45,23 @@ async function createMainWindow(): Promise<void> {
   });
 
   setMainWindow(mainWindow);
+  configurePermissionHandler(mainWindow);
 
   if (savedState?.isMaximized) {
     mainWindow.maximize();
   }
+
+  // Register ready-to-show BEFORE loading content (event fires once)
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+    if (!app.isPackaged) {
+      mainWindow.webContents.openDevTools();
+      // Verify after show so it doesn't block window display
+      verifyContextIsolation(mainWindow).catch((err) =>
+        console.error('Context isolation verification failed:', err)
+      );
+    }
+  });
 
   // Load renderer
   if (!app.isPackaged && process.env['ELECTRON_RENDERER_URL']) {
@@ -56,14 +69,6 @@ async function createMainWindow(): Promise<void> {
   } else {
     await mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
   }
-
-  mainWindow.once('ready-to-show', async () => {
-    if (!app.isPackaged) {
-      await verifyContextIsolation(mainWindow);
-      mainWindow.webContents.openDevTools();
-    }
-    mainWindow.show();
-  });
 
   mainWindow.on('close', () => {
     saveWindowState(mainWindow);
@@ -77,7 +82,6 @@ async function createMainWindow(): Promise<void> {
 // ── App lifecycle ───────────────────────────────────────────────────────────
 app.whenReady().then(async () => {
   configureWebSecurity();
-  configurePermissionHandler();
   registerIpcHandlers();
   await createMainWindow();
 });

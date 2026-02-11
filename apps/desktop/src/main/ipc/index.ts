@@ -1,12 +1,20 @@
-import { app, ipcMain } from 'electron';
+import { registerAgentHandlers } from './handlers/agent';
+import { registerConfigHandlers } from './handlers/config';
+import { registerMCPHandlers } from './handlers/mcp';
+import { registerWindowHandlers } from './handlers/window';
+import { registerAppHandlers } from './handlers/app';
 
 /**
- * Registers IPC handlers.
- * Phase 2: Only app:version handler.
- * Full IPC implementation comes in Phase 4.
+ * Registers all IPC handlers.
+ * Called once during app initialization in main/index.ts.
+ *
+ * Each handler group registers its own ipcMain.handle calls.
+ * No business logic lives here — this is purely aggregation.
  */
 export function registerIpcHandlers(): void {
-  ipcMain.handle('app:version', () => {
-    return app.getVersion();
-  });
+  registerAgentHandlers();
+  registerConfigHandlers();
+  registerMCPHandlers();
+  registerWindowHandlers();
+  registerAppHandlers();
 }

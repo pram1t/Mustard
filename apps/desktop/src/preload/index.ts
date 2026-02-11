@@ -1,16 +1,81 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import { IPC_CHANNELS } from '../shared/ipc-channels';
+import type { PreloadAPI } from '../shared/preload-api';
+import type { AgentEvent } from '../shared/event-types';
 
 /**
- * Minimal initial preload API.
- * Full PreloadAPI implementation will come in Phase 4 (IPC Architecture).
- * For Phase 1, we expose only getAppInfo for verification.
+ * Preload script: Exposes the complete PreloadAPI to the renderer.
+ *
+ * Rules:
+ * - All methods use ipcRenderer.invoke (request/response) except onEvent
+ * - onEvent uses ipcRenderer.on (one-way stream) and returns unsubscribe
+ * - No direct Node.js APIs are exposed
  */
-contextBridge.exposeInMainWorld('api', {
-  getAppInfo: () =>
-    ipcRenderer.invoke('app:version').then((version: string) => ({
+const api: PreloadAPI = {
+  // ── Agent Operations ────────────────────────────────────────────────────
+  chat: (message: string) =>
+    ipcRenderer.invoke(IPC_CHANNELS.AGENT_CHAT, { message }),
+
+  stop: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.AGENT_STOP),
+
+  onEvent: (callback: (event: AgentEvent) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, data: AgentEvent) => {
+      callback(data);
+    };
+    ipcRenderer.on(IPC_CHANNELS.AGENT_EVENT, listener);
+    return () => {
+      ipcRenderer.removeListener(IPC_CHANNELS.AGENT_EVENT, listener);
+    };
+  },
+
+  getStatus: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.AGENT_STATUS),
+
+  // ── Configuration ───────────────────────────────────────────────────────
+  getConfig: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.CONFIG_GET),
+
+  setConfig: (config) =>
+    ipcRenderer.invoke(IPC_CHANNELS.CONFIG_SET, { config }),
+
+  getProviders: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.CONFIG_GET_PROVIDERS),
+
+  getModels: (providerId: string) =>
+    ipcRenderer.invoke(IPC_CHANNELS.CONFIG_GET_MODELS, { provider: providerId }),
+
+  // ── MCP Management ─────────────────────────────────────────────────────
+  getMCPServers: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.MCP_LIST),
+
+  setMCPServer: (server) =>
+    ipcRenderer.invoke(IPC_CHANNELS.MCP_ADD, { server })
+      .then((r: { serverId: string }) => r.serverId),
+
+  removeMCPServer: (serverId: string) =>
+    ipcRenderer.invoke(IPC_CHANNELS.MCP_REMOVE, { serverId }),
+
+  // ── Window Controls ────────────────────────────────────────────────────
+  minimize: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MINIMIZE),
+
+  toggleMaximize: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MAXIMIZE),
+
+  close: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.WINDOW_CLOSE),
+
+  // ── Application ────────────────────────────────────────────────────────
+  getAppInfo: async () => {
+    const version = await ipcRenderer.invoke(IPC_CHANNELS.APP_VERSION);
+    return {
       version,
       platform: process.platform,
       arch: process.arch,
       isDev: process.env.NODE_ENV === 'development',
-    })),
-});
+    };
+  },
+};
+
+contextBridge.exposeInMainWorld('api', api);
