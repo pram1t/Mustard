@@ -1,0 +1,26 @@
+.window-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+
+.window-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.window-control:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.window-control.close:hover {
+  background-color: #e81123;
+  color: white;
+}

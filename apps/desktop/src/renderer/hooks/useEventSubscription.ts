@@ -1,19 +1,19 @@
 import { useEffect } from 'react';
+import { useConversationStore } from '../stores/conversation';
 
 /**
- * Subscribes to agent events from the main process.
- * Stub implementation - full event handling comes in Phase 4+.
+ * Subscribes to agent events from the main process
+ * and feeds them to the conversation store.
  */
 export function useEventSubscription(): void {
+  const handleEvent = useConversationStore((s) => s.handleEvent);
+
   useEffect(() => {
     if (typeof window.api?.onEvent !== 'function') {
       return;
     }
 
-    const unsubscribe = window.api.onEvent((event) => {
-      console.log('Agent event:', event.type);
-    });
-
+    const unsubscribe = window.api.onEvent(handleEvent);
     return unsubscribe;
-  }, []);
+  }, [handleEvent]);
 }

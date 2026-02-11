@@ -1,15 +1,20 @@
 import type { ReactNode } from 'react';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Layout } from './components/Layout/Layout';
+import { Router } from './components/Router';
+import { useTheme } from './hooks/useTheme';
+import { useEventSubscription } from './hooks/useEventSubscription';
 
 function App(): ReactNode {
+  useTheme();
+  useEventSubscription();
+
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>OpenAgent</h1>
-      </header>
-      <main className="app-main">
-        <p className="app-placeholder">Ready</p>
-      </main>
-    </div>
+    <ErrorBoundary>
+      <Layout>
+        <Router />
+      </Layout>
+    </ErrorBoundary>
   );
 }
 

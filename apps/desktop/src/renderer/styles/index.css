@@ -49,36 +49,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.app {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.app-header {
-  padding: var(--space-md);
-  border-bottom: 1px solid var(--border-color);
-  -webkit-app-region: drag;
-}
-
-.app-header h1 {
-  font-size: var(--font-size-lg);
-  font-weight: 500;
-}
-
-.app-main {
-  flex: 1;
-  overflow: hidden;
-}
-
-.app-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--color-text-muted);
-}
-
 /* Error boundary */
 .error-boundary {
   display: flex;
