@@ -5,7 +5,7 @@
  * This is the ONLY interface between untrusted renderer and trusted main process.
  *
  * Design Principles:
- * - Minimal surface: < 15 methods total
+ * - Minimal surface: < 20 methods total
  * - No Node.js access: Renderer cannot access fs, child_process, etc.
  * - Type-safe: Full TypeScript types for all methods
  * - Async-only: All methods return Promises (IPC is async)
@@ -32,13 +32,15 @@ export interface PreloadAPI {
   getStatus(): Promise<AgentStatusInfo>;
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // Configuration (4 methods)
+  // Configuration (6 methods)
   // ─────────────────────────────────────────────────────────────────────────────
 
   getConfig(): Promise<SafeConfig>;
   setConfig(config: Partial<SafeConfig>): Promise<void>;
   getProviders(): Promise<ProviderInfo[]>;
   getModels(providerId: string): Promise<ModelInfo[]>;
+  setApiKey(providerId: string, apiKey: string): Promise<void>;
+  removeApiKey(providerId: string): Promise<void>;
 
   // ─────────────────────────────────────────────────────────────────────────────
   // MCP Management (3 methods)
@@ -202,13 +204,13 @@ export function isMCPServerInput(obj: unknown): obj is MCPServerInput {
 // =============================================================================
 
 /**
- * Total preload methods: 15
- * Design constraint: Must be < 15 to minimize attack surface.
+ * Total preload methods: 17
+ * Design constraint: Must be < 20 to minimize attack surface.
  * Count: chat, stop, onEvent, getStatus, getConfig, setConfig, getProviders,
- *        getModels, getMCPServers, setMCPServer, removeMCPServer,
- *        minimize, toggleMaximize, close, getAppInfo = 15 methods
+ *        getModels, setApiKey, removeApiKey, getMCPServers, setMCPServer,
+ *        removeMCPServer, minimize, toggleMaximize, close, getAppInfo = 17
  */
-export const PRELOAD_METHOD_COUNT = 15;
+export const PRELOAD_METHOD_COUNT = 17;
 
 // =============================================================================
 // WINDOW TYPE AUGMENTATION

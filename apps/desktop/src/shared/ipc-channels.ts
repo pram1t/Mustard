@@ -51,6 +51,12 @@ export const IPC_CHANNELS = {
   /** Get available models for a provider */
   CONFIG_GET_MODELS: 'config:getModels',
 
+  /** Set API key for a provider (encrypted storage) */
+  CONFIG_SET_API_KEY: 'config:setApiKey',
+
+  /** Remove API key for a provider */
+  CONFIG_REMOVE_API_KEY: 'config:removeApiKey',
+
   // ─────────────────────────────────────────────────────────────────────────────
   // MCP (Model Context Protocol)
   // ─────────────────────────────────────────────────────────────────────────────
@@ -122,6 +128,8 @@ export type InvokeChannel =
   | typeof IPC_CHANNELS.CONFIG_SET
   | typeof IPC_CHANNELS.CONFIG_GET_PROVIDERS
   | typeof IPC_CHANNELS.CONFIG_GET_MODELS
+  | typeof IPC_CHANNELS.CONFIG_SET_API_KEY
+  | typeof IPC_CHANNELS.CONFIG_REMOVE_API_KEY
   | typeof IPC_CHANNELS.MCP_LIST
   | typeof IPC_CHANNELS.MCP_ADD
   | typeof IPC_CHANNELS.MCP_REMOVE
@@ -184,6 +192,8 @@ export interface IPCRequestMap {
   [IPC_CHANNELS.CONFIG_SET]: { config: Record<string, unknown> };
   [IPC_CHANNELS.CONFIG_GET_PROVIDERS]: void;
   [IPC_CHANNELS.CONFIG_GET_MODELS]: { provider: string };
+  [IPC_CHANNELS.CONFIG_SET_API_KEY]: { provider: string; apiKey: string };
+  [IPC_CHANNELS.CONFIG_REMOVE_API_KEY]: { provider: string };
   [IPC_CHANNELS.MCP_LIST]: void;
   [IPC_CHANNELS.MCP_ADD]: { server: MCPServerConfig };
   [IPC_CHANNELS.MCP_REMOVE]: { serverId: string };
@@ -209,6 +219,8 @@ export interface IPCResponseMap {
   [IPC_CHANNELS.CONFIG_SET]: { success: boolean };
   [IPC_CHANNELS.CONFIG_GET_PROVIDERS]: ProviderInfo[];
   [IPC_CHANNELS.CONFIG_GET_MODELS]: ModelInfo[];
+  [IPC_CHANNELS.CONFIG_SET_API_KEY]: { success: boolean };
+  [IPC_CHANNELS.CONFIG_REMOVE_API_KEY]: { success: boolean };
   [IPC_CHANNELS.MCP_LIST]: MCPServerInfo[];
   [IPC_CHANNELS.MCP_ADD]: { success: boolean; serverId: string };
   [IPC_CHANNELS.MCP_REMOVE]: { success: boolean };
@@ -284,6 +296,6 @@ interface UpdateInfo {
 
 /**
  * Total number of IPC channels.
- * Design constraint: Must be < 20 to minimize attack surface.
+ * Design constraint: Must be < 25 to minimize attack surface.
  */
 export const CHANNEL_COUNT = Object.keys(IPC_CHANNELS).length;

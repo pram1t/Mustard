@@ -22,12 +22,12 @@ import { registerWindowHandlers } from '../handlers/window';
 import { registerAppHandlers } from '../handlers/app';
 
 describe('IPC Channel Definitions', () => {
-  it('should have fewer than 20 channels', () => {
-    expect(CHANNEL_COUNT).toBeLessThanOrEqual(20);
+  it('should have fewer than 25 channels', () => {
+    expect(CHANNEL_COUNT).toBeLessThanOrEqual(25);
   });
 
-  it('should have exactly 20 channel definitions', () => {
-    expect(CHANNEL_COUNT).toBe(20);
+  it('should have exactly 22 channel definitions', () => {
+    expect(CHANNEL_COUNT).toBe(22);
   });
 
   it('should have all channel values in VALID_CHANNELS set', () => {
@@ -50,12 +50,14 @@ describe('Handler Registration', () => {
     expect(handlers.has(IPC_CHANNELS.AGENT_EVENT)).toBe(false);
   });
 
-  it('registerConfigHandlers registers 4 invoke channels', () => {
+  it('registerConfigHandlers registers 6 invoke channels', () => {
     registerConfigHandlers();
     expect(handlers.has(IPC_CHANNELS.CONFIG_GET)).toBe(true);
     expect(handlers.has(IPC_CHANNELS.CONFIG_SET)).toBe(true);
     expect(handlers.has(IPC_CHANNELS.CONFIG_GET_PROVIDERS)).toBe(true);
     expect(handlers.has(IPC_CHANNELS.CONFIG_GET_MODELS)).toBe(true);
+    expect(handlers.has(IPC_CHANNELS.CONFIG_SET_API_KEY)).toBe(true);
+    expect(handlers.has(IPC_CHANNELS.CONFIG_REMOVE_API_KEY)).toBe(true);
   });
 
   it('registerMCPHandlers registers 5 invoke channels', () => {
@@ -100,6 +102,6 @@ describe('Handler Registration', () => {
     registerMCPHandlers();
     registerWindowHandlers();
     registerAppHandlers();
-    expect(handlers.size).toBe(19);
+    expect(handlers.size).toBe(21);
   });
 });

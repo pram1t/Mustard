@@ -45,6 +45,12 @@ const api: PreloadAPI = {
   getModels: (providerId: string) =>
     ipcRenderer.invoke(IPC_CHANNELS.CONFIG_GET_MODELS, { provider: providerId }),
 
+  setApiKey: (providerId: string, apiKey: string) =>
+    ipcRenderer.invoke(IPC_CHANNELS.CONFIG_SET_API_KEY, { provider: providerId, apiKey }),
+
+  removeApiKey: (providerId: string) =>
+    ipcRenderer.invoke(IPC_CHANNELS.CONFIG_REMOVE_API_KEY, { provider: providerId }),
+
   // ── MCP Management ─────────────────────────────────────────────────────
   getMCPServers: () =>
     ipcRenderer.invoke(IPC_CHANNELS.MCP_LIST),

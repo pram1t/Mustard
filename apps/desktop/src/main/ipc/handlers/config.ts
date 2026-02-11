@@ -27,4 +27,14 @@ export function registerConfigHandlers(): void {
     validateSender(event);
     return getConfigService().getModels(payload.provider);
   });
+
+  ipcMain.handle(IPC_CHANNELS.CONFIG_SET_API_KEY, async (event, payload: { provider: string; apiKey: string }) => {
+    validateSender(event);
+    return getConfigService().setApiKey(payload.provider, payload.apiKey);
+  });
+
+  ipcMain.handle(IPC_CHANNELS.CONFIG_REMOVE_API_KEY, async (event, payload: { provider: string }) => {
+    validateSender(event);
+    return getConfigService().removeApiKey(payload.provider);
+  });
 }

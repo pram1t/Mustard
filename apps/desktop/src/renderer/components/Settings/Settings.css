@@ -1,0 +1,265 @@
+/* Settings navigation */
+.settings-nav {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  padding: var(--space-sm);
+  gap: 2px;
+}
+
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  text-align: left;
+  width: 100%;
+}
+
+.settings-nav-item:hover {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+}
+
+.settings-nav-item.active {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.settings-nav-icon {
+  font-size: var(--font-size-lg);
+  width: 24px;
+  text-align: center;
+}
+
+/* Settings panel */
+.settings-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-lg);
+}
+
+/* Shared section styles */
+.settings-section {
+  margin-bottom: var(--space-lg);
+}
+
+.settings-section h3 {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+  color: var(--color-text);
+}
+
+.settings-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+}
+
+/* Form controls */
+.settings-select {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  outline: none;
+}
+
+.settings-select:focus {
+  border-color: var(--color-accent);
+}
+
+.settings-input {
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  outline: none;
+}
+
+.settings-input:focus {
+  border-color: var(--color-accent);
+}
+
+.settings-input:disabled {
+  opacity: 0.5;
+}
+
+/* Buttons */
+.settings-btn {
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.settings-btn:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.settings-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.settings-btn.primary {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.settings-btn.primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.settings-btn.danger {
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.settings-btn.danger:hover {
+  background-color: var(--color-error);
+  color: white;
+}
+
+/* Option button groups (theme, font size) */
+.option-group {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.option-button {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.option-button:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.option-button.active {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+/* API Key input */
+.api-key-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.api-key-status {
+  color: var(--color-success);
+  font-size: var(--font-size-md);
+}
+
+.api-key-check {
+  font-weight: bold;
+}
+
+.api-key-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.api-key-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.api-key-field {
+  max-width: 400px;
+}
+
+.api-key-error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+}
+
+/* Shortcuts table */
+.shortcuts-table {
+  width: 100%;
+  max-width: 500px;
+  border-collapse: collapse;
+}
+
+.shortcuts-table th,
+.shortcuts-table td {
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.shortcuts-table th {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  background-color: var(--color-bg-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  box-shadow: 0 1px 0 var(--border-color);
+}
+
+/* About settings */
+.about-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-xs) var(--space-md);
+  max-width: 400px;
+}
+
+.about-info dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+}
+
+.about-info dd {
+  font-size: var(--font-size-md);
+  margin: 0;
+}
