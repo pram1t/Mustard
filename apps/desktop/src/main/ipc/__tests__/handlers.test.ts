@@ -38,8 +38,8 @@ describe('IPC Channel Definitions', () => {
     expect(CHANNEL_COUNT).toBeLessThanOrEqual(25);
   });
 
-  it('should have exactly 23 channel definitions', () => {
-    expect(CHANNEL_COUNT).toBe(23);
+  it('should have exactly 24 channel definitions', () => {
+    expect(CHANNEL_COUNT).toBe(24);
   });
 
   it('should have all channel values in VALID_CHANNELS set', () => {

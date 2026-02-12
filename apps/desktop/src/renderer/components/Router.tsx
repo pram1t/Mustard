@@ -6,15 +6,16 @@ import { MCPView } from '../views/MCPView';
 import { HistoryView } from '../views/HistoryView';
 
 export function Router(): ReactNode {
-  const { route } = useHashRouter();
+  const { route, params } = useHashRouter();
 
   switch (route) {
     case '/':
-      return <ChatView />;
+    case '/chat':
+      return <ChatView deepLinkParams={params} />;
     case '/settings':
-      return <SettingsView />;
+      return <SettingsView deepLinkParams={params} />;
     case '/mcp':
-      return <MCPView />;
+      return <MCPView deepLinkParams={params} />;
     case '/history':
       return <HistoryView />;
     case '/about':
@@ -24,6 +25,6 @@ export function Router(): ReactNode {
         </div>
       );
     default:
-      return <ChatView />;
+      return <ChatView deepLinkParams={params} />;
   }
 }

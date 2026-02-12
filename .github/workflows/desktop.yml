@@ -84,7 +84,7 @@ jobs:
         run: npm run build
 
       - name: Package (no signing)
-        run: npx electron-builder --config apps/desktop/electron-builder.yml --dir
+        run: npx electron-builder --config electron-builder.yml --dir
         working-directory: apps/desktop
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'

@@ -65,6 +65,12 @@ export interface PreloadAPI {
   selectFolder(): Promise<string | null>;
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Navigation (1 method)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  onNavigate(callback: (payload: NavigatePayload) => void): () => void;
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Application (1 method)
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -74,6 +80,11 @@ export interface PreloadAPI {
 // =============================================================================
 // SUPPORTING TYPES
 // =============================================================================
+
+export interface NavigatePayload {
+  route: string;
+  params: Record<string, string>;
+}
 
 export interface AgentStatusInfo {
   state: 'idle' | 'busy' | 'error';
@@ -210,14 +221,14 @@ export function isMCPServerInput(obj: unknown): obj is MCPServerInput {
 // =============================================================================
 
 /**
- * Total preload methods: 18
+ * Total preload methods: 19
  * Design constraint: Must be < 20 to minimize attack surface.
  * Count: chat, stop, onEvent, getStatus, getConfig, setConfig, getProviders,
  *        getModels, setApiKey, removeApiKey, getMCPServers, setMCPServer,
- *        removeMCPServer, selectFolder, minimize, toggleMaximize, close,
- *        getAppInfo = 18
+ *        removeMCPServer, selectFolder, onNavigate, minimize, toggleMaximize,
+ *        close, getAppInfo = 19
  */
-export const PRELOAD_METHOD_COUNT = 18;
+export const PRELOAD_METHOD_COUNT = 19;
 
 // =============================================================================
 // WINDOW TYPE AUGMENTATION

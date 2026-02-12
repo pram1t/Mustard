@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { MessageList } from '../components/Chat/MessageList';
 import { ChatInput } from '../components/Chat/ChatInput';
@@ -7,8 +7,20 @@ import type { FileDropInfo } from '../hooks/useFileDrop';
 import { useConversationStore } from '../stores/conversation';
 import './ChatView.css';
 
-export function ChatView(): ReactNode {
+interface ChatViewProps {
+  deepLinkParams?: Record<string, string>;
+}
+
+export function ChatView({ deepLinkParams }: ChatViewProps): ReactNode {
   const addUserMessage = useConversationStore((s) => s.addUserMessage);
+  const setInput = useConversationStore((s) => s.setInput);
+
+  // Pre-fill chat input from deep link ?message= param (don't auto-send)
+  useEffect(() => {
+    if (deepLinkParams?.message) {
+      setInput(deepLinkParams.message);
+    }
+  }, [deepLinkParams?.message, setInput]);
   const [projectDir, setProjectDir] = useState<string | null>(null);
 
   const handleSelectFolder = useCallback(async () => {

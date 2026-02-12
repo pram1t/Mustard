@@ -8,6 +8,7 @@
 import { Tray, Menu, nativeImage, app } from 'electron';
 import type { BrowserWindow } from 'electron';
 import path from 'path';
+import { IPC_CHANNELS } from '../../shared/ipc-channels';
 
 let tray: Tray | null = null;
 
@@ -48,7 +49,7 @@ export function createTray(mainWindow: BrowserWindow): Tray {
       click: () => {
         mainWindow.show();
         mainWindow.focus();
-        mainWindow.webContents.send('navigate', '/');
+        mainWindow.webContents.send(IPC_CHANNELS.APP_NAVIGATE, { route: '/', params: {} });
       },
     },
     {
@@ -56,7 +57,7 @@ export function createTray(mainWindow: BrowserWindow): Tray {
       click: () => {
         mainWindow.show();
         mainWindow.focus();
-        mainWindow.webContents.send('navigate', '/settings');
+        mainWindow.webContents.send(IPC_CHANNELS.APP_NAVIGATE, { route: '/settings', params: {} });
       },
     },
     { type: 'separator' },

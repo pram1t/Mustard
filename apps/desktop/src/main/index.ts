@@ -47,12 +47,22 @@ import { registerProtocol, parseDeepLink, extractDeepLinkFromArgs } from './prot
 import { createTray, destroyTray } from './window/tray';
 import { registerGlobalShortcuts, unregisterGlobalShortcuts } from './window/shortcuts';
 import { enforceHTTPS } from './security/network-security';
+import { IPC_CHANNELS } from '../shared/ipc-channels';
 
 // ── Pre-ready security (must run before app.whenReady) ──────────────────────
 configureAppSecurity();
 configureSecureSwitches();
 enforceSandbox();
 registerProtocol();
+
+// ── Deep link queue ─────────────────────────────────────────────────────────
+// Stores a deep link URL that arrived before the window was ready.
+let pendingDeepLink: string | null = null;
+
+// Extract deep link from initial launch args (Windows/Linux only — macOS uses open-url event)
+if (process.platform !== 'darwin') {
+  pendingDeepLink = extractDeepLinkFromArgs(process.argv);
+}
 
 // ── Single instance lock (production only) ──────────────────────────────────
 if (app.isPackaged) {
@@ -103,6 +113,12 @@ async function createMainWindow(): Promise<void> {
     if (!app.isPackaged) {
       // DevTools available via View menu or Ctrl+Shift+I — don't auto-open
       verifyContextIsolation(mainWindow).catch(() => {});
+    }
+    // Deliver any queued deep link after renderer has mounted
+    if (pendingDeepLink) {
+      const queued = pendingDeepLink;
+      pendingDeepLink = null;
+      setTimeout(() => handleDeepLink(queued), 100);
     }
   });
 
@@ -168,10 +184,20 @@ function handleDeepLink(rawUrl: string): void {
   if (!result) return;
 
   const win = getMainWindow();
-  if (!win) return;
+  if (!win || win.isDestroyed()) {
+    // Queue for delivery after window is ready
+    pendingDeepLink = rawUrl;
+    return;
+  }
 
-  // Navigate to the deep link route via hash
-  const params = new URLSearchParams(result.params).toString();
-  const hash = params ? `${result.route}?${params}` : result.route;
-  win.webContents.send('navigate', hash);
+  if (win.webContents.isLoading()) {
+    pendingDeepLink = rawUrl;
+    return;
+  }
+
+  // Send structured payload via typed IPC channel
+  win.webContents.send(IPC_CHANNELS.APP_NAVIGATE, {
+    route: result.route,
+    params: result.params,
+  });
 }

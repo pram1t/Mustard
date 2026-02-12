@@ -63,6 +63,14 @@ describe('parseDeepLink', () => {
     expect(parseDeepLink(`openagent://chat?message=${longValue}`)).toBeNull();
   });
 
+  it('parses chat deep link with multiple params', () => {
+    const result = parseDeepLink('openagent://chat?message=hello&provider=openai');
+    expect(result).toEqual({
+      route: '/chat',
+      params: { message: 'hello', provider: 'openai' },
+    });
+  });
+
   it('rejects empty/null input', () => {
     expect(parseDeepLink('')).toBeNull();
     expect(parseDeepLink(null as unknown as string)).toBeNull();

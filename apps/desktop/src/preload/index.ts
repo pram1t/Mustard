@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { IPC_CHANNELS } from '../shared/ipc-channels';
-import type { PreloadAPI } from '../shared/preload-api';
+import type { PreloadAPI, NavigatePayload } from '../shared/preload-api';
 import type { AgentEvent } from '../shared/event-types';
 
 /**
@@ -61,6 +61,17 @@ const api: PreloadAPI = {
 
   removeMCPServer: (serverId: string) =>
     ipcRenderer.invoke(IPC_CHANNELS.MCP_REMOVE, { serverId }),
+
+  // ── Navigation ────────────────────────────────────────────────────────
+  onNavigate: (callback: (payload: NavigatePayload) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, data: NavigatePayload) => {
+      callback(data);
+    };
+    ipcRenderer.on(IPC_CHANNELS.APP_NAVIGATE, listener);
+    return () => {
+      ipcRenderer.removeListener(IPC_CHANNELS.APP_NAVIGATE, listener);
+    };
+  },
 
   // ── Dialog ────────────────────────────────────────────────────────────
   selectFolder: () =>

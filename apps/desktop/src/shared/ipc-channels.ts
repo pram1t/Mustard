@@ -106,6 +106,13 @@ export const IPC_CHANNELS = {
   APP_QUIT: 'app:quit',
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Navigation (deep links, tray menu)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** Navigate renderer to a route (main → renderer push event) */
+  APP_NAVIGATE: 'app:navigate',
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Dialog
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -155,7 +162,8 @@ export type InvokeChannel =
  * Channels that use send/on pattern (one-way events).
  */
 export type EventChannel =
-  | typeof IPC_CHANNELS.AGENT_EVENT;
+  | typeof IPC_CHANNELS.AGENT_EVENT
+  | typeof IPC_CHANNELS.APP_NAVIGATE;
 
 // =============================================================================
 // CHANNEL VALIDATION
