@@ -51,9 +51,11 @@ export type UpdateStatus =
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function tryLoadUpdater(): any | null {
   try {
-    // Use require for optional dependency — electron-updater may not be installed
+    // Use dynamic require for optional dependency — electron-updater may not be installed.
+    // The module name is in a variable to prevent TypeScript from resolving it statically.
+    const moduleName = 'electron-updater';
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require('electron-updater');
+    return require(moduleName);
   } catch {
     return null;
   }

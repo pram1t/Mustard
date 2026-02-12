@@ -29,14 +29,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npx vitest run --config apps/desktop/vitest.config.ts
+      - name: Build all workspace packages
+        run: npm run build
 
-      - name: Type check
+      - name: Type check desktop
         run: npm run typecheck --workspace=openagent-desktop
 
-      - name: Build application
-        run: npm run build --workspace=openagent-desktop
+      - name: Run desktop tests
+        run: npx vitest run --config apps/desktop/vitest.config.ts
 
       - name: Generate SBOM
         run: npm run sbom --workspace=openagent-desktop

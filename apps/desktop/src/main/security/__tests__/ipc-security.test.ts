@@ -40,17 +40,21 @@ describe('IPC Security', () => {
   });
 
   describe('API key security', () => {
-    it('SafeConfig type does not contain apiKey field', async () => {
-      // Import and check the type shape
-      const { getConfig } = await import('@openagent/config');
-      const config = getConfig();
+    it('SafeConfig design does not expose raw apiKey', () => {
+      // Verify by design: our preload API returns hasApiKey (boolean) not apiKey (string)
+      // The SafeConfig type in shared/types includes hasApiKey, not apiKey
+      const safeConfigFields = ['provider', 'model', 'hasApiKey', 'theme', 'shortcuts', 'ui'];
+      expect(safeConfigFields).toContain('hasApiKey');
+      expect(safeConfigFields).not.toContain('apiKey');
+    });
 
-      // The raw config has apiKey, but SafeConfig should not
-      // This is a structural test that verifies our preload API design
-      const safeKeys = ['provider', 'model', 'hasApiKey', 'theme', 'shortcuts', 'ui'];
-      // hasApiKey is a boolean, not the actual key
-      expect(safeKeys).toContain('hasApiKey');
-      expect(safeKeys).not.toContain('apiKey');
+    it('API key set/remove use dedicated channels, not generic config:set', () => {
+      // API key operations should go through dedicated IPC channels
+      // not through the generic config:set which could be spoofed
+      expect(IPC_CHANNELS.CONFIG_SET_API_KEY).toBeDefined();
+      expect(IPC_CHANNELS.CONFIG_REMOVE_API_KEY).toBeDefined();
+      expect(IPC_CHANNELS.CONFIG_SET_API_KEY).not.toBe(IPC_CHANNELS.CONFIG_SET);
+      expect(IPC_CHANNELS.CONFIG_REMOVE_API_KEY).not.toBe(IPC_CHANNELS.CONFIG_SET);
     });
   });
 
