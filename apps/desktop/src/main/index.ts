@@ -1,5 +1,13 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
+import { createLogger, setDefaultLogger } from '@openagent/logger';
+
+// ── Logger setup (must run before any @openagent/core code) ─────────────────
+// Use JSON format (synchronous stdout) instead of pino-pretty transport.
+// Pino transports spawn Worker threads via thread-stream, which is incompatible
+// with Electron's bundled main process. JSON format writes directly to stdout.
+setDefaultLogger(createLogger({ format: 'json', level: 'debug' }));
+
 import { configureAppSecurity, configureSecureSwitches } from './security/app-security';
 import { enforceSandbox } from './security/sandbox';
 import { configureWebSecurity, configurePermissionHandler } from './security/web-security';
