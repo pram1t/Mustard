@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+
+vi.mock('electron', () => ({
+  app: {
+    isPackaged: false,
+    getPath: vi.fn(() => '/mock'),
+  },
+}));
+
 import { validateSender } from '../validate-sender';
 import { setMainWindow } from '../../window';
 
@@ -54,6 +62,14 @@ describe('validateSender', () => {
   it('should pass for app:// origin from main window', () => {
     const event = {
       senderFrame: { url: 'app://./index.html' },
+      sender: mockWebContents,
+    };
+    expect(() => validateSender(event as any)).not.toThrow();
+  });
+
+  it('should pass for http://localhost in dev mode (app.isPackaged = false)', () => {
+    const event = {
+      senderFrame: { url: 'http://localhost:5173/' },
       sender: mockWebContents,
     };
     expect(() => validateSender(event as any)).not.toThrow();

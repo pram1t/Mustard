@@ -1,4 +1,5 @@
 import type { IpcMainInvokeEvent } from 'electron';
+import { app } from 'electron';
 import { getMainWindow } from '../window';
 
 /**
@@ -8,7 +9,7 @@ import { getMainWindow } from '../window';
  * Checks:
  * 1. event.senderFrame exists
  * 2. event.sender matches mainWindow.webContents
- * 3. Origin is file:// or app://
+ * 3. Origin is file://, app://, or http://localhost (dev mode only)
  */
 export function validateSender(event: IpcMainInvokeEvent): void {
   if (!event.senderFrame) {
@@ -21,7 +22,12 @@ export function validateSender(event: IpcMainInvokeEvent): void {
   }
 
   const url = event.senderFrame.url;
-  if (!url.startsWith('file://') && !url.startsWith('app://')) {
+  const isAllowedOrigin =
+    url.startsWith('file://') ||
+    url.startsWith('app://') ||
+    (!app.isPackaged && url.startsWith('http://localhost'));
+
+  if (!isAllowedOrigin) {
     throw new Error(`IPC: Unauthorized origin: ${url}`);
   }
 }
