@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { IPC_CHANNELS } from '../../../shared/ipc-channels';
 import { validateSender } from '../validate-sender';
-import { getConfigService } from '../../services';
+import { getConfigService, getAgentService } from '../../services';
 
 /**
  * Registers configuration IPC handlers.
@@ -30,7 +30,10 @@ export function registerConfigHandlers(): void {
 
   ipcMain.handle(IPC_CHANNELS.CONFIG_SET_API_KEY, async (event, payload: { provider: string; apiKey: string }) => {
     validateSender(event);
-    return getConfigService().setApiKey(payload.provider, payload.apiKey);
+    const result = await getConfigService().setApiKey(payload.provider, payload.apiKey);
+    // Reset agent so it picks up the new provider on next chat
+    getAgentService().dispose();
+    return result;
   });
 
   ipcMain.handle(IPC_CHANNELS.CONFIG_REMOVE_API_KEY, async (event, payload: { provider: string }) => {

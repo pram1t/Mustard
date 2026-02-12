@@ -3,6 +3,7 @@ import { registerConfigHandlers } from './handlers/config';
 import { registerMCPHandlers } from './handlers/mcp';
 import { registerWindowHandlers } from './handlers/window';
 import { registerAppHandlers } from './handlers/app';
+import { registerDialogHandlers } from './handlers/dialog';
 
 /**
  * Registers all IPC handlers.
@@ -17,4 +18,5 @@ export function registerIpcHandlers(): void {
   registerMCPHandlers();
   registerWindowHandlers();
   registerAppHandlers();
+  registerDialogHandlers();
 }

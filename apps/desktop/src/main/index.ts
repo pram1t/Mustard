@@ -1,12 +1,37 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
-import { createLogger, setDefaultLogger } from '@openagent/logger';
+import { setDefaultLogger } from '@openagent/logger';
+import type { Logger, LogContext } from '@openagent/logger';
 
-// ── Logger setup (must run before any @openagent/core code) ─────────────────
-// Use JSON format (synchronous stdout) instead of pino-pretty transport.
-// Pino transports spawn Worker threads via thread-stream, which is incompatible
-// with Electron's bundled main process. JSON format writes directly to stdout.
-setDefaultLogger(createLogger({ format: 'json', level: 'debug' }));
+// ── Root cause fix: Electron GUI has no stdout/stderr ────────────────────────
+// When Electron runs as a GUI app (not from terminal), process.stdout and
+// process.stderr are destroyed/broken pipes. ANY write to them (console.log,
+// pino, etc.) throws EPIPE and crashes the app.
+//
+// Fix: Create a completely silent logger and replace console.* with noops.
+// Logs are not needed in the main process — use renderer DevTools for debugging.
+
+const noop = () => {};
+
+// Silent logger for @openagent packages (replaces pino)
+const silentLogger: Logger = {
+  get level() { return 'silent' as any; },
+  child(_ctx: LogContext) { return silentLogger; },
+  trace: noop,
+  debug: noop,
+  info: noop,
+  warn: noop,
+  error: noop,
+  fatal: noop,
+};
+setDefaultLogger(silentLogger);
+
+// Replace console methods to prevent ANY stdout/stderr writes
+console.log = noop;
+console.debug = noop;
+console.info = noop;
+console.warn = noop;
+console.error = noop;
 
 import { configureAppSecurity, configureSecureSwitches } from './security/app-security';
 import { enforceSandbox } from './security/sandbox';
@@ -76,11 +101,8 @@ async function createMainWindow(): Promise<void> {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     if (!app.isPackaged) {
-      mainWindow.webContents.openDevTools();
-      // Verify after show so it doesn't block window display
-      verifyContextIsolation(mainWindow).catch((err) =>
-        console.error('Context isolation verification failed:', err)
-      );
+      // DevTools available via View menu or Ctrl+Shift+I — don't auto-open
+      verifyContextIsolation(mainWindow).catch(() => {});
     }
   });
 
@@ -152,5 +174,4 @@ function handleDeepLink(rawUrl: string): void {
   const params = new URLSearchParams(result.params).toString();
   const hash = params ? `${result.route}?${params}` : result.route;
   win.webContents.send('navigate', hash);
-  console.log(`[DeepLink] Navigated to: ${hash}`);
 }

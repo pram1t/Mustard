@@ -8,7 +8,13 @@
 
 import { getConfig } from '@openagent/config';
 import type { LLMProvider as LLMProviderType } from '@openagent/config';
-import type { LLMRouter } from '@openagent/llm';
+import {
+  type LLMRouter,
+  OpenAIProvider,
+  AnthropicProvider,
+  GeminiProvider,
+  OllamaProvider,
+} from '@openagent/llm';
 import type {
   SafeConfig,
   ProviderInfo,
@@ -22,6 +28,16 @@ export const ENV_KEY_MAP: Record<string, string> = {
   gemini: 'GEMINI_API_KEY',
   ollama: '',
 };
+
+/**
+ * All known providers — shown in the Settings dropdown regardless of API key status.
+ */
+const ALL_PROVIDERS: Array<{ id: string; name: string; requiresApiKey: boolean }> = [
+  { id: 'openai', name: 'OpenAI', requiresApiKey: true },
+  { id: 'anthropic', name: 'Anthropic', requiresApiKey: true },
+  { id: 'gemini', name: 'Gemini', requiresApiKey: true },
+  { id: 'ollama', name: 'Ollama', requiresApiKey: false },
+];
 
 export class ConfigService {
   private router: LLMRouter;
@@ -66,7 +82,6 @@ export class ConfigService {
     try {
       // Block API key from being set via IPC
       if ('apiKey' in updates) {
-        console.warn('[ConfigService] Attempted to set API key via IPC — blocked');
         delete updates.apiKey;
       }
 
@@ -77,6 +92,13 @@ export class ConfigService {
         ...(updates.model !== undefined ? { model: updates.model as string } : {}),
       });
 
+      // If provider changed, update router primary (if that provider is registered)
+      if (updates.provider && typeof updates.provider === 'string') {
+        if (this.router.hasProvider(updates.provider)) {
+          this.router.setPrimary(updates.provider);
+        }
+      }
+
       return { success: true };
     } catch (error) {
       console.error('[ConfigService] Config set failed:', error);
@@ -86,19 +108,15 @@ export class ConfigService {
 
   /**
    * Gets available LLM providers.
+   * Returns ALL known providers regardless of API key status.
    */
   getProviders(): ProviderInfo[] {
-    try {
-      const names = this.router.listProviders();
-      return names.map((name) => ({
-        id: name,
-        name: name.charAt(0).toUpperCase() + name.slice(1),
-        requiresApiKey: name !== 'ollama',
-        hasApiKey: this.checkHasApiKey(name),
-      }));
-    } catch {
-      return [];
-    }
+    return ALL_PROVIDERS.map((p) => ({
+      id: p.id,
+      name: p.name,
+      requiresApiKey: p.requiresApiKey,
+      hasApiKey: this.checkHasApiKey(p.id),
+    }));
   }
 
   /**
@@ -125,7 +143,7 @@ export class ConfigService {
 
   /**
    * Stores an API key via CredentialService.
-   * Also sets the environment variable for immediate use.
+   * Also sets the environment variable and registers the provider in the router.
    */
   async setApiKey(provider: string, apiKey: string): Promise<{ success: boolean }> {
     try {
@@ -135,6 +153,10 @@ export class ConfigService {
       if (envVar) {
         process.env[envVar] = apiKey;
       }
+
+      // Register the provider in the router so it's available immediately
+      this.registerProviderInRouter(provider, apiKey);
+
       return { success: true };
     } catch (error) {
       console.error('[ConfigService] setApiKey failed:', error);
@@ -143,7 +165,7 @@ export class ConfigService {
   }
 
   /**
-   * Removes a stored API key and clears the environment variable.
+   * Removes a stored API key, clears the environment variable, and unregisters the provider.
    */
   async removeApiKey(provider: string): Promise<{ success: boolean }> {
     try {
@@ -153,10 +175,57 @@ export class ConfigService {
       if (envVar) {
         delete process.env[envVar];
       }
+
+      // Unregister provider from router since key is gone
+      this.router.unregisterProvider(provider);
+
       return { success: true };
     } catch (error) {
       console.error('[ConfigService] removeApiKey failed:', error);
       return { success: false };
+    }
+  }
+
+  /**
+   * Registers a provider in the router with the given API key.
+   * If the provider is already registered, it re-registers with the new key.
+   */
+  private registerProviderInRouter(provider: string, apiKey: string): void {
+    try {
+      const config = getConfig();
+
+      // Unregister first if already exists (to update credentials)
+      if (this.router.hasProvider(provider)) {
+        this.router.unregisterProvider(provider);
+      }
+
+      if (provider === 'openai') {
+        this.router.registerProvider(new OpenAIProvider({
+          apiKey,
+          model: config.llm.model,
+          baseURL: config.llm.baseUrl,
+        }));
+      } else if (provider === 'anthropic') {
+        this.router.registerProvider(new AnthropicProvider({
+          apiKey,
+          model: config.llm.model,
+        }));
+      } else if (provider === 'gemini') {
+        this.router.registerProvider(new GeminiProvider({
+          apiKey,
+          model: config.llm.model,
+        }));
+      } else if (provider === 'ollama') {
+        this.router.registerProvider(new OllamaProvider({
+          baseURL: config.llm.baseUrl,
+          model: config.llm.model,
+        }));
+      }
+
+      // Also set as primary so the router uses this provider for chat
+      this.router.setPrimary(provider);
+    } catch {
+      // Silently fail — Electron has no stdout for logging
     }
   }
 

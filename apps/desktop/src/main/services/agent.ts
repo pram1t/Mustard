@@ -24,11 +24,29 @@ export class AgentService {
   private sessionId: string;
   private router: LLMRouter;
   private tools: IToolRegistry;
+  private cwd: string;
 
   constructor(router: LLMRouter, tools: IToolRegistry) {
     this.router = router;
     this.tools = tools;
     this.sessionId = `desktop_${Date.now()}`;
+    this.cwd = process.cwd();
+  }
+
+  /**
+   * Sets the working directory for the agent.
+   * Resets the agent so it picks up the new cwd on next chat.
+   */
+  setCwd(dir: string): void {
+    this.cwd = dir;
+    // Reset agent so it creates a new one with the updated cwd
+    if (this.agent) {
+      this.agent = null;
+    }
+  }
+
+  getCwd(): string {
+    return this.cwd;
   }
 
   /**
@@ -47,7 +65,7 @@ export class AgentService {
       this.agent = createAgent(this.router, {
         tools: this.tools,
         sessionId: this.sessionId,
-        cwd: process.cwd(),
+        cwd: this.cwd,
       });
     }
 
@@ -55,7 +73,10 @@ export class AgentService {
 
     // Fire and forget — events stream asynchronously
     this.consumeEvents(message).catch((err) => {
-      console.error('[AgentService] Event consumption failed:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      emitEvent(createErrorEvent(this.sessionId, 'INTERNAL_ERROR', msg, false));
+      this.abortController = null;
+      emitStatus(this.sessionId, 'idle');
     });
 
     return { success: true };

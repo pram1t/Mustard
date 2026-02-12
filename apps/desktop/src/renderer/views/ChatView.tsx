@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { MessageList } from '../components/Chat/MessageList';
 import { ChatInput } from '../components/Chat/ChatInput';
@@ -9,6 +9,18 @@ import './ChatView.css';
 
 export function ChatView(): ReactNode {
   const addUserMessage = useConversationStore((s) => s.addUserMessage);
+  const [projectDir, setProjectDir] = useState<string | null>(null);
+
+  const handleSelectFolder = useCallback(async () => {
+    try {
+      const folder = await window.api.selectFolder();
+      if (folder) {
+        setProjectDir(folder);
+      }
+    } catch (error) {
+      console.error('Failed to select folder:', error);
+    }
+  }, []);
 
   const handleFileDrop = useCallback(
     (files: FileDropInfo[]) => {
@@ -25,8 +37,31 @@ export function ChatView(): ReactNode {
     maxFiles: 10,
   });
 
+  const dirName = projectDir
+    ? projectDir.split(/[\\/]/).pop() || projectDir
+    : null;
+
   return (
     <div className="chat-view" {...dragProps}>
+      <div className="chat-header">
+        <button
+          className="chat-folder-btn"
+          onClick={handleSelectFolder}
+          title={projectDir || 'Select a project folder'}
+        >
+          <span className="chat-folder-icon">&#128193;</span>
+          {dirName ? (
+            <span className="chat-folder-name">{dirName}</span>
+          ) : (
+            <span className="chat-folder-placeholder">Open Folder</span>
+          )}
+        </button>
+        {projectDir && (
+          <span className="chat-folder-path" title={projectDir}>
+            {projectDir}
+          </span>
+        )}
+      </div>
       {isDragging && (
         <div className="chat-drop-overlay">
           <div className="chat-drop-content">

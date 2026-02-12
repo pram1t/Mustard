@@ -105,6 +105,13 @@ export const IPC_CHANNELS = {
   /** Quit the application */
   APP_QUIT: 'app:quit',
 
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Dialog
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /** Open native folder picker dialog */
+  DIALOG_SELECT_FOLDER: 'dialog:selectFolder',
+
 } as const;
 
 // =============================================================================
@@ -141,7 +148,8 @@ export type InvokeChannel =
   | typeof IPC_CHANNELS.WINDOW_IS_MAXIMIZED
   | typeof IPC_CHANNELS.APP_VERSION
   | typeof IPC_CHANNELS.APP_CHECK_UPDATE
-  | typeof IPC_CHANNELS.APP_QUIT;
+  | typeof IPC_CHANNELS.APP_QUIT
+  | typeof IPC_CHANNELS.DIALOG_SELECT_FOLDER;
 
 /**
  * Channels that use send/on pattern (one-way events).
@@ -206,6 +214,7 @@ export interface IPCRequestMap {
   [IPC_CHANNELS.APP_VERSION]: void;
   [IPC_CHANNELS.APP_CHECK_UPDATE]: void;
   [IPC_CHANNELS.APP_QUIT]: void;
+  [IPC_CHANNELS.DIALOG_SELECT_FOLDER]: void;
 }
 
 /**
@@ -233,6 +242,7 @@ export interface IPCResponseMap {
   [IPC_CHANNELS.APP_VERSION]: string;
   [IPC_CHANNELS.APP_CHECK_UPDATE]: UpdateInfo | null;
   [IPC_CHANNELS.APP_QUIT]: void;
+  [IPC_CHANNELS.DIALOG_SELECT_FOLDER]: string | null;
 }
 
 // =============================================================================

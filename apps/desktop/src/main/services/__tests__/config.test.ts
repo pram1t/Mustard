@@ -79,11 +79,13 @@ describe('ConfigService', () => {
     expect(config.ui).toBeDefined();
   });
 
-  it('getProviders() returns array of ProviderInfo', () => {
+  it('getProviders() returns all known providers regardless of registration', () => {
     const providers = service.getProviders();
-    expect(providers).toHaveLength(2);
-    expect(providers[0]).toMatchObject({ id: 'openai', name: 'Openai' });
-    expect(providers[1]).toMatchObject({ id: 'anthropic', name: 'Anthropic' });
+    expect(providers).toHaveLength(4);
+    expect(providers[0]).toMatchObject({ id: 'openai', name: 'OpenAI', requiresApiKey: true });
+    expect(providers[1]).toMatchObject({ id: 'anthropic', name: 'Anthropic', requiresApiKey: true });
+    expect(providers[2]).toMatchObject({ id: 'gemini', name: 'Gemini', requiresApiKey: true });
+    expect(providers[3]).toMatchObject({ id: 'ollama', name: 'Ollama', requiresApiKey: false });
   });
 
   it('getModels() returns models for a provider', () => {

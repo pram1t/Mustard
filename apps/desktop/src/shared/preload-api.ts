@@ -59,6 +59,12 @@ export interface PreloadAPI {
   close(): Promise<void>;
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Dialog (1 method)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  selectFolder(): Promise<string | null>;
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Application (1 method)
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -204,13 +210,14 @@ export function isMCPServerInput(obj: unknown): obj is MCPServerInput {
 // =============================================================================
 
 /**
- * Total preload methods: 17
+ * Total preload methods: 18
  * Design constraint: Must be < 20 to minimize attack surface.
  * Count: chat, stop, onEvent, getStatus, getConfig, setConfig, getProviders,
  *        getModels, setApiKey, removeApiKey, getMCPServers, setMCPServer,
- *        removeMCPServer, minimize, toggleMaximize, close, getAppInfo = 17
+ *        removeMCPServer, selectFolder, minimize, toggleMaximize, close,
+ *        getAppInfo = 18
  */
-export const PRELOAD_METHOD_COUNT = 17;
+export const PRELOAD_METHOD_COUNT = 18;
 
 // =============================================================================
 // WINDOW TYPE AUGMENTATION

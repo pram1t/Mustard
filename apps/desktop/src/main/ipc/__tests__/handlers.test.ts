@@ -13,6 +13,17 @@ vi.mock('electron', () => ({
     getVersion: () => '0.1.0',
     quit: vi.fn(),
   },
+  dialog: {
+    showOpenDialog: vi.fn(async () => ({ canceled: true, filePaths: [] })),
+  },
+}));
+
+vi.mock('../../window', () => ({
+  getMainWindow: vi.fn(() => ({})),
+}));
+
+vi.mock('../../services', () => ({
+  getAgentService: vi.fn(() => ({ setCwd: vi.fn() })),
 }));
 
 import { registerAgentHandlers } from '../handlers/agent';
@@ -20,14 +31,15 @@ import { registerConfigHandlers } from '../handlers/config';
 import { registerMCPHandlers } from '../handlers/mcp';
 import { registerWindowHandlers } from '../handlers/window';
 import { registerAppHandlers } from '../handlers/app';
+import { registerDialogHandlers } from '../handlers/dialog';
 
 describe('IPC Channel Definitions', () => {
   it('should have fewer than 25 channels', () => {
     expect(CHANNEL_COUNT).toBeLessThanOrEqual(25);
   });
 
-  it('should have exactly 22 channel definitions', () => {
-    expect(CHANNEL_COUNT).toBe(22);
+  it('should have exactly 23 channel definitions', () => {
+    expect(CHANNEL_COUNT).toBe(23);
   });
 
   it('should have all channel values in VALID_CHANNELS set', () => {
@@ -84,24 +96,31 @@ describe('Handler Registration', () => {
     expect(handlers.has(IPC_CHANNELS.APP_QUIT)).toBe(true);
   });
 
+  it('registerDialogHandlers registers 1 invoke channel', () => {
+    registerDialogHandlers();
+    expect(handlers.has(IPC_CHANNELS.DIALOG_SELECT_FOLDER)).toBe(true);
+  });
+
   it('all registered channels are in the allowlist', () => {
     registerAgentHandlers();
     registerConfigHandlers();
     registerMCPHandlers();
     registerWindowHandlers();
     registerAppHandlers();
+    registerDialogHandlers();
 
     for (const channel of handlers.keys()) {
       expect(VALID_CHANNELS.has(channel)).toBe(true);
     }
   });
 
-  it('total registered handlers equals 19 (all invoke channels)', () => {
+  it('total registered handlers equals 22 (all invoke channels)', () => {
     registerAgentHandlers();
     registerConfigHandlers();
     registerMCPHandlers();
     registerWindowHandlers();
     registerAppHandlers();
-    expect(handlers.size).toBe(21);
+    registerDialogHandlers();
+    expect(handlers.size).toBe(22);
   });
 });

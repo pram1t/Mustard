@@ -62,6 +62,10 @@ const api: PreloadAPI = {
   removeMCPServer: (serverId: string) =>
     ipcRenderer.invoke(IPC_CHANNELS.MCP_REMOVE, { serverId }),
 
+  // ── Dialog ────────────────────────────────────────────────────────────
+  selectFolder: () =>
+    ipcRenderer.invoke(IPC_CHANNELS.DIALOG_SELECT_FOLDER),
+
   // ── Window Controls ────────────────────────────────────────────────────
   minimize: () =>
     ipcRenderer.invoke(IPC_CHANNELS.WINDOW_MINIMIZE),
