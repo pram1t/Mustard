@@ -2,12 +2,23 @@
  * OpenAgent V2 - Dispatcher
  *
  * Assigns tasks to workers, starts execution, handles completion.
+ * Supports both sequential (dispatchNext) and parallel (runAll) execution.
  */
 
 import type { IMessageBus } from '@openagent/message-bus';
+import type { IMemoryStore } from '@openagent/memory';
 import type { WorkerFactory, IWorker } from '@openagent/worker';
 import type { TaskQueue, QueueTask } from '@openagent/queue';
 import type { ExecutionPlan, StepResult } from './types.js';
+
+/**
+ * Optional dependencies for dispatcher → worker config pass-through.
+ */
+export interface DispatcherDeps {
+  bus?: IMessageBus;
+  memoryStore?: IMemoryStore;
+  projectId?: string;
+}
 
 /**
  * Dispatches tasks from the queue to workers and collects results.
@@ -16,13 +27,17 @@ export class Dispatcher {
   private readonly queue: TaskQueue;
   private readonly factory: WorkerFactory;
   private readonly bus?: IMessageBus;
+  private readonly maxConcurrency: number;
+  private readonly deps: DispatcherDeps;
   private readonly stepResults = new Map<string, StepResult>();
   private readonly activeWorkers = new Map<string, IWorker>();
 
-  constructor(queue: TaskQueue, factory: WorkerFactory, bus?: IMessageBus) {
+  constructor(queue: TaskQueue, factory: WorkerFactory, bus?: IMessageBus, maxConcurrency: number = 3, deps?: DispatcherDeps) {
     this.queue = queue;
     this.factory = factory;
     this.bus = bus;
+    this.maxConcurrency = maxConcurrency;
+    this.deps = deps ?? {};
   }
 
   /**
@@ -43,26 +58,70 @@ export class Dispatcher {
   }
 
   /**
-   * Dispatch the next available task to a worker.
-   * Returns the step result when execution completes,
-   * or null if no tasks are ready.
+   * Run all tasks with parallel execution up to maxConcurrency.
+   * Returns all step results when execution is complete.
    */
-  async dispatchNext(): Promise<StepResult | null> {
-    const task = this.queue.getNext();
-    if (!task) return null;
+  async runAll(): Promise<StepResult[]> {
+    const running = new Map<string, Promise<{ taskId: string; result: StepResult }>>();
 
-    this.queue.start(task.id);
+    while (this.hasPendingWork() || running.size > 0) {
+      // Fill slots up to maxConcurrency
+      while (running.size < this.maxConcurrency) {
+        const task = this.queue.getNext();
+        if (!task) break;
 
+        this.queue.start(task.id);
+
+        this.bus?.publish('task.started', {
+          taskId: task.id,
+          title: task.title,
+          role: task.assignTo,
+        });
+
+        const promise = this.executeTask(task).then((result) => ({
+          taskId: task.id,
+          result,
+        }));
+        running.set(task.id, promise);
+      }
+
+      if (running.size === 0) {
+        // Check if there are pending tasks that might become ready
+        const stats = this.queue.getStats();
+        if (stats.pending > 0 && stats.running === 0) {
+          // Tasks stuck waiting for deps that will never resolve (failed deps)
+          break;
+        }
+        break;
+      }
+
+      // Wait for any one task to complete
+      const completed = await Promise.race([...running.values()]);
+      running.delete(completed.taskId);
+      this.stepResults.set(completed.taskId, completed.result);
+    }
+
+    return this.getResults();
+  }
+
+  /**
+   * Execute a single task.
+   */
+  private async executeTask(task: QueueTask): Promise<StepResult> {
     const startTime = Date.now();
     const prompt = (task.metadata?.prompt as string) ?? task.description;
     const role = (task.assignTo as any) ?? 'backend';
 
     try {
-      // Create a worker for this task
-      const worker = this.factory.create({ role, cwd: process.cwd() });
+      const worker = this.factory.create({
+        role,
+        cwd: process.cwd(),
+        bus: this.deps.bus,
+        memoryStore: this.deps.memoryStore,
+        projectId: this.deps.projectId,
+      });
       this.activeWorkers.set(task.id, worker);
 
-      // Run the worker and collect output
       let output = '';
       for await (const event of worker.run(prompt, task.id)) {
         if (event.type === 'text') {
@@ -70,8 +129,8 @@ export class Dispatcher {
         }
       }
 
-      // Mark task complete
       this.queue.complete(task.id, { output });
+      this.activeWorkers.delete(task.id);
 
       const result: StepResult = {
         stepId: task.id,
@@ -80,11 +139,9 @@ export class Dispatcher {
         duration: Date.now() - startTime,
       };
 
-      this.stepResults.set(task.id, result);
-      this.activeWorkers.delete(task.id);
-
       this.bus?.publish('task.completed', {
         taskId: task.id,
+        title: task.title,
         duration: result.duration,
       });
 
@@ -92,6 +149,7 @@ export class Dispatcher {
     } catch (err) {
       const error = (err as Error).message;
       this.queue.fail(task.id, error);
+      this.activeWorkers.delete(task.id);
 
       const result: StepResult = {
         stepId: task.id,
@@ -100,13 +158,35 @@ export class Dispatcher {
         duration: Date.now() - startTime,
       };
 
-      this.stepResults.set(task.id, result);
-      this.activeWorkers.delete(task.id);
-
-      this.bus?.publish('task.failed', { taskId: task.id, error });
+      this.bus?.publish('task.failed', {
+        taskId: task.id,
+        title: task.title,
+        error,
+      });
 
       return result;
     }
+  }
+
+  /**
+   * Dispatch the next available task sequentially.
+   * @deprecated Use runAll() for parallel execution.
+   */
+  async dispatchNext(): Promise<StepResult | null> {
+    const task = this.queue.getNext();
+    if (!task) return null;
+
+    this.queue.start(task.id);
+
+    this.bus?.publish('task.started', {
+      taskId: task.id,
+      title: task.title,
+      role: task.assignTo,
+    });
+
+    const result = await this.executeTask(task);
+    this.stepResults.set(task.id, result);
+    return result;
   }
 
   /**
@@ -115,6 +195,14 @@ export class Dispatcher {
   hasMore(): boolean {
     const stats = this.queue.getStats();
     return stats.ready > 0 || stats.pending > 0 || stats.running > 0;
+  }
+
+  /**
+   * Check if there is pending work (tasks not yet completed or failed).
+   */
+  private hasPendingWork(): boolean {
+    const stats = this.queue.getStats();
+    return stats.ready > 0 || stats.pending > 0;
   }
 
   /**

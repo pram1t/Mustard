@@ -12,6 +12,7 @@ import { WorkerRegistry, WorkerFactory } from '@openagent/worker';
 import { Planner } from './planner.js';
 import { Dispatcher } from './dispatcher.js';
 import { ProgressMonitor } from './monitor.js';
+import { ApprovalManager, type PlanApprovalCallback, type StepApprovalCallback } from './approval.js';
 import type {
   ExecutionPlan,
   OrchestratorConfig,
@@ -26,6 +27,7 @@ const DEFAULT_CONFIG: Required<OrchestratorConfig> = {
   maxParallelWorkers: 3,
   taskTimeoutMs: 5 * 60 * 1000,
   requireApproval: false,
+  stepByStepApproval: false,
   maxRetries: 2,
 };
 
@@ -48,6 +50,7 @@ export class Orchestrator {
   private readonly factory: WorkerFactory;
   private readonly dispatcher: Dispatcher;
   private readonly monitor: ProgressMonitor;
+  private readonly approval: ApprovalManager;
 
   constructor(config: OrchestratorConfig, deps: OrchestratorDeps) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -56,8 +59,27 @@ export class Orchestrator {
     this.queue = new TaskQueue(this.bus);
     this.registry = new WorkerRegistry();
     this.factory = new WorkerFactory(this.registry, deps.router, deps.tools);
-    this.dispatcher = new Dispatcher(this.queue, this.factory, this.bus);
+    this.dispatcher = new Dispatcher(this.queue, this.factory, this.bus, this.config.maxParallelWorkers, {
+      bus: this.bus,
+      memoryStore: deps.memoryStore,
+      projectId: undefined, // Set per-request if needed
+    });
     this.monitor = new ProgressMonitor(this.queue, this.bus);
+    this.approval = new ApprovalManager();
+  }
+
+  /**
+   * Set callback for plan approval (Phase 12).
+   */
+  setPlanApprovalCallback(cb: PlanApprovalCallback): void {
+    this.approval.setPlanApprovalCallback(cb);
+  }
+
+  /**
+   * Set callback for step-by-step approval (Phase 12).
+   */
+  setStepApprovalCallback(cb: StepApprovalCallback): void {
+    this.approval.setStepApprovalCallback(cb);
   }
 
   /**
@@ -68,25 +90,41 @@ export class Orchestrator {
     const startTime = Date.now();
 
     // 1. Create plan
-    const plan = await this.planner.createPlan(request, context);
+    let plan = await this.planner.createPlan(request, context);
 
     this.bus.publish('plan.created', { planId: plan.id, steps: plan.steps.length });
 
-    // 2. Load plan into queue
-    this.dispatcher.loadPlan(plan);
+    // 2. If approval required and callback set, get approval (Phase 12)
+    if (this.config.requireApproval && this.approval.hasPlanCallback()) {
+      const approvalResult = await this.approval.requestPlanApproval(plan);
 
-    // 3. Start monitoring
-    this.monitor.startMonitoring(plan);
+      if (approvalResult.decision === 'reject') {
+        return {
+          planId: plan.id,
+          success: false,
+          stepResults: [],
+          totalDuration: Date.now() - startTime,
+          summary: 'Plan rejected by user.',
+        };
+      }
 
-    // 4. Dispatch loop — run tasks until done
-    while (this.dispatcher.hasMore()) {
-      await this.dispatcher.dispatchNext();
+      // Use possibly-modified plan
+      plan = approvalResult.plan;
     }
 
-    // 5. Stop monitoring
+    // 3. Load plan into queue
+    this.dispatcher.loadPlan(plan);
+
+    // 4. Start monitoring
+    this.monitor.startMonitoring(plan);
+
+    // 5. Parallel dispatch — run all tasks up to maxConcurrency
+    await this.dispatcher.runAll();
+
+    // 6. Stop monitoring
     this.monitor.stopMonitoring();
 
-    // 6. Collect results
+    // 7. Collect results
     const results = this.dispatcher.getResults();
     const success = results.every((r) => r.status === 'completed');
 
@@ -120,9 +158,7 @@ export class Orchestrator {
     this.dispatcher.loadPlan(plan);
     this.monitor.startMonitoring(plan);
 
-    while (this.dispatcher.hasMore()) {
-      await this.dispatcher.dispatchNext();
-    }
+    await this.dispatcher.runAll();
 
     this.monitor.stopMonitoring();
 

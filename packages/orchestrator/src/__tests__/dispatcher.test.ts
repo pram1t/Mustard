@@ -39,6 +39,30 @@ function createFailingFactory(error: string) {
   } as any;
 }
 
+// Mock WorkerFactory with delays to test concurrency
+function createDelayFactory(delayMs: number = 10) {
+  const executionOrder: string[] = [];
+  return {
+    executionOrder,
+    factory: {
+      create: vi.fn((config: any) => ({
+        id: `mock-worker-${Math.random().toString(36).slice(2, 8)}`,
+        role: config.role,
+        name: `Mock ${config.role}`,
+        status: 'idle',
+        getStatus: () => 'idle',
+        run: async function* (prompt: string, taskId?: string) {
+          executionOrder.push(`start:${config.role}`);
+          await new Promise((r) => setTimeout(r, delayMs));
+          executionOrder.push(`end:${config.role}`);
+          yield { type: 'text', content: `Done: ${config.role}` };
+        },
+      })),
+      destroy: vi.fn(),
+    } as any,
+  };
+}
+
 describe('Dispatcher', () => {
   let bus: EventBus;
   let queue: TaskQueue;
@@ -157,6 +181,127 @@ describe('Dispatcher', () => {
     });
   });
 
+  describe('runAll', () => {
+    it('should execute all tasks to completion', async () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+
+      dispatcher.loadPlan(testPlan);
+      const results = await dispatcher.runAll();
+
+      expect(results).toHaveLength(3);
+      expect(results.every((r) => r.status === 'completed')).toBe(true);
+    });
+
+    it('should respect dependency ordering', async () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+
+      dispatcher.loadPlan(testPlan);
+      const results = await dispatcher.runAll();
+
+      // step-1 must finish before step-2 and step-3
+      const step1Result = results.find((r) => r.stepId === 'step-1');
+      const step2Result = results.find((r) => r.stepId === 'step-2');
+      const step3Result = results.find((r) => r.stepId === 'step-3');
+
+      expect(step1Result).toBeDefined();
+      expect(step2Result).toBeDefined();
+      expect(step3Result).toBeDefined();
+    });
+
+    it('should respect maxConcurrency', async () => {
+      const factory = createMockFactory();
+      // Set maxConcurrency to 1 so tasks run sequentially
+      const dispatcher = new Dispatcher(queue, factory, bus, 1);
+
+      // Add independent tasks
+      queue.add({ id: 't1', title: 'A', description: 'A', assignTo: 'backend' });
+      queue.add({ id: 't2', title: 'B', description: 'B', assignTo: 'frontend' });
+      queue.add({ id: 't3', title: 'C', description: 'C', assignTo: 'architect' });
+
+      const results = await dispatcher.runAll();
+      expect(results).toHaveLength(3);
+      expect(results.every((r) => r.status === 'completed')).toBe(true);
+    });
+
+    it('should handle failures gracefully', async () => {
+      const factory = createFailingFactory('Worker crashed');
+      const dispatcher = new Dispatcher(queue, factory, bus);
+
+      queue.add({ id: 't1', title: 'Test', description: 'Test' });
+
+      const results = await dispatcher.runAll();
+      expect(results).toHaveLength(1);
+      expect(results[0].status).toBe('failed');
+      expect(results[0].error).toBe('Worker crashed');
+    });
+
+    it('should execute independent tasks in parallel', async () => {
+      const { factory, executionOrder } = createDelayFactory(20);
+      const dispatcher = new Dispatcher(queue, factory, bus, 3);
+
+      // Add 3 independent tasks
+      queue.add({ id: 't1', title: 'A', description: 'A', assignTo: 'backend' });
+      queue.add({ id: 't2', title: 'B', description: 'B', assignTo: 'frontend' });
+      queue.add({ id: 't3', title: 'C', description: 'C', assignTo: 'architect' });
+
+      const results = await dispatcher.runAll();
+
+      expect(results).toHaveLength(3);
+      // All 3 should have started before any ended (parallel)
+      const startCount = executionOrder.filter((e) => e.startsWith('start:')).length;
+      expect(startCount).toBe(3);
+    });
+
+    it('should return empty results when queue is empty', async () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+
+      const results = await dispatcher.runAll();
+      expect(results).toHaveLength(0);
+    });
+
+    it('should publish task events during execution', async () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+      const events: string[] = [];
+
+      bus.subscribe('task.started', () => events.push('started'));
+      bus.subscribe('task.completed', () => events.push('completed'));
+
+      queue.add({ id: 't1', title: 'Test', description: 'Test' });
+      await dispatcher.runAll();
+
+      expect(events).toContain('started');
+      expect(events).toContain('completed');
+    });
+
+    it('should handle diamond dependency pattern', async () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+
+      // Diamond: A -> B, A -> C, B+C -> D
+      const diamondPlan: ExecutionPlan = {
+        id: 'diamond',
+        request: 'Diamond test',
+        steps: [
+          { id: 'a', title: 'A', description: 'Root', assignTo: 'architect', priority: 'high', dependencies: [], prompt: 'A' },
+          { id: 'b', title: 'B', description: 'Left', assignTo: 'backend', priority: 'normal', dependencies: ['a'], prompt: 'B' },
+          { id: 'c', title: 'C', description: 'Right', assignTo: 'frontend', priority: 'normal', dependencies: ['a'], prompt: 'C' },
+          { id: 'd', title: 'D', description: 'Merge', assignTo: 'qa', priority: 'normal', dependencies: ['b', 'c'], prompt: 'D' },
+        ],
+        createdAt: new Date(),
+      };
+
+      dispatcher.loadPlan(diamondPlan);
+      const results = await dispatcher.runAll();
+
+      expect(results).toHaveLength(4);
+      expect(results.every((r) => r.status === 'completed')).toBe(true);
+    });
+  });
+
   describe('hasMore', () => {
     it('should return true when tasks remain', () => {
       const factory = createMockFactory();
@@ -189,6 +334,34 @@ describe('Dispatcher', () => {
       await dispatcher.dispatchNext();
 
       expect(dispatcher.getResults()).toHaveLength(2);
+    });
+  });
+
+  describe('getActiveWorkerCount', () => {
+    it('should return 0 when no workers active', () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+      expect(dispatcher.getActiveWorkerCount()).toBe(0);
+    });
+  });
+
+  describe('getResult', () => {
+    it('should return specific step result', async () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+
+      queue.add({ id: 'specific-task', title: 'Test', description: 'Test' });
+      await dispatcher.dispatchNext();
+
+      const result = dispatcher.getResult('specific-task');
+      expect(result).toBeDefined();
+      expect(result!.stepId).toBe('specific-task');
+    });
+
+    it('should return undefined for unknown step', () => {
+      const factory = createMockFactory();
+      const dispatcher = new Dispatcher(queue, factory, bus);
+      expect(dispatcher.getResult('nonexistent')).toBeUndefined();
     });
   });
 });
