@@ -8,6 +8,8 @@ import type { LLMRouter } from '@openagent/llm';
 import type { IToolRegistry } from '@openagent/tools';
 import { BaseWorker } from './base-worker.js';
 import { WorkerRegistry } from './registry.js';
+import { WorkerChannel } from './communication.js';
+import { WorkerMemory } from './memory-integration.js';
 import type { WorkerConfig, IWorker } from './types.js';
 
 /**
@@ -29,6 +31,9 @@ export class WorkerFactory {
    * Looks up the definition from the registry by role, creates a BaseWorker,
    * and registers it as active.
    *
+   * If config.bus is provided, creates a WorkerChannel for inter-worker communication.
+   * If config.memoryStore + config.projectId are provided, creates a WorkerMemory.
+   *
    * @throws Error if no definition exists for the role
    */
   create(config: WorkerConfig): IWorker {
@@ -38,6 +43,23 @@ export class WorkerFactory {
     }
 
     const worker = new BaseWorker(definition, this.router, this.tools, config);
+
+    // Create communication channel if bus is provided (Phase 9)
+    if (config.bus) {
+      const channel = new WorkerChannel(config.bus, worker.id, worker.role);
+      worker.setChannel(channel);
+    }
+
+    // Create memory integration if memoryStore + projectId are provided (Phase 11)
+    if (config.memoryStore && config.projectId) {
+      const memory = new WorkerMemory(
+        config.memoryStore,
+        worker.id,
+        worker.role,
+        config.projectId,
+      );
+      worker.setMemory(memory);
+    }
 
     // Track in registry
     this.registry.trackWorker(worker);

@@ -12,6 +12,8 @@ import type { LLMRouter } from '@openagent/llm';
 import type { IToolRegistry, Tool } from '@openagent/tools';
 import { ToolRegistry } from '@openagent/tools';
 import { buildWorkerPrompt } from './prompt-builder.js';
+import type { WorkerChannel } from './communication.js';
+import type { WorkerMemory } from './memory-integration.js';
 import type { IWorker, WorkerConfig, WorkerDefinition, WorkerStatus } from './types.js';
 
 /**
@@ -29,6 +31,12 @@ export class BaseWorker implements IWorker {
   private readonly tools: IToolRegistry;
   private readonly config: WorkerConfig;
   private readonly systemPrompt: string;
+
+  /** Communication channel for inter-worker messaging (Phase 9) */
+  private channel?: WorkerChannel;
+
+  /** Memory integration for cross-session persistence (Phase 11) */
+  private memory?: WorkerMemory;
 
   constructor(
     definition: WorkerDefinition,
@@ -48,6 +56,20 @@ export class BaseWorker implements IWorker {
 
     // Build system prompt
     this.systemPrompt = buildWorkerPrompt(definition, config.systemPromptOverride);
+  }
+
+  /**
+   * Set the communication channel (called by WorkerFactory).
+   */
+  setChannel(channel: WorkerChannel): void {
+    this.channel = channel;
+  }
+
+  /**
+   * Set the memory integration (called by WorkerFactory).
+   */
+  setMemory(memory: WorkerMemory): void {
+    this.memory = memory;
   }
 
   /**
@@ -90,11 +112,17 @@ export class BaseWorker implements IWorker {
   /**
    * Run the worker with a prompt.
    * Creates a fresh AgentLoop for each run (stateless between runs).
+   *
+   * If a WorkerChannel is set, inbox messages are prepended as context.
+   * If a WorkerMemory is set, relevant memories are prepended as context.
    */
   async *run(prompt: string, _taskId?: string): AsyncGenerator<AgentEvent> {
     this._status = 'working';
 
     try {
+      // Build enriched prompt with context from memory and communication
+      const enrichedPrompt = this.buildEnrichedPrompt(prompt);
+
       const agentConfig: AgentConfig = {
         tools: this.tools,
         systemPrompt: this.systemPrompt,
@@ -106,7 +134,7 @@ export class BaseWorker implements IWorker {
       const loop = new AgentLoop(this.router, agentConfig);
       await loop.initialize();
 
-      for await (const event of loop.run(prompt)) {
+      for await (const event of loop.run(enrichedPrompt)) {
         yield event;
       }
 
@@ -115,5 +143,33 @@ export class BaseWorker implements IWorker {
       this._status = 'error';
       throw err;
     }
+  }
+
+  /**
+   * Build an enriched prompt by prepending memory context and inbox messages.
+   */
+  private buildEnrichedPrompt(prompt: string): string {
+    const sections: string[] = [];
+
+    // Prepend memory context if available
+    if (this.memory) {
+      const memoryContext = this.memory.buildTaskContext(prompt);
+      if (memoryContext) {
+        sections.push(memoryContext);
+      }
+    }
+
+    // Prepend inbox messages if available
+    if (this.channel) {
+      const inboxContext = this.channel.formatInboxAsContext();
+      if (inboxContext) {
+        sections.push(inboxContext);
+      }
+    }
+
+    // Add the actual prompt
+    sections.push(prompt);
+
+    return sections.join('\n\n');
   }
 }
