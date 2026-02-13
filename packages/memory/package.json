@@ -1,0 +1,29 @@
+{
+  "name": "@openagent/memory",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Persistent memory with SQLite and FTS5 search for OpenAgent V2",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@openagent/logger": "*",
+    "better-sqlite3": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^25.0.9",
+    "typescript": "^5.9.3"
+  }
+}
