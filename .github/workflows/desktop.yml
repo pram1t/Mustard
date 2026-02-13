@@ -80,6 +80,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Fix 7zip-bin permissions
+        if: runner.os == 'macOS'
+        run: chmod +x node_modules/7zip-bin/mac/*/7za || true
+
       - name: Build all packages
         run: npm run build
 
