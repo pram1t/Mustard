@@ -16,13 +16,19 @@
   "keywords": ["openagent", "cli", "agent", "ai"],
   "license": "MIT",
   "dependencies": {
+    "@openagent/artifact": "*",
     "@openagent/config": "*",
     "@openagent/core": "*",
     "@openagent/hooks": "*",
     "@openagent/llm": "*",
     "@openagent/logger": "*",
     "@openagent/mcp": "*",
-    "@openagent/tools": "*"
+    "@openagent/memory": "*",
+    "@openagent/message-bus": "*",
+    "@openagent/orchestrator": "*",
+    "@openagent/queue": "*",
+    "@openagent/tools": "*",
+    "@openagent/worker": "*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

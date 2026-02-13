@@ -7,3 +7,4 @@
 export { initCommand, type InitOptions } from './init.js';
 export { configCommand, type ConfigAction, type ConfigOptions } from './config.js';
 export { plansCommand, type PlansAction, type PlansOptions } from './plans.js';
+export { orchestrateCommand, type OrchestrateOptions } from './orchestrate.js';

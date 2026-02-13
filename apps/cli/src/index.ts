@@ -36,7 +36,7 @@ import {
   loadResolvedConfig,
   type HooksConfig,
 } from '@openagent/config';
-import { initCommand, configCommand, plansCommand } from './commands/index.js';
+import { initCommand, configCommand, plansCommand, orchestrateCommand } from './commands/index.js';
 import { createHookExecutor, type HookExecutor } from '@openagent/hooks';
 import {
   MCPRegistry,
@@ -165,6 +165,8 @@ function parseArgs(): {
   permissionMode: PermissionMode;
   allowTools: string[];
   denyTools: string[];
+  orchestrate: boolean;
+  maxWorkers: number;
 } {
   const args = process.argv.slice(2);
   let help = false;
@@ -181,6 +183,8 @@ function parseArgs(): {
   let plansSubcommand: PlansSubcommand | undefined;
   let resume: string | undefined;
   let noSave = false;
+  let orchestrate = false;
+  let maxWorkers = 3;
   let permissionMode: PermissionMode = 'default';
   const allowTools: string[] = [];
   const denyTools: string[] = [];
@@ -224,7 +228,7 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
   }
 
   // Check for session subcommand
@@ -241,7 +245,7 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
   }
 
   // Check for init subcommand
@@ -257,7 +261,7 @@ function parseArgs(): {
       }
     }
     initSubcommand = initOpts;
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
   }
 
   // Check for config subcommand
@@ -279,7 +283,7 @@ function parseArgs(): {
     }
 
     configSubcommand = configOpts;
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
   }
 
   // Check for plans subcommand
@@ -298,7 +302,7 @@ function parseArgs(): {
     }
 
     plansSubcommand = plansOpts;
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -331,6 +335,10 @@ function parseArgs(): {
       resume = args[++i];
     } else if (arg === '--no-save') {
       noSave = true;
+    } else if (arg === '--orchestrate' || arg === '-O') {
+      orchestrate = true;
+    } else if (arg === '--max-workers') {
+      maxWorkers = parseInt(args[++i] || '3', 10) || 3;
     } else if (!arg.startsWith('-')) {
       promptParts.push(arg);
     }
@@ -354,6 +362,8 @@ function parseArgs(): {
     permissionMode,
     allowTools,
     denyTools,
+    orchestrate,
+    maxWorkers,
   };
 }
 
@@ -383,6 +393,8 @@ Options:
   -P, --permission-mode <mode>  Permission mode: permissive, default, strict
   --allow-tool <name>           Always allow a tool (repeatable)
   --deny-tool <name>            Always deny a tool (repeatable)
+  -O, --orchestrate             Use multi-worker orchestrated execution
+  --max-workers <n>             Maximum parallel workers (default: 3)
 
 Providers:
   openai            OpenAI GPT models (default: gpt-4o)
@@ -832,7 +844,7 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // Require a prompt
+  // Require a prompt (for both single-agent and orchestrate modes)
   if (!args.prompt) {
     console.error('Error: No prompt provided. Use --help for usage information.');
     process.exit(1);
@@ -900,6 +912,23 @@ async function main(): Promise<void> {
       if (args.verbose) {
         console.warn(`[MCP] Warning: Failed to load MCP tools: ${error instanceof Error ? error.message : String(error)}`);
       }
+    }
+
+    // Handle orchestrate mode — branch to multi-worker execution
+    if (args.orchestrate) {
+      await orchestrateCommand(args.prompt, {
+        router,
+        tools,
+        verbose: args.verbose,
+        maxParallelWorkers: args.maxWorkers,
+        cwd: process.cwd(),
+      });
+
+      // Cleanup MCP connections
+      if (mcpRegistry) {
+        await mcpRegistry.disconnectAll();
+      }
+      return;
     }
 
     // Session management
