@@ -18,10 +18,22 @@ Each step must specify:
 - id: unique string identifier (e.g., "step-1")
 - title: short title
 - description: what this step accomplishes
-- assignTo: one of "architect", "frontend", "backend"
+- assignTo: one of the available worker roles (see below)
 - priority: one of "critical", "high", "normal", "low"
 - dependencies: array of step IDs this step depends on (empty if none)
 - prompt: the specific prompt to send to the assigned worker
+
+Available Worker Roles:
+- architect: System design, code review, technical planning (read-only — cannot write code)
+- frontend: UI components, client-side logic, styling, accessibility
+- backend: APIs, services, databases, server-side logic
+- qa: Test strategy, test writing, bug detection, coverage analysis
+- devops: CI/CD pipelines, Docker, infrastructure, deployment configuration
+- security: Vulnerability assessment, secure coding review, threat modeling (read-only)
+- pm: Requirements gathering, task breakdown, prioritization (read-only)
+- tech_writer: Documentation, READMEs, API docs, tutorials, guides
+- ui_ux: Design systems, accessibility audits, component patterns
+- dba: Database schema design, query optimization, migrations
 
 Respond with ONLY a JSON array of steps. No markdown, no explanation.
 

@@ -85,8 +85,19 @@ describe('Worker Definitions', () => {
   });
 
   describe('builtinDefinitions', () => {
-    it('should contain all 3 MVP roles', () => {
-      expect(Object.keys(builtinDefinitions)).toEqual(['architect', 'frontend', 'backend']);
+    it('should contain all 10 worker roles', () => {
+      const roles = Object.keys(builtinDefinitions);
+      expect(roles).toHaveLength(10);
+      expect(roles).toContain('architect');
+      expect(roles).toContain('frontend');
+      expect(roles).toContain('backend');
+      expect(roles).toContain('qa');
+      expect(roles).toContain('devops');
+      expect(roles).toContain('security');
+      expect(roles).toContain('pm');
+      expect(roles).toContain('tech_writer');
+      expect(roles).toContain('ui_ux');
+      expect(roles).toContain('dba');
     });
 
     it('should map roles to correct definitions', () => {

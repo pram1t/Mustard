@@ -43,19 +43,19 @@ describe('WorkerRegistry', () => {
     });
 
     it('should return undefined for unregistered role', () => {
-      expect(registry.getDefinition('dba')).toBeUndefined();
+      expect(registry.getDefinition('nonexistent' as any)).toBeUndefined();
     });
 
     it('should register custom definitions', () => {
       const customDef: WorkerDefinition = {
         ...architectDefinition,
-        role: 'dba',
-        name: 'DBA',
-        description: 'Database administrator',
+        role: 'custom_role' as any,
+        name: 'Custom Worker',
+        description: 'A custom role for testing',
       };
       registry.registerDefinition(customDef);
-      expect(registry.hasDefinition('dba')).toBe(true);
-      expect(registry.getDefinition('dba')!.name).toBe('DBA');
+      expect(registry.hasDefinition('custom_role' as any)).toBe(true);
+      expect(registry.getDefinition('custom_role' as any)!.name).toBe('Custom Worker');
     });
 
     it('should override existing definitions', () => {
@@ -69,7 +69,7 @@ describe('WorkerRegistry', () => {
 
     it('should return all definitions', () => {
       const all = registry.getAllDefinitions();
-      expect(all.length).toBe(3);
+      expect(all.length).toBe(10);
     });
 
     it('should return all registered roles', () => {
