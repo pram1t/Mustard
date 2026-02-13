@@ -106,6 +106,9 @@ export interface OrchestratorConfig {
   /** Whether to require plan approval before execution */
   requireApproval?: boolean;
 
+  /** Whether to require step-by-step approval during execution */
+  stepByStepApproval?: boolean;
+
   /** Maximum retries per step */
   maxRetries?: number;
 }

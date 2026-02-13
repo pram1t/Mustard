@@ -11,6 +11,16 @@ export { Dispatcher } from './dispatcher.js';
 export { ProgressMonitor } from './monitor.js';
 export type { ProgressSnapshot, StepProgress } from './monitor.js';
 
+// Approval (Phase 12)
+export { ApprovalManager, formatPlanForApproval } from './approval.js';
+export type {
+  ApprovalDecision,
+  ApprovalResult,
+  PlanApprovalCallback,
+  StepApprovalCallback,
+  StepApprovalContext,
+} from './approval.js';
+
 export type {
   PlanStep,
   ExecutionPlan,
