@@ -134,6 +134,15 @@ export interface WorkerConfig {
 
   /** Additional system prompt text to prepend/append */
   systemPromptOverride?: string;
+
+  /** Message bus for inter-worker communication (Phase 9) */
+  bus?: import('@openagent/message-bus').IMessageBus;
+
+  /** Memory store for cross-session persistence (Phase 11) */
+  memoryStore?: import('@openagent/memory').IMemoryStore;
+
+  /** Project ID for scoping memories (Phase 11) */
+  projectId?: string;
 }
 
 // =============================================================================
