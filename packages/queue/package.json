@@ -19,9 +19,11 @@
   },
   "dependencies": {
     "@openagent/logger": "*",
-    "@openagent/message-bus": "*"
+    "@openagent/message-bus": "*",
+    "better-sqlite3": "^11.0.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^25.0.9",
     "typescript": "^5.9.3"
   }

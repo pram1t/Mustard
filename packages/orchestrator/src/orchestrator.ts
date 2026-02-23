@@ -62,6 +62,7 @@ export class Orchestrator {
     this.dispatcher = new Dispatcher(this.queue, this.factory, this.bus, this.config.maxParallelWorkers, {
       bus: this.bus,
       memoryStore: deps.memoryStore,
+      artifactStore: deps.artifactStore,
       projectId: undefined, // Set per-request if needed
     });
     this.monitor = new ProgressMonitor(this.queue, this.bus);

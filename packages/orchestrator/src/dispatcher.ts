@@ -7,6 +7,7 @@
 
 import type { IMessageBus } from '@openagent/message-bus';
 import type { IMemoryStore } from '@openagent/memory';
+import type { IArtifactStore, IHandoffManager } from '@openagent/artifact';
 import type { WorkerFactory, IWorker } from '@openagent/worker';
 import type { TaskQueue, QueueTask } from '@openagent/queue';
 import type { ExecutionPlan, StepResult } from './types.js';
@@ -17,6 +18,8 @@ import type { ExecutionPlan, StepResult } from './types.js';
 export interface DispatcherDeps {
   bus?: IMessageBus;
   memoryStore?: IMemoryStore;
+  artifactStore?: IArtifactStore;
+  handoffManager?: IHandoffManager;
   projectId?: string;
 }
 
@@ -109,8 +112,14 @@ export class Dispatcher {
    */
   private async executeTask(task: QueueTask): Promise<StepResult> {
     const startTime = Date.now();
-    const prompt = (task.metadata?.prompt as string) ?? task.description;
+    let prompt = (task.metadata?.prompt as string) ?? task.description;
     const role = (task.assignTo as any) ?? 'backend';
+
+    // Inject artifact context from completed dependencies
+    const artifactContext = this.buildArtifactContext(task);
+    if (artifactContext) {
+      prompt = `${artifactContext}\n\n${prompt}`;
+    }
 
     try {
       const worker = this.factory.create({
@@ -131,6 +140,9 @@ export class Dispatcher {
 
       this.queue.complete(task.id, { output });
       this.activeWorkers.delete(task.id);
+
+      // Store output as artifact and create handoffs for downstream tasks
+      this.storeArtifactAndHandoff(task, output);
 
       const result: StepResult = {
         stepId: task.id,
@@ -165,6 +177,55 @@ export class Dispatcher {
       });
 
       return result;
+    }
+  }
+
+  /**
+   * Build artifact context from completed dependency steps.
+   */
+  private buildArtifactContext(task: QueueTask): string | null {
+    const store = this.deps.artifactStore;
+    if (!store || !this.deps.projectId) return null;
+
+    const sections: string[] = [];
+    for (const depId of task.dependencies) {
+      const depResult = this.stepResults.get(depId);
+      if (!depResult?.output) continue;
+
+      const depTask = this.queue.get(depId);
+      if (!depTask) continue;
+
+      sections.push(`--- Output from "${depTask.title}" (${depTask.assignTo}) ---\n${depResult.output}`);
+    }
+
+    if (sections.length === 0) return null;
+    return `## Context from Previous Steps\n\n${sections.join('\n\n')}`;
+  }
+
+  /**
+   * Store task output as artifact and create handoffs for downstream tasks.
+   */
+  private storeArtifactAndHandoff(task: QueueTask, output: string): void {
+    const store = this.deps.artifactStore;
+    const handoffMgr = this.deps.handoffManager;
+    if (!store || !this.deps.projectId || !output) return;
+
+    const artifact = store.create({
+      name: `step-${task.id}`,
+      type: 'documentation',
+      createdBy: task.assignTo ?? 'unknown',
+      projectId: this.deps.projectId,
+      content: output,
+      summary: task.title,
+    });
+
+    if (!handoffMgr) return;
+
+    // Find downstream tasks that depend on this one
+    for (const t of this.queue.getAll()) {
+      if (t.dependencies.includes(task.id) && t.assignTo) {
+        handoffMgr.create(artifact.id, task.assignTo ?? 'unknown', t.assignTo, task.title);
+      }
     }
   }
 

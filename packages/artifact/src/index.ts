@@ -6,6 +6,9 @@
 
 export { ArtifactStore } from './store.js';
 export { HandoffManager } from './handoff.js';
+export { SqliteArtifactStore } from './sqlite-store.js';
+export { SqliteHandoffManager } from './sqlite-handoff.js';
+export { validateArtifactContent, artifactSchemas } from './validators.js';
 
 export type {
   ArtifactType,

@@ -7,6 +7,7 @@
 
 export { Orchestrator } from './orchestrator.js';
 export { Planner } from './planner.js';
+export { RequestParser } from './parser.js';
 export { Dispatcher } from './dispatcher.js';
 export { ProgressMonitor } from './monitor.js';
 export type { ProgressSnapshot, StepProgress } from './monitor.js';
@@ -20,6 +21,13 @@ export type {
   StepApprovalCallback,
   StepApprovalContext,
 } from './approval.js';
+
+export type {
+  ParsedRequest,
+  RequestIntent,
+  RequestScope,
+  RequestComplexity,
+} from './parser.js';
 
 export type {
   PlanStep,

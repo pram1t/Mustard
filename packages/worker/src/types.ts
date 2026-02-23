@@ -174,6 +174,11 @@ export interface IWorker {
    * Get the worker's current status.
    */
   getStatus(): WorkerStatus;
+
+  /**
+   * Abort the current execution and reset to idle.
+   */
+  abort(): void;
 }
 
 // =============================================================================

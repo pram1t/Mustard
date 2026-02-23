@@ -53,6 +53,10 @@ Thumbs.db
 coverage/
 .nyc_output/
 
+# Next.js
+.next/
+out/
+
 # Electron
 apps/desktop/out/
 apps/desktop/release/

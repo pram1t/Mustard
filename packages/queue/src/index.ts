@@ -5,6 +5,7 @@
  */
 
 export { TaskQueue } from './task-queue.js';
+export { SqliteTaskQueue } from './sqlite-queue.js';
 export { DependencyResolver } from './dependency-resolver.js';
 export { RetryPolicy, DEFAULT_RETRY_CONFIG } from './retry.js';
 

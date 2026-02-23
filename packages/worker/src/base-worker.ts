@@ -26,6 +26,7 @@ export class BaseWorker implements IWorker {
   readonly name: string;
 
   private _status: WorkerStatus = 'idle';
+  private _aborted = false;
   private readonly definition: WorkerDefinition;
   private readonly router: LLMRouter;
   private readonly tools: IToolRegistry;
@@ -110,6 +111,14 @@ export class BaseWorker implements IWorker {
   }
 
   /**
+   * Abort the current execution and reset to idle.
+   */
+  abort(): void {
+    this._aborted = true;
+    this._status = 'idle';
+  }
+
+  /**
    * Run the worker with a prompt.
    * Creates a fresh AgentLoop for each run (stateless between runs).
    *
@@ -118,6 +127,7 @@ export class BaseWorker implements IWorker {
    */
   async *run(prompt: string, _taskId?: string): AsyncGenerator<AgentEvent> {
     this._status = 'working';
+    this._aborted = false;
 
     try {
       // Build enriched prompt with context from memory and communication
@@ -135,6 +145,7 @@ export class BaseWorker implements IWorker {
       await loop.initialize();
 
       for await (const event of loop.run(enrichedPrompt)) {
+        if (this._aborted) break;
         yield event;
       }
 
