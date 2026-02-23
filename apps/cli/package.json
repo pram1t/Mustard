@@ -1,7 +1,17 @@
 {
   "name": "openagent-cli",
-  "version": "0.0.0",
-  "description": "OpenAgent CLI application",
+  "version": "1.0.0",
+  "description": "LLM-agnostic agentic coding assistant — an open-source alternative to Claude Code that works with any provider",
+  "author": "pram1t",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/openagent.git",
+    "directory": "apps/cli"
+  },
+  "homepage": "https://github.com/pram1t/openagent#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/openagent/issues"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
@@ -13,7 +23,20 @@
     "clean": "rm -rf dist",
     "start": "tsx src/index.ts"
   },
-  "keywords": ["openagent", "cli", "agent", "ai"],
+  "keywords": [
+    "openagent",
+    "cli",
+    "agent",
+    "ai",
+    "coding-assistant",
+    "llm",
+    "openai",
+    "anthropic",
+    "gemini",
+    "ollama",
+    "mcp",
+    "agentic"
+  ],
   "license": "MIT",
   "dependencies": {
     "@openagent/artifact": "*",
@@ -28,6 +51,7 @@
     "@openagent/orchestrator": "*",
     "@openagent/queue": "*",
     "@openagent/tools": "*",
+    "@openagent/server": "*",
     "@openagent/worker": "*"
   },
   "devDependencies": {
