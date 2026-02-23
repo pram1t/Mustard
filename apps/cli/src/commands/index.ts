@@ -8,3 +8,6 @@ export { initCommand, type InitOptions } from './init.js';
 export { configCommand, type ConfigAction, type ConfigOptions } from './config.js';
 export { plansCommand, type PlansAction, type PlansOptions } from './plans.js';
 export { orchestrateCommand, type OrchestrateOptions } from './orchestrate.js';
+export { workerCommand, type WorkerAction, type WorkerOptions } from './worker.js';
+export { requestCommand, type RequestAction, type RequestOptions } from './request.js';
+export { serverCommand, type ServerAction, type ServerCommandOptions } from './server.js';

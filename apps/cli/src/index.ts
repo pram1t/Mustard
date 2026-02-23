@@ -36,7 +36,7 @@ import {
   loadResolvedConfig,
   type HooksConfig,
 } from '@openagent/config';
-import { initCommand, configCommand, plansCommand, orchestrateCommand } from './commands/index.js';
+import { initCommand, configCommand, plansCommand, orchestrateCommand, workerCommand, requestCommand, serverCommand } from './commands/index.js';
 import { createHookExecutor, type HookExecutor } from '@openagent/hooks';
 import {
   MCPRegistry,
@@ -145,6 +145,32 @@ interface PlansSubcommand {
 }
 
 /**
+ * Worker subcommand arguments
+ */
+interface WorkerSubcommand {
+  action: 'list' | 'info';
+  role?: string;
+}
+
+/**
+ * Request subcommand arguments
+ */
+interface RequestSubcommand {
+  action: 'submit' | 'execute';
+  prompt: string;
+}
+
+/**
+ * Server subcommand arguments
+ */
+interface ServerSubcommand {
+  action: 'start';
+  port?: number;
+  host?: string;
+  apiKey?: string;
+}
+
+/**
  * Parse command line arguments
  */
 function parseArgs(): {
@@ -160,12 +186,16 @@ function parseArgs(): {
   initSubcommand?: InitSubcommand;
   configSubcommand?: ConfigSubcommand;
   plansSubcommand?: PlansSubcommand;
+  workerSubcommand?: WorkerSubcommand;
+  requestSubcommand?: RequestSubcommand;
+  serverSubcommand?: ServerSubcommand;
   resume?: string;
   noSave: boolean;
   permissionMode: PermissionMode;
   allowTools: string[];
   denyTools: string[];
   orchestrate: boolean;
+  approve: boolean;
   maxWorkers: number;
 } {
   const args = process.argv.slice(2);
@@ -181,9 +211,13 @@ function parseArgs(): {
   let initSubcommand: InitSubcommand | undefined;
   let configSubcommand: ConfigSubcommand | undefined;
   let plansSubcommand: PlansSubcommand | undefined;
+  let workerSubcommand: WorkerSubcommand | undefined;
+  let requestSubcommand: RequestSubcommand | undefined;
+  let serverSubcommand: ServerSubcommand | undefined;
   let resume: string | undefined;
   let noSave = false;
   let orchestrate = false;
+  let approve = false;
   let maxWorkers = 3;
   let permissionMode: PermissionMode = 'default';
   const allowTools: string[] = [];
@@ -228,7 +262,7 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
   }
 
   // Check for session subcommand
@@ -245,7 +279,7 @@ function parseArgs(): {
       help = true;
     }
 
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
   }
 
   // Check for init subcommand
@@ -261,7 +295,7 @@ function parseArgs(): {
       }
     }
     initSubcommand = initOpts;
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
   }
 
   // Check for config subcommand
@@ -283,7 +317,7 @@ function parseArgs(): {
     }
 
     configSubcommand = configOpts;
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
   }
 
   // Check for plans subcommand
@@ -302,7 +336,48 @@ function parseArgs(): {
     }
 
     plansSubcommand = plansOpts;
-    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, maxWorkers };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
+  }
+
+  // Check for worker subcommand
+  if (args[0] === 'worker' || args[0] === 'workers') {
+    const workerAction = (args[1] || 'list') as WorkerSubcommand['action'];
+    const workerOpts: WorkerSubcommand = { action: workerAction };
+
+    if (workerAction === 'info') {
+      workerOpts.role = args[2];
+    }
+
+    workerSubcommand = workerOpts;
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
+  }
+
+  // Check for request subcommand
+  if (args[0] === 'request') {
+    const reqAction = (args[1] || 'submit') as RequestSubcommand['action'];
+    const reqPrompt = args.slice(2).join(' ');
+
+    requestSubcommand = { action: reqAction, prompt: reqPrompt };
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
+  }
+
+  // Check for server subcommand
+  if (args[0] === 'server') {
+    const srvAction = (args[1] || 'start') as ServerSubcommand['action'];
+    const srvOpts: ServerSubcommand = { action: srvAction };
+
+    for (let i = 2; i < args.length; i++) {
+      if (args[i] === '--port') {
+        srvOpts.port = parseInt(args[++i] || '3100', 10);
+      } else if (args[i] === '--host') {
+        srvOpts.host = args[++i];
+      } else if (args[i] === '--api-key') {
+        srvOpts.apiKey = args[++i];
+      }
+    }
+
+    serverSubcommand = srvOpts;
+    return { help, version, model, provider, baseUrl, prompt: '', verbose, mcpSubcommand, sessionSubcommand, initSubcommand, configSubcommand, plansSubcommand, workerSubcommand, requestSubcommand, serverSubcommand, resume, noSave, permissionMode, allowTools, denyTools, orchestrate, approve, maxWorkers };
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -337,6 +412,8 @@ function parseArgs(): {
       noSave = true;
     } else if (arg === '--orchestrate' || arg === '-O') {
       orchestrate = true;
+    } else if (arg === '--approve' || arg === '-A') {
+      approve = true;
     } else if (arg === '--max-workers') {
       maxWorkers = parseInt(args[++i] || '3', 10) || 3;
     } else if (!arg.startsWith('-')) {
@@ -357,12 +434,16 @@ function parseArgs(): {
     initSubcommand,
     configSubcommand,
     plansSubcommand,
+    workerSubcommand,
+    requestSubcommand,
+    serverSubcommand,
     resume,
     noSave,
     permissionMode,
     allowTools,
     denyTools,
     orchestrate,
+    approve,
     maxWorkers,
   };
 }
@@ -378,6 +459,8 @@ Usage: openagent [options] <prompt>
        openagent init [options]
        openagent config <subcommand> [options]
        openagent plans [subcommand] [options]
+       openagent worker [subcommand] [options]
+       openagent request <subcommand> <prompt> [options]
        openagent mcp <subcommand> [options]
        openagent session <subcommand> [options]
 
@@ -394,6 +477,7 @@ Options:
   --allow-tool <name>           Always allow a tool (repeatable)
   --deny-tool <name>            Always deny a tool (repeatable)
   -O, --orchestrate             Use multi-worker orchestrated execution
+  -A, --approve                 Require plan approval before executing (with -O)
   --max-workers <n>             Maximum parallel workers (default: 3)
 
 Providers:
@@ -423,6 +507,21 @@ Config Subcommands:
   config edit --global                  Open global config in editor
   config path                           Show project config path
   config path --global                  Show global config path
+
+Worker Subcommands (V2):
+  worker                                List all worker roles
+  worker list                           List all worker roles
+  worker info <role>                    Show detailed worker info
+
+Request Subcommands (V2):
+  request submit "<prompt>"             Plan, review, and execute
+  request execute "<prompt>"            Plan and execute immediately
+
+Server Subcommands (V2):
+  server start                          Start the API server
+  server start --port <port>            Set port (default: 3100)
+  server start --host <host>            Set host (default: 127.0.0.1)
+  server start --api-key <key>          Set API key for auth
 
 Plans Subcommands:
   plans                                 List all plans
@@ -473,6 +572,12 @@ MCP Examples:
   openagent mcp add api-server --type http --url http://localhost:3000
   openagent mcp list
   openagent mcp remove filesystem
+
+V2 Worker/Request Examples:
+  openagent worker                      # List all worker roles
+  openagent worker info architect       # Show architect details
+  openagent request submit "Build a REST API for users"
+  openagent request execute "Add authentication to the API"
 
 Project Config Examples:
   openagent init                        # Initialize project config
@@ -844,8 +949,29 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // Require a prompt (for both single-agent and orchestrate modes)
-  if (!args.prompt) {
+  // Handle worker subcommand (no LLM needed)
+  if (args.workerSubcommand) {
+    await workerCommand(args.workerSubcommand.action, {
+      role: args.workerSubcommand.role,
+      verbose: args.verbose,
+    });
+    process.exit(0);
+  }
+
+  // Handle request subcommand (needs LLM — initialized below)
+  if (args.requestSubcommand) {
+    if (!args.requestSubcommand.prompt) {
+      console.error('Error: A prompt is required for request commands.');
+      console.error('Usage: openagent request submit "<prompt>"');
+      process.exit(1);
+    }
+
+    // Request commands need LLM infrastructure — fall through to provider setup
+    // and handle after router/tools are created
+  }
+
+  // Require a prompt (for both single-agent and orchestrate modes; request/server have their own args)
+  if (!args.requestSubcommand && !args.serverSubcommand && !args.prompt) {
     console.error('Error: No prompt provided. Use --help for usage information.');
     process.exit(1);
   }
@@ -914,8 +1040,54 @@ async function main(): Promise<void> {
       }
     }
 
+    // Handle server subcommand — start the API server
+    if (args.serverSubcommand) {
+      await serverCommand(args.serverSubcommand.action, {
+        router,
+        tools,
+        port: args.serverSubcommand.port,
+        host: args.serverSubcommand.host,
+        apiKey: args.serverSubcommand.apiKey,
+        maxWorkers: args.maxWorkers,
+        verbose: args.verbose,
+      });
+      return; // Server runs until killed
+    }
+
+    // Handle request subcommand — V2 multi-worker with plan approval
+    if (args.requestSubcommand) {
+      await requestCommand(args.requestSubcommand.action, args.requestSubcommand.prompt, {
+        router,
+        tools,
+        verbose: args.verbose,
+        maxParallelWorkers: args.maxWorkers,
+        cwd: process.cwd(),
+      });
+
+      if (mcpRegistry) {
+        await mcpRegistry.disconnectAll();
+      }
+      return;
+    }
+
     // Handle orchestrate mode — branch to multi-worker execution
     if (args.orchestrate) {
+      // If --approve flag is set, use the interactive request submit flow
+      if (args.approve) {
+        await requestCommand('submit', args.prompt, {
+          router,
+          tools,
+          verbose: args.verbose,
+          maxParallelWorkers: args.maxWorkers,
+          cwd: process.cwd(),
+        });
+
+        if (mcpRegistry) {
+          await mcpRegistry.disconnectAll();
+        }
+        return;
+      }
+
       await orchestrateCommand(args.prompt, {
         router,
         tools,

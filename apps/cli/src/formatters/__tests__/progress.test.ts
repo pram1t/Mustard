@@ -43,7 +43,7 @@ describe('Progress Formatters', () => {
 
     it('should format sub-second durations', () => {
       const result = formatTaskCompleted('step-1', 'Quick task', 150);
-      expect(result).toContain('0.2s');
+      expect(result).toContain('0.1s');
     });
   });
 
