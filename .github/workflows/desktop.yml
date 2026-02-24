@@ -10,7 +10,6 @@ on:
       - 'packages/llm/**'
       - 'packages/tools/**'
       - 'packages/mcp/**'
-      - 'package-lock.json'
   pull_request:
     paths:
       - 'apps/desktop/**'
@@ -81,8 +80,12 @@ jobs:
         run: npm ci
 
       - name: Fix 7zip-bin permissions
-        if: runner.os == 'macOS'
-        run: chmod +x node_modules/7zip-bin/mac/*/7za || true
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x node_modules/7zip-bin/linux/x64/7za 2>/dev/null || true
+          chmod +x node_modules/7zip-bin/linux/ia32/7za 2>/dev/null || true
+          chmod +x node_modules/7zip-bin/mac/arm64/7za 2>/dev/null || true
+          chmod +x node_modules/7zip-bin/mac/x64/7za 2>/dev/null || true
 
       - name: Build all packages
         run: npm run build
