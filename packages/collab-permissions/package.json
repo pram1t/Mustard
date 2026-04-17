@@ -1,0 +1,29 @@
+{
+  "name": "@openagent/collab-permissions",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Permission modes and risk assessment for OpenAgent Collab",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@openagent/logger": "*",
+    "@openagent/collab-core": "*",
+    "@openagent/collab-ai": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "typescript": "^5.9.3"
+  }
+}
