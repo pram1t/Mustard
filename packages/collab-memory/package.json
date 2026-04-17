@@ -1,0 +1,32 @@
+{
+  "name": "@openagent/collab-memory",
+  "version": "0.0.0",
+  "private": true,
+  "description": "4-layer shared memory system for OpenAgent Collab",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@openagent/logger": "*",
+    "@openagent/collab-core": "*",
+    "@openagent/memory": "*",
+    "@openagent/llm": "*",
+    "better-sqlite3": "^11.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^25.0.9",
+    "typescript": "^5.9.3"
+  }
+}
