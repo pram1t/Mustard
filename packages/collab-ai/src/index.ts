@@ -26,7 +26,24 @@ export {
   INTENT_TOPICS,
   INTENT_TOPIC_WILDCARD,
 } from './bus-adapter.js';
-export type { AttachIntentEngineOptions } from './bus-adapter.js';
+export type {
+  AttachIntentEngineOptions,
+  IntentEventName,
+} from './bus-adapter.js';
+
+// ============================================================================
+// Context bridge
+// ============================================================================
+
+export { ContextBridge } from './context-bridge.js';
+export type {
+  RoomProvider,
+  ParticipantProvider,
+  KnowledgeProvider,
+  TaskProvider,
+  ContextBridgeConfig,
+  ContextBridgeOptions,
+} from './context-bridge.js';
 
 // ============================================================================
 // Auto-approval
