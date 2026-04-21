@@ -14,6 +14,9 @@ export type { IntentEngineOptions } from './intent-engine.js';
 export { ZoneManager } from './zone-manager.js';
 export { RateLimiter } from './rate-limiter.js';
 
+export { AgentRegistry } from './agent-registry.js';
+export type { AgentRegistryConfig, AgentRegisterInput } from './agent-registry.js';
+
 // ============================================================================
 // Auto-approval
 // ============================================================================
