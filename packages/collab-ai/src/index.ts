@@ -4,6 +4,30 @@
  * AI intent engine, zone claiming, and agent coordination for OpenAgent Collab.
  */
 
+// ============================================================================
+// Classes
+// ============================================================================
+
+export { IntentEngine } from './intent-engine.js';
+export type { IntentEngineOptions } from './intent-engine.js';
+
+export { ZoneManager } from './zone-manager.js';
+export { RateLimiter } from './rate-limiter.js';
+
+// ============================================================================
+// Auto-approval
+// ============================================================================
+
+export {
+  shouldAutoApprove,
+  defaultAutoApprovalPolicy,
+} from './auto-approval.js';
+export type { AutoApprovalPolicy } from './auto-approval.js';
+
+// ============================================================================
+// Types
+// ============================================================================
+
 export type {
   // Intent system
   Intent,

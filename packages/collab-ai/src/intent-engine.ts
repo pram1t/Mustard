@@ -15,10 +15,25 @@ import type {
   IntentStatus,
   RiskLevel,
 } from './types.js';
+import { shouldAutoApprove, type AutoApprovalPolicy } from './auto-approval.js';
 
 // ============================================================================
 // IntentEngine
 // ============================================================================
+
+/**
+ * Options for the IntentEngine constructor.
+ */
+export interface IntentEngineOptions {
+  /**
+   * Optional auto-approval policy. When provided and `enabled`, newly
+   * proposed intents that match the policy are immediately transitioned to
+   * `approved` in the same synchronous frame as `propose()`.
+   *
+   * Observers will see the event sequence: `proposed` → `approved`.
+   */
+  autoApproval?: AutoApprovalPolicy;
+}
 
 /**
  * Manages AI intents — proposed actions that require approval.
@@ -26,6 +41,11 @@ import type {
 export class IntentEngine {
   private readonly intents = new Map<string, Intent>();
   private readonly listeners = new Map<string, Set<(intent: Intent) => void>>();
+  private readonly autoApproval?: AutoApprovalPolicy;
+
+  constructor(options: IntentEngineOptions = {}) {
+    this.autoApproval = options.autoApproval;
+  }
 
   // --------------------------------------------------------------------------
   // CRUD
@@ -33,6 +53,9 @@ export class IntentEngine {
 
   /**
    * Propose a new intent.
+   *
+   * If an auto-approval policy is configured and the intent matches,
+   * it is auto-approved in the same synchronous frame.
    */
   propose(opts: {
     agentId: string;
@@ -58,6 +81,11 @@ export class IntentEngine {
 
     this.intents.set(intent.id, intent);
     this.emit('proposed', intent);
+
+    if (this.autoApproval && shouldAutoApprove(intent, this.autoApproval)) {
+      return this.approve(intent.id, this.autoApproval.approverIdentity);
+    }
+
     return intent;
   }
 
