@@ -18,6 +18,17 @@ export { AgentRegistry } from './agent-registry.js';
 export type { AgentRegistryConfig, AgentRegisterInput } from './agent-registry.js';
 
 // ============================================================================
+// Message-bus integration
+// ============================================================================
+
+export {
+  attachIntentEngineToBus,
+  INTENT_TOPICS,
+  INTENT_TOPIC_WILDCARD,
+} from './bus-adapter.js';
+export type { AttachIntentEngineOptions } from './bus-adapter.js';
+
+// ============================================================================
 // Auto-approval
 // ============================================================================
 
