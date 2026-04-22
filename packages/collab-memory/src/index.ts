@@ -11,6 +11,14 @@
 export { EphemeralMemory } from './ephemeral.js';
 export type { EphemeralMemoryOptions } from './ephemeral.js';
 
+export { SessionMemory } from './session.js';
+export type {
+  SessionMemoryOptions,
+  CreateSessionInput,
+  EndSessionInput,
+  AppendEntryInput,
+} from './session.js';
+
 // ============================================================================
 // Types
 // ============================================================================
