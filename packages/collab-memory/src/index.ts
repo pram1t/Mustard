@@ -4,6 +4,17 @@
  * 4-layer shared memory system for OpenAgent Collab.
  */
 
+// ============================================================================
+// Classes
+// ============================================================================
+
+export { EphemeralMemory } from './ephemeral.js';
+export type { EphemeralMemoryOptions } from './ephemeral.js';
+
+// ============================================================================
+// Types
+// ============================================================================
+
 export type {
   // Memory layers
   MemoryLayer,
