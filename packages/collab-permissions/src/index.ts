@@ -4,6 +4,51 @@
  * Permission modes and risk assessment for OpenAgent Collab.
  */
 
+// ============================================================================
+// Classes / functions
+// ============================================================================
+
+export { SensitiveFileDetector } from './sensitive-files.js';
+export type {
+  SensitivePatternEntry,
+  SensitiveFileDetectorOptions,
+} from './sensitive-files.js';
+
+export { RiskAssessor } from './risk-assessor.js';
+export type { RiskAssessorOptions } from './risk-assessor.js';
+
+export {
+  canPerform,
+  needsApproval,
+  canAutoApprove,
+  getAutoApproveCountdown,
+  getApprovalTimeout,
+  getRequiredApprovals,
+  getCapabilities,
+  intentGatedAction,
+  decide,
+} from './permission-checker.js';
+export type {
+  GatedAction,
+  PermissionDecision,
+  DecideOptions,
+} from './permission-checker.js';
+
+// ============================================================================
+// Glob matcher (exposed for consumers that want to reuse the helper)
+// ============================================================================
+
+export {
+  matchesGlob,
+  globToRegExp,
+  normalizePath,
+  firstMatch,
+} from './glob-match.js';
+
+// ============================================================================
+// Types (existing, unchanged)
+// ============================================================================
+
 export type {
   // Mode rules
   ModeCapabilities,
