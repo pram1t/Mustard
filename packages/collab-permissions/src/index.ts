@@ -71,6 +71,16 @@ export type {
 } from './approval-manager.js';
 
 // ============================================================================
+// Gateway (integration)
+// ============================================================================
+
+export { PermissionGateway } from './permission-gateway.js';
+export type {
+  PermissionGatewayOptions,
+  GatewayDecisionEvent,
+} from './permission-gateway.js';
+
+// ============================================================================
 // Types (existing, unchanged)
 // ============================================================================
 
