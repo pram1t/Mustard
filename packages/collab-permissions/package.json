@@ -20,7 +20,8 @@
   "dependencies": {
     "@openagent/logger": "*",
     "@openagent/collab-core": "*",
-    "@openagent/collab-ai": "*"
+    "@openagent/collab-ai": "*",
+    "@openagent/message-bus": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

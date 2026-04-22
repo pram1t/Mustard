@@ -46,6 +46,20 @@ export {
 } from './glob-match.js';
 
 // ============================================================================
+// Mode manager + bus integration
+// ============================================================================
+
+export { ModeManager } from './mode-manager.js';
+export type { ModeManagerOptions } from './mode-manager.js';
+
+export {
+  attachModeManagerToBus,
+  MODE_TOPICS,
+  MODE_TOPIC_WILDCARD,
+} from './bus-adapter.js';
+export type { AttachModeManagerOptions } from './bus-adapter.js';
+
+// ============================================================================
 // Types (existing, unchanged)
 // ============================================================================
 
