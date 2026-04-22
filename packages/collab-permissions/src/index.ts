@@ -60,6 +60,17 @@ export {
 export type { AttachModeManagerOptions } from './bus-adapter.js';
 
 // ============================================================================
+// Approval manager
+// ============================================================================
+
+export { ApprovalManager } from './approval-manager.js';
+export type {
+  ApprovalManagerOptions,
+  ApprovalEventName,
+  OpenApprovalInput,
+} from './approval-manager.js';
+
+// ============================================================================
 // Types (existing, unchanged)
 // ============================================================================
 
