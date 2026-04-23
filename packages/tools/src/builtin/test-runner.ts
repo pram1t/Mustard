@@ -11,6 +11,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { BaseTool } from '../base.js';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
+import { validateCommand } from '../security.js';
 
 const execAsync = promisify(exec);
 
@@ -124,6 +125,15 @@ async function detectFramework(cwd: string): Promise<string | null> {
   }
 
   return null;
+}
+
+/**
+ * Escape a string for use as a shell argument.
+ */
+function shellEscape(str: string): string {
+  // Simple shell escape for POSIX-style shells
+  // Wraps in single quotes and handles internal single quotes
+  return "'" + str.replace(/'/g, "'\\''") + "'";
 }
 
 /**
@@ -308,13 +318,14 @@ Features:
       let command = config.command;
 
       if (pattern) {
-        // Add pattern to command
+        // Add pattern to command with shell escaping
+        const escapedPattern = shellEscape(pattern);
         if (framework === 'vitest' || framework === 'jest') {
-          command += ` "${pattern}"`;
+          command += ` ${escapedPattern}`;
         } else if (framework === 'mocha') {
-          command += ` --grep "${pattern}"`;
+          command += ` --grep ${escapedPattern}`;
         } else if (framework === 'pytest') {
-          command += ` -k "${pattern}"`;
+          command += ` -k ${escapedPattern}`;
         }
       }
 
@@ -334,6 +345,13 @@ Features:
           `Run this in your terminal for interactive test watching.`,
           { framework, command, watch: true }
         );
+      }
+
+      // Security validation of the final command
+      try {
+        validateCommand(command);
+      } catch (error) {
+        return this.failure((error as Error).message);
       }
 
       // Run tests

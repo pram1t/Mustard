@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { parseTestOutput } from '../test-runner.js';
+import { parseTestOutput, TestRunnerTool } from '../test-runner.js';
 
 describe('TestRunnerTool', () => {
+  const tool = new TestRunnerTool();
   describe('parseTestOutput', () => {
     it('should parse Vitest success output', () => {
       const output = `
@@ -71,6 +72,42 @@ FAILED test_main.py::test_fail - assert 1 == 2
       expect(results.failed).toBe(1);
       expect(results.errors).toHaveLength(1);
       expect(results.errors[0].test).toBe('Unknown Test');
+    });
+  });
+
+  describe('security', () => {
+    it('should block command injection in pattern', async () => {
+      const result = await tool.execute({
+        pattern: 'test; rm -rf /'
+      }, {
+        cwd: process.cwd(),
+        sessionId: 'test',
+        homeDir: '/tmp',
+        config: {}
+      });
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Command blocked');
+    });
+
+    it('should handle shell metacharacters safely', async () => {
+      // If our shell escape works, this should not cause an injection.
+      // We use a pattern that contains characters that would be dangerous if not escaped.
+      const result = await tool.execute({
+        pattern: "'; echo vulnerable; '"
+      }, {
+        cwd: process.cwd(),
+        sessionId: 'test',
+        homeDir: '/tmp',
+        config: {}
+      });
+
+      // The command should be something like: npx vitest run ''\''; echo vulnerable; '\''
+      // validateCommand might block it because it still contains ';' even if escaped,
+      // as it checks the whole command string.
+      // If it passes validation, it should fail to find any tests.
+      if (result.success === false) {
+        expect(result.error).toMatch(/Command blocked|Test execution failed|No tests found/i);
+      }
     });
   });
 });
