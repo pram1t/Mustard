@@ -11,7 +11,7 @@
  */
 
 import type {
-  EphemeralMemory as EphemeralMemoryShape,
+  EphemeralMemorySnapshot,
   CursorSnapshot,
   IntentSnapshot,
   ThreadMessage,
@@ -141,10 +141,10 @@ export class EphemeralMemory {
   // --------------------------------------------------------------------------
 
   /**
-   * Full snapshot in the shape declared by the EphemeralMemory type.
+   * Full snapshot in the shape declared by EphemeralMemorySnapshot.
    * Maps are fresh copies so callers can't mutate internal state.
    */
-  snapshot(): EphemeralMemoryShape {
+  snapshot(): EphemeralMemorySnapshot {
     return {
       cursors: new Map(
         Array.from(this.cursors.entries()).map(([k, v]) => [k, { ...v }]),

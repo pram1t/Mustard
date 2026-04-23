@@ -12,9 +12,11 @@
 export type MemoryLayer = 'ephemeral' | 'session' | 'project' | 'team';
 
 /**
- * Layer 1: Ephemeral memory — in-memory, cleared on leave.
+ * Layer 1: Ephemeral memory snapshot — the data shape produced by
+ * EphemeralMemory.snapshot(). The class itself is also called
+ * `EphemeralMemory`, hence the suffix on the interface.
  */
-export interface EphemeralMemory {
+export interface EphemeralMemorySnapshot {
   /** Current cursor positions */
   cursors: Map<string, CursorSnapshot>;
 

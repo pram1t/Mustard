@@ -55,7 +55,7 @@ export type {
   MemoryLayer,
 
   // Layer 1: Ephemeral
-  EphemeralMemory,
+  EphemeralMemorySnapshot,
   CursorSnapshot,
   IntentSnapshot,
   ThreadMessage,
