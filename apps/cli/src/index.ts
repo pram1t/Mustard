@@ -891,6 +891,15 @@ function getMCPTools(registry: MCPRegistry): Tool[] {
  * Main entry point
  */
 async function main(): Promise<void> {
+  // Early intercept for `openagent collab ...` — handles its own argv and
+  // exits directly. Avoids threading a new subcommand through the
+  // monolithic parseArgs() below.
+  const rawArgv = process.argv.slice(2);
+  if (rawArgv[0] === 'collab') {
+    const { collabMain } = await import('./commands/collab.js');
+    process.exit(await collabMain(rawArgv.slice(1)));
+  }
+
   const args = parseArgs();
 
   // Handle help and version flags
