@@ -18,6 +18,12 @@ import {
   type LoginResponse,
 } from './types.js';
 import { sign, verify, type JwtPayload } from './jwt.js';
+import { RoomRegistry } from './room-registry.js';
+import { registerRoomRoutes } from './routes/rooms.js';
+import { registerIntentRoutes } from './routes/intents.js';
+import type { IMessageBus } from '@openagent/message-bus';
+import { EventBus } from '@openagent/message-bus';
+import type { AutoApprovalPolicy } from '@openagent/collab-ai';
 
 // ============================================================================
 // Augmentations
@@ -39,11 +45,24 @@ declare module 'fastify' {
 
 export interface CreateAppOptions {
   config?: Partial<CollabServerConfig>;
+  /** Optional pre-existing bus (for tests + multi-server hookups). */
+  bus?: IMessageBus;
+  /** Optional pre-existing registry (advanced; tests). */
+  registry?: RoomRegistry;
+  /** Auto-approval policy passed to the registry if it's constructed here. */
+  autoApproval?: AutoApprovalPolicy;
+}
+
+export interface CreateAppResult {
+  app: FastifyInstance;
+  config: CollabServerConfig;
+  registry: RoomRegistry;
+  bus: IMessageBus;
 }
 
 export async function createApp(
   options: CreateAppOptions = {},
-): Promise<{ app: FastifyInstance; config: CollabServerConfig }> {
+): Promise<CreateAppResult> {
   const config: CollabServerConfig = {
     ...DEFAULT_COLLAB_SERVER_CONFIG,
     ...options.config,
@@ -54,6 +73,10 @@ export async function createApp(
       'collab-server: `jwtSecret` is required — pass a non-empty string',
     );
   }
+
+  const bus = options.bus ?? new EventBus();
+  const registry =
+    options.registry ?? new RoomRegistry({ bus, autoApproval: options.autoApproval });
 
   const app = Fastify({
     logger: false, // callers wire their own logger via hooks if desired
@@ -138,7 +161,11 @@ export async function createApp(
     return response;
   });
 
-  return { app, config };
+  // ---- Collab REST routes ----
+  registerRoomRoutes(app, registry);
+  registerIntentRoutes(app, registry);
+
+  return { app, config, registry, bus };
 }
 
 // ============================================================================
