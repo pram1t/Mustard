@@ -36,6 +36,9 @@ export type {
   ListTeamEntriesFilter,
 } from './team.js';
 
+export { ContextAssembler, approxTokens } from './context-assembler.js';
+export type { ContextAssemblerOptions } from './context-assembler.js';
+
 // ============================================================================
 // Types
 // ============================================================================
