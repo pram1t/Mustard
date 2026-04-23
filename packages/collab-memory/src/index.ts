@@ -39,6 +39,13 @@ export type {
 export { ContextAssembler, approxTokens } from './context-assembler.js';
 export type { ContextAssemblerOptions } from './context-assembler.js';
 
+export { Summarizer } from './summarizer.js';
+export type {
+  SummarizerOptions,
+  SummarizeInput,
+  CompleteFn,
+} from './summarizer.js';
+
 // ============================================================================
 // Types
 // ============================================================================
