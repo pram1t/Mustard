@@ -16,6 +16,15 @@ Think of it as an open-source alternative to Claude Code that works with the mod
 - **Multi-worker orchestration** -- Break large tasks into parallel workstreams with 10 specialized worker roles.
 - **Persistent memory** -- SQLite-backed memory with FTS5 full-text search for long-term context.
 - **Desktop app** -- Electron-based desktop UI alongside the CLI.
+- **Real-time collaboration** -- Multi-participant rooms with permissioned AI intents, live event bridge over WebSocket, and a Next.js workspace UI. See [docs/COLLAB-GETTING-STARTED.md](docs/COLLAB-GETTING-STARTED.md).
+
+### Collab quick links
+
+- [Getting started](docs/COLLAB-GETTING-STARTED.md) — server + CLI + web UI in 5 minutes
+- [API reference](docs/COLLAB-API.md) — REST + WebSocket
+- [Integration guide](docs/COLLAB-INTEGRATION.md) — package map, runtime topology, event flow
+
+The Collab stack ships as `@openagent/collab-core`, `@openagent/collab-sync`, `@openagent/collab-presence`, `@openagent/collab-ai`, `@openagent/collab-permissions`, `@openagent/collab-memory`, and `@openagent/collab-server`. The CLI exposes `openagent collab ...` subcommands; the web app lives at `apps/web` (Next.js 15) with `/collab` and `/collab/[id]` routes.
 
 ## Quick Start
 
