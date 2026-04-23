@@ -5,7 +5,13 @@
  */
 
 export { createApp } from './app.js';
-export type { CreateAppOptions } from './app.js';
+export type { CreateAppOptions, CreateAppResult } from './app.js';
+
+export { registerWebSocket } from './ws.js';
+export type {
+  RegisterWebSocketOptions,
+  WebSocketBridge,
+} from './ws.js';
 
 export {
   DEFAULT_COLLAB_SERVER_CONFIG,

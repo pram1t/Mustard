@@ -21,6 +21,7 @@ import { sign, verify, type JwtPayload } from './jwt.js';
 import { RoomRegistry } from './room-registry.js';
 import { registerRoomRoutes } from './routes/rooms.js';
 import { registerIntentRoutes } from './routes/intents.js';
+import { registerWebSocket, type WebSocketBridge } from './ws.js';
 import type { IMessageBus } from '@openagent/message-bus';
 import { EventBus } from '@openagent/message-bus';
 import type { AutoApprovalPolicy } from '@openagent/collab-ai';
@@ -58,6 +59,7 @@ export interface CreateAppResult {
   config: CollabServerConfig;
   registry: RoomRegistry;
   bus: IMessageBus;
+  ws: WebSocketBridge;
 }
 
 export async function createApp(
@@ -165,7 +167,10 @@ export async function createApp(
   registerRoomRoutes(app, registry);
   registerIntentRoutes(app, registry);
 
-  return { app, config, registry, bus };
+  // ---- WebSocket bridge ----
+  const ws = registerWebSocket({ app, bus, config });
+
+  return { app, config, registry, bus, ws };
 }
 
 // ============================================================================
