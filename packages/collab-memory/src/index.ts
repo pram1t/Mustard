@@ -28,6 +28,14 @@ export type {
   ProjectSearchHit,
 } from './project.js';
 
+export { TeamMemory } from './team.js';
+export type {
+  TeamMemoryOptions,
+  AddTeamEntryInput,
+  UpdateTeamEntryInput,
+  ListTeamEntriesFilter,
+} from './team.js';
+
 // ============================================================================
 // Types
 // ============================================================================
