@@ -19,6 +19,15 @@ export type {
   AppendEntryInput,
 } from './session.js';
 
+export { ProjectMemory } from './project.js';
+export type {
+  ProjectMemoryOptions,
+  AddProjectEntryInput,
+  UpdateProjectEntryInput,
+  ProjectSearchOptions,
+  ProjectSearchHit,
+} from './project.js';
+
 // ============================================================================
 // Types
 // ============================================================================
