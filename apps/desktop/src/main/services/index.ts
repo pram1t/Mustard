@@ -9,6 +9,7 @@ import { AgentService } from './agent';
 import { ConfigService, ENV_KEY_MAP } from './config';
 import { MCPService } from './mcp';
 import { CredentialService } from './credentials';
+import { UpdateService } from './updater';
 import { getConfig } from '@openagent/config';
 import {
   LLMRouter,
@@ -26,6 +27,7 @@ let agentService: AgentService | null = null;
 let configService: ConfigService | null = null;
 let mcpService: MCPService | null = null;
 let credentialService: CredentialService | null = null;
+let updateService: UpdateService | null = null;
 
 // ── Getter functions (throw if not initialized) ──────────────────────────────
 
@@ -47,6 +49,11 @@ export function getMCPService(): MCPService {
 export function getCredentialService(): CredentialService {
   if (!credentialService) throw new Error('CredentialService not initialized');
   return credentialService;
+}
+
+export function getUpdateService(): UpdateService {
+  if (!updateService) throw new Error('UpdateService not initialized');
+  return updateService;
 }
 
 // ── Initialization ───────────────────────────────────────────────────────────
@@ -77,6 +84,7 @@ export async function initializeServices(): Promise<void> {
   agentService = new AgentService(router, tools);
   configService = new ConfigService(router, credentialService);
   mcpService = new MCPService(mcpRegistry);
+  updateService = new UpdateService();
 
   const backend = credentialService.getStorageBackend();
   console.log('[Services] Initialized', {
@@ -96,6 +104,7 @@ export function disposeServices(): void {
   configService = null;
   mcpService = null;
   credentialService = null;
+  updateService = null;
   console.log('[Services] Disposed');
 }
 
