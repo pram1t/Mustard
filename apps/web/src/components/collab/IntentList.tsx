@@ -24,7 +24,7 @@ export interface IntentListProps {
   onReject?: (intent: Intent) => void;
 }
 
-export default function IntentList(props: IntentListProps): JSX.Element {
+export default function IntentList(props: IntentListProps) {
   const { intents, onApprove, onReject } = props;
   if (intents.length === 0) {
     return (

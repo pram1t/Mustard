@@ -12,7 +12,7 @@ export interface RoomListProps {
   rooms: Room[];
 }
 
-export default function RoomList(props: RoomListProps): JSX.Element {
+export default function RoomList(props: RoomListProps) {
   if (props.rooms.length === 0) {
     return (
       <div className="rounded border border-dashed border-zinc-800 p-6 text-center text-sm text-zinc-500">

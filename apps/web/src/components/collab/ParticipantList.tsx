@@ -18,7 +18,7 @@ export interface ParticipantListProps {
   currentParticipantId?: string;
 }
 
-export default function ParticipantList(props: ParticipantListProps): JSX.Element {
+export default function ParticipantList(props: ParticipantListProps) {
   const { participants, onLeave, currentParticipantId } = props;
   if (participants.length === 0) {
     return (

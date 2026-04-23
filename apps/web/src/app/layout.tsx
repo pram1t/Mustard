@@ -18,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/tasks" className="px-3 py-2 rounded hover:bg-zinc-800 text-sm">Tasks</a>
             <a href="/request" className="px-3 py-2 rounded hover:bg-zinc-800 text-sm">New Request</a>
             <a href="/artifacts" className="px-3 py-2 rounded hover:bg-zinc-800 text-sm">Artifacts</a>
+            <a href="/collab" className="px-3 py-2 rounded hover:bg-zinc-800 text-sm">Collab</a>
             <div className="mt-auto pt-4 border-t border-zinc-800 text-xs text-zinc-500">
               <a href="/api/ws" className="hover:text-zinc-400">API: localhost:3100</a>
             </div>

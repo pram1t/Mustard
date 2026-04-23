@@ -21,7 +21,7 @@ export interface EventLogProps {
   onClear?: () => void;
 }
 
-export default function EventLog(props: EventLogProps): JSX.Element {
+export default function EventLog(props: EventLogProps) {
   const { state, events, onClear } = props;
   return (
     <section className="flex flex-col gap-2">

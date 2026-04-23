@@ -40,7 +40,7 @@ export interface ModeSelectorProps {
   disabled?: boolean;
 }
 
-export default function ModeSelector(props: ModeSelectorProps): JSX.Element {
+export default function ModeSelector(props: ModeSelectorProps) {
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {MODES.map(m => {
