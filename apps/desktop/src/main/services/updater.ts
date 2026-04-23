@@ -100,19 +100,28 @@ export class UpdateService {
       this.setStatus('checking');
     });
 
-    autoUpdater.on('update-available', (info: { version: string; releaseNotes?: string | unknown; releaseDate?: string }) => {
+    autoUpdater.on('update-available', (info: { version: string; releaseNotes?: string | any; releaseDate?: string }) => {
+      let notes = '';
+      if (typeof info.releaseNotes === 'string') {
+        notes = info.releaseNotes;
+      } else if (Array.isArray(info.releaseNotes)) {
+        notes = info.releaseNotes.map(n => n.note || n).join('\n');
+      }
+
       this.updateInfo = {
         version: info.version,
-        releaseNotes: typeof info.releaseNotes === 'string' ? info.releaseNotes : undefined,
+        releaseNotes: notes || undefined,
         releaseDate: info.releaseDate,
       };
       this.setStatus('available');
       this.sendToRenderer('update:available', this.updateInfo);
+      console.log(`[Updater] Update available: ${info.version}`);
     });
 
-    autoUpdater.on('update-not-available', () => {
+    autoUpdater.on('update-not-available', (info: any) => {
       this.setStatus('not-available');
       this.sendToRenderer('update:not-available', null);
+      console.log(`[Updater] No update available (current: ${info?.version || 'unknown'})`);
     });
 
     autoUpdater.on('download-progress', (progress: { percent: number; bytesPerSecond: number; total: number; transferred: number }) => {
@@ -125,9 +134,10 @@ export class UpdateService {
       } as UpdateProgress);
     });
 
-    autoUpdater.on('update-downloaded', () => {
+    autoUpdater.on('update-downloaded', (info: any) => {
       this.setStatus('downloaded');
       this.sendToRenderer('update:downloaded', this.updateInfo);
+      console.log(`[Updater] Update downloaded: ${info.version}`);
     });
 
     autoUpdater.on('error', (error: Error) => {

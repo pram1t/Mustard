@@ -11,6 +11,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { BaseTool } from '../base.js';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
+import { validateCommand } from '../security.js';
 
 const execAsync = promisify(exec);
 
@@ -18,10 +19,24 @@ const execAsync = promisify(exec);
  * Test framework configuration
  */
 interface FrameworkConfig {
-  name: string;
-  detectFiles: string[];
-  command: string;
-  jsonFlag?: string;
+  readonly name: string;
+  readonly detectFiles: readonly string[];
+  readonly command: string;
+  readonly jsonFlag?: string;
+}
+
+export interface TestError {
+  test: string;
+  message: string;
+  file?: string;
+  line?: number;
+}
+
+export interface TestResults {
+  passed: number;
+  failed: number;
+  skipped: number;
+  errors: TestError[];
 }
 
 const FRAMEWORKS: Record<string, FrameworkConfig> = {
@@ -73,7 +88,7 @@ async function detectFramework(cwd: string): Promise<string | null> {
     }
 
     // Check test script
-    const testScript = pkg.scripts?.test || '';
+    const testScript = (pkg.scripts?.test as string) || '';
     if (testScript.includes('vitest')) return 'vitest';
     if (testScript.includes('jest')) return 'jest';
     if (testScript.includes('mocha')) return 'mocha';
@@ -113,56 +128,119 @@ async function detectFramework(cwd: string): Promise<string | null> {
 }
 
 /**
+ * Escape a string for use as a shell argument.
+ */
+function shellEscape(str: string): string {
+  // Simple shell escape for POSIX-style shells
+  // Wraps in single quotes and handles internal single quotes
+  return "'" + str.replace(/'/g, "'\\''") + "'";
+}
+
+/**
  * Parse test output to extract results
  */
-function parseTestOutput(output: string, framework: string): {
-  passed: number;
-  failed: number;
-  skipped: number;
-  errors: Array<{ test: string; message: string; file?: string; line?: number }>;
-} {
-  const result = {
+export function parseTestOutput(output: string, _framework: string): TestResults {
+  const result: TestResults = {
     passed: 0,
     failed: 0,
     skipped: 0,
-    errors: [] as Array<{ test: string; message: string; file?: string; line?: number }>,
+    errors: [],
   };
 
-  // Generic patterns
-  const passedMatch = output.match(/(\d+)\s+(?:pass(?:ed|ing)?|✓)/i);
-  const failedMatch = output.match(/(\d+)\s+(?:fail(?:ed|ing)?|✗)/i);
-  const skippedMatch = output.match(/(\d+)\s+(?:skip(?:ped)?|pending)/i);
+  // Generic patterns for pass/fail/skip counts.
+  // We prefer more specific summary patterns over line-by-line counts.
+  const summaryPatterns = {
+    passed: [
+      /Tests:\s*(\d+)\s*passed/i,
+      /(\d+)\s+passed/i,
+    ],
+    failed: [
+      /Tests:\s*(\d+)\s*failed/i,
+      /(\d+)\s+failed/i,
+    ],
+    skipped: [
+      /Tests:\s*(\d+)\s*skipped/i,
+      /(\d+)\s+skipped/i,
+    ],
+  };
 
-  if (passedMatch) result.passed = parseInt(passedMatch[1], 10);
-  if (failedMatch) result.failed = parseInt(failedMatch[1], 10);
-  if (skippedMatch) result.skipped = parseInt(skippedMatch[1], 10);
+  for (const [key, regexes] of Object.entries(summaryPatterns)) {
+    for (const regex of regexes) {
+      // Find the LAST occurrence which is usually the summary
+      const matches = [...output.matchAll(new RegExp(regex, 'gi'))];
+      if (matches.length > 0) {
+        const lastMatch = matches[matches.length - 1];
+        result[key as keyof Omit<TestResults, 'errors'>] = parseInt(lastMatch[1], 10);
+        break;
+      }
+    }
+  }
 
-  // Extract error messages
-  const errorPatterns = [
-    // Jest/Vitest
-    /FAIL\s+(.+?)\n[\s\S]*?●\s+(.+?)\n\n([\s\S]*?)(?=\n\n|$)/g,
-    // Generic assertion errors
-    /(?:AssertionError|Error):\s*(.+?)(?:\n|$)/g,
-    // File:line references
-    /at\s+.+?\s+\((.+?):(\d+):\d+\)/g,
-  ];
-
-  // Try to extract specific errors
-  const failureBlocks = output.match(/(?:FAIL|✗|FAILED)[\s\S]*?(?=(?:PASS|✓|PASSED|$))/gi) || [];
+  // Extract error messages from failure blocks
+  const failureBlocks = output.match(/(?:FAIL|✗|FAILED|________________)[\s\S]*?(?=(?:PASS|✓|PASSED|Test Suites:|________________|$))/gi) || [];
 
   for (const block of failureBlocks) {
-    const testMatch = block.match(/(?:FAIL|✗|FAILED)\s+(.+)/i);
-    const messageMatch = block.match(/(?:Error|AssertionError|Expected)[\s\S]*?(?:\n\n|$)/i);
-    const fileMatch = block.match(/at\s+.+?\s+\((.+?):(\d+)/);
+    // 1. Try to find test name
+    // Jest/Vitest style: ● Name
+    // Pytest style: ________________ Name ________________
+    // Generic: FAIL Name
+    let testName = '';
+    const nameMatch = block.match(/●\s+(.+)/i) ||
+                      block.match(/_{2,}\s+(.+?)\s+_{2,}/i) ||
+                      block.match(/(?:FAIL|✗|FAILED)\s+(.+)/i);
 
-    if (testMatch) {
+    if (nameMatch) {
+      testName = nameMatch[1].trim();
+    }
+
+    if (!testName || testName.match(/\.(js|ts|jsx|tsx|py)$/)) {
+      // If testName is a filename, try to look deeper into the block for the actual test name
+      const subNameMatch = block.match(/●\s+(.+)/i);
+      if (subNameMatch) {
+        testName = subNameMatch[1].trim();
+      }
+    }
+
+    // 2. Try to find error message
+    const messageMatch = block.match(/(?:Error|AssertionError|Expected|Message|E {7}):?[\s\S]*?(?:\n\s*\n|\n\s*at\s+|$)/i);
+
+    // 3. Try to find file and line
+    const fileMatch = block.match(/at\s+.+?\s+\((.+?):(\d+)/) ||
+                      block.match(/at\s+(.+?):(\d+)/) ||
+                      block.match(/^(.+?):(\d+): AssertionError/m);
+
+    if (testName && testName !== '________________') {
       result.errors.push({
-        test: testMatch[1].trim(),
+        test: testName,
         message: messageMatch ? messageMatch[0].trim() : 'Test failed',
         file: fileMatch ? fileMatch[1] : undefined,
         line: fileMatch ? parseInt(fileMatch[2], 10) : undefined,
       });
     }
+  }
+
+  // Fallback for Pytest summary style failures
+  if (result.failed > 0 && result.errors.length === 0) {
+    const pytestSummaryFailures = output.match(/FAILED\s+(.+?)\s+-\s+(.+)/g);
+    if (pytestSummaryFailures) {
+      for (const line of pytestSummaryFailures) {
+        const m = line.match(/FAILED\s+(.+?)\s+-\s+(.+)/);
+        if (m) {
+          result.errors.push({
+            test: m[1].trim(),
+            message: m[2].trim(),
+          });
+        }
+      }
+    }
+  }
+
+  // Ultimate fallback
+  if (result.failed > 0 && result.errors.length === 0) {
+    result.errors.push({
+      test: 'Unknown Test',
+      message: 'One or more tests failed, but details could not be parsed. See full output below.',
+    });
   }
 
   return result;
@@ -213,7 +291,7 @@ Features:
     params: Record<string, unknown>,
     context: ExecutionContext
   ): Promise<ToolResult> {
-    return this.safeExecute(params, context, async () => {
+    return this.safeExecute(params, context, async (): Promise<ToolResult> => {
       let framework = (params.framework as string) || 'auto';
       const pattern = params.pattern as string | undefined;
       const watch = params.watch as boolean;
@@ -240,13 +318,14 @@ Features:
       let command = config.command;
 
       if (pattern) {
-        // Add pattern to command
+        // Add pattern to command with shell escaping
+        const escapedPattern = shellEscape(pattern);
         if (framework === 'vitest' || framework === 'jest') {
-          command += ` "${pattern}"`;
+          command += ` ${escapedPattern}`;
         } else if (framework === 'mocha') {
-          command += ` --grep "${pattern}"`;
+          command += ` --grep ${escapedPattern}`;
         } else if (framework === 'pytest') {
-          command += ` -k "${pattern}"`;
+          command += ` -k ${escapedPattern}`;
         }
       }
 
@@ -268,6 +347,13 @@ Features:
         );
       }
 
+      // Security validation of the final command
+      try {
+        validateCommand(command);
+      } catch (error) {
+        return this.failure((error as Error).message);
+      }
+
       // Run tests
       try {
         const { stdout, stderr } = await execAsync(command, {
@@ -279,28 +365,7 @@ Features:
         const output = stdout + stderr;
         const results = parseTestOutput(output, framework);
 
-        let summary = `${config.name} Test Results:\n\n`;
-        summary += `✅ Passed: ${results.passed}\n`;
-        summary += `❌ Failed: ${results.failed}\n`;
-        summary += `⏭️ Skipped: ${results.skipped}\n`;
-
-        if (results.errors.length > 0) {
-          summary += `\nErrors:\n`;
-          for (const error of results.errors) {
-            summary += `\n- **${error.test}**\n`;
-            if (error.file && error.line) {
-              summary += `  at ${error.file}:${error.line}\n`;
-            }
-            summary += `  ${error.message.substring(0, 200)}${error.message.length > 200 ? '...' : ''}\n`;
-          }
-        }
-
-        summary += `\n---\nFull output:\n\`\`\`\n${output.substring(0, 5000)}${output.length > 5000 ? '\n...(truncated)' : ''}\n\`\`\``;
-
-        return this.success(summary, {
-          framework,
-          ...results,
-        });
+        return this.formatResults(results, config.name, output, framework);
       } catch (error: unknown) {
         // Tests may "fail" with non-zero exit but still produce useful output
         const execError = error as { stdout?: string; stderr?: string; message?: string };
@@ -308,33 +373,43 @@ Features:
 
         if (output) {
           const results = parseTestOutput(output, framework);
-
-          let summary = `${config.name} Tests Failed:\n\n`;
-          summary += `✅ Passed: ${results.passed}\n`;
-          summary += `❌ Failed: ${results.failed}\n`;
-          summary += `⏭️ Skipped: ${results.skipped}\n`;
-
-          if (results.errors.length > 0) {
-            summary += `\nErrors:\n`;
-            for (const error of results.errors) {
-              summary += `\n- **${error.test}**\n`;
-              if (error.file && error.line) {
-                summary += `  at ${error.file}:${error.line}\n`;
-              }
-            }
-          }
-
-          summary += `\n---\nFull output:\n\`\`\`\n${output.substring(0, 5000)}${output.length > 5000 ? '\n...(truncated)' : ''}\n\`\`\``;
-
-          return this.success(summary, {
-            framework,
-            exitCode: 1,
-            ...results,
-          });
+          return this.formatResults(results, config.name, output, framework, 1);
         }
 
         return this.failure(`Test execution failed: ${execError.message || error}`);
       }
+    });
+  }
+
+  private formatResults(
+    results: TestResults,
+    frameworkName: string,
+    output: string,
+    framework: string,
+    exitCode = 0
+  ): ToolResult {
+    let summary = `${frameworkName} Test Results:\n\n`;
+    summary += `✅ Passed: ${results.passed}\n`;
+    summary += `❌ Failed: ${results.failed}\n`;
+    summary += `⏭️ Skipped: ${results.skipped}\n`;
+
+    if (results.errors.length > 0) {
+      summary += `\nErrors:\n`;
+      for (const error of results.errors) {
+        summary += `\n- **${error.test}**\n`;
+        if (error.file && error.line) {
+          summary += `  at ${error.file}:${error.line}\n`;
+        }
+        summary += `  ${error.message.substring(0, 200)}${error.message.length > 200 ? '...' : ''}\n`;
+      }
+    }
+
+    summary += `\n---\nFull output:\n\`\`\`\n${output.substring(0, 5000)}${output.length > 5000 ? '\n...(truncated)' : ''}\n\`\`\``;
+
+    return this.success(summary, {
+      framework,
+      exitCode,
+      ...results,
     });
   }
 }

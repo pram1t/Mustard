@@ -25,6 +25,7 @@
     "@openagent/mcp": "*",
     "@openagent/tools": "*",
     "dompurify": "^3.3.1",
+    "electron-updater": "^6.3.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",

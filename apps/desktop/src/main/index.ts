@@ -41,7 +41,7 @@ import { createSecureWindow } from './window/factory';
 import { setMainWindow, getMainWindow } from './window';
 import { loadWindowState, saveWindowState } from './window/state';
 import { registerIpcHandlers } from './ipc';
-import { initializeServices, disposeServices } from './services';
+import { initializeServices, disposeServices, getUpdateService } from './services';
 import { initAllowedPaths } from './security/path-validation';
 import { registerProtocol, parseDeepLink, extractDeepLinkFromArgs } from './protocol/deep-link';
 import { createTray, destroyTray } from './window/tray';
@@ -152,6 +152,7 @@ app.whenReady().then(async () => {
   if (mainWindow) {
     createTray(mainWindow);
     registerGlobalShortcuts(mainWindow);
+    getUpdateService().initialize(mainWindow);
   }
 });
 

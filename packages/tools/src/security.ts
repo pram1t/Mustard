@@ -63,6 +63,15 @@ const DANGEROUS_COMMAND_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
 
   // Network exfiltration patterns
   { pattern: /nc\s+-[^|]*\s+\d+\s*</, reason: 'Netcat file exfiltration detected' },
+  { pattern: /\/dev\/(tcp|udp)\//, reason: 'Bash network redirection detected' },
+
+  // Obfuscation and evasion
+  { pattern: /\\x[0-9a-fA-F]{2}/, reason: 'Hexadecimal obfuscation detected' },
+  { pattern: /printf\s+['"][^'"]*\\/, reason: 'printf-based obfuscation detected' },
+
+  // System manipulation
+  { pattern: /chmod\s+777/, reason: 'Overly permissive chmod 777 detected' },
+  { pattern: /chown\s+root/, reason: 'chown to root detected' },
 
   // Fork bombs
   { pattern: /:\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;?\s*:/, reason: 'Fork bomb detected' },
