@@ -17,6 +17,13 @@ export type {
   ApiError,
 } from './types.js';
 
+export { RoomRegistry } from './room-registry.js';
+export type {
+  RoomContext,
+  RoomRegistryOptions,
+  CreateRoomInput,
+} from './room-registry.js';
+
 export { sign, verify } from './jwt.js';
 export type {
   JwtHeader,
