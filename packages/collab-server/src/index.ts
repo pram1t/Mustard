@@ -14,6 +14,21 @@ export type {
 } from './ws.js';
 
 export {
+  SqliteYjsPersistence,
+  createYjsPersistence,
+} from './yjs-persistence.js';
+export type {
+  YjsPersistence,
+  SqliteYjsPersistenceOptions,
+} from './yjs-persistence.js';
+
+export { registerYjsRoute } from './yjs-route.js';
+export type {
+  RegisterYjsRouteOptions,
+  YjsRouteHandle,
+} from './yjs-route.js';
+
+export {
   DEFAULT_COLLAB_SERVER_CONFIG,
 } from './types.js';
 export type {

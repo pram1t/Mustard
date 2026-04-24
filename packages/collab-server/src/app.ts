@@ -22,6 +22,11 @@ import { RoomRegistry } from './room-registry.js';
 import { registerRoomRoutes } from './routes/rooms.js';
 import { registerIntentRoutes } from './routes/intents.js';
 import { registerWebSocket, type WebSocketBridge } from './ws.js';
+import {
+  registerYjsRoute,
+  type YjsRouteHandle,
+} from './yjs-route.js';
+import type { SqliteYjsPersistenceOptions } from './yjs-persistence.js';
 import type { IMessageBus } from '@openagent/message-bus';
 import { EventBus } from '@openagent/message-bus';
 import type { AutoApprovalPolicy } from '@openagent/collab-ai';
@@ -52,6 +57,11 @@ export interface CreateAppOptions {
   registry?: RoomRegistry;
   /** Auto-approval policy passed to the registry if it's constructed here. */
   autoApproval?: AutoApprovalPolicy;
+  /**
+   * Persistence options for the /yjs route's SQLite snapshot store.
+   * Default: in-memory.
+   */
+  yjsPersistence?: SqliteYjsPersistenceOptions;
 }
 
 export interface CreateAppResult {
@@ -60,6 +70,7 @@ export interface CreateAppResult {
   registry: RoomRegistry;
   bus: IMessageBus;
   ws: WebSocketBridge;
+  yjs: YjsRouteHandle;
 }
 
 export async function createApp(
@@ -170,7 +181,15 @@ export async function createApp(
   // ---- WebSocket bridge ----
   const ws = registerWebSocket({ app, bus, config });
 
-  return { app, config, registry, bus, ws };
+  // ---- Yjs upgrade endpoint ----
+  const yjs = registerYjsRoute({
+    app,
+    registry,
+    config,
+    persistence: options.yjsPersistence,
+  });
+
+  return { app, config, registry, bus, ws, yjs };
 }
 
 // ============================================================================
