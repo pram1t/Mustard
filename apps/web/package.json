@@ -12,7 +12,9 @@
   "dependencies": {
     "next": "^15.3.3",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "yjs": "^13.6.0",
+    "y-websocket": "^1.5.0"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

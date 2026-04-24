@@ -14,6 +14,7 @@ import ParticipantList from '../../../components/collab/ParticipantList';
 import IntentList from '../../../components/collab/IntentList';
 import ModeSelector from '../../../components/collab/ModeSelector';
 import EventLog from '../../../components/collab/EventLog';
+import SharedNotepad from '../../../components/collab/SharedNotepad';
 
 const DEFAULT_BASE = 'http://127.0.0.1:3200';
 
@@ -233,6 +234,12 @@ export default function RoomDetailPage({
               onReject={handleReject}
             />
           </section>
+
+          <SharedNotepad
+            baseUrl={baseUrl}
+            token={token}
+            roomId={roomId}
+          />
         </div>
 
         <aside className="flex flex-col gap-6">
