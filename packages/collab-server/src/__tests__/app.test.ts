@@ -66,6 +66,50 @@ describe('/auth/login', () => {
   });
 });
 
+describe('/auth/refresh', () => {
+  it('issues a new token preserving sub + roomId for a valid Bearer', async () => {
+    const app = await makeApp();
+
+    const login = await app.inject({
+      method: 'POST',
+      url: '/auth/login',
+      payload: { participantId: 'alice', roomId: 'r-1' },
+    });
+    const oldToken = (login.json() as LoginResponse).token;
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/refresh',
+      headers: { authorization: `Bearer ${oldToken}` },
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json() as LoginResponse;
+    expect(body.participantId).toBe('alice');
+    expect(body.roomId).toBe('r-1');
+    expect(body.token).not.toBe(oldToken);
+    expect(body.expiresAt).toBeGreaterThan(Math.floor(Date.now() / 1000));
+    await app.close();
+  });
+
+  it('rejects refresh without a Bearer token', async () => {
+    const app = await makeApp();
+    const res = await app.inject({ method: 'POST', url: '/auth/refresh' });
+    expect(res.statusCode).toBe(401);
+    await app.close();
+  });
+
+  it('rejects refresh with an invalid token', async () => {
+    const app = await makeApp();
+    const res = await app.inject({
+      method: 'POST',
+      url: '/auth/refresh',
+      headers: { authorization: 'Bearer garbage.token.here' },
+    });
+    expect(res.statusCode).toBe(401);
+    await app.close();
+  });
+});
+
 describe('unknown route', () => {
   it('returns 404 with structured body', async () => {
     const app = await makeApp();

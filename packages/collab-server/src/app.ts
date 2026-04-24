@@ -174,6 +174,32 @@ export async function createApp(
     return response;
   });
 
+  // ---- Refresh token ----
+  // Accepts a still-valid Bearer JWT and returns a new one with a
+  // fresh tokenLifetimeSec window. Refusal modes:
+  //  - 401 if the presented token is missing/invalid/expired
+  //  - 200 with a new token (same sub + roomId) otherwise
+  // The old token remains valid until its original expiry — there's
+  // no server-side blacklist in V1.
+  app.post('/auth/refresh', { config: { auth: true } }, async req => {
+    const payload = req.jwtPayload!;
+    const subject = String(payload.sub);
+    const roomId =
+      typeof payload.roomId === 'string' ? (payload.roomId as string) : undefined;
+    const newToken = sign(
+      { sub: subject, roomId },
+      config.jwtSecret,
+      { expiresInSec: config.tokenLifetimeSec },
+    );
+    const response: LoginResponse = {
+      token: newToken,
+      expiresAt: Math.floor(Date.now() / 1000) + config.tokenLifetimeSec,
+      participantId: subject,
+      roomId,
+    };
+    return response;
+  });
+
   // ---- Collab REST routes ----
   registerRoomRoutes(app, registry);
   registerIntentRoutes(app, registry);

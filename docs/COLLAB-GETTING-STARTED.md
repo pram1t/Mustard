@@ -119,7 +119,36 @@ From there:
 
 ---
 
-## 4. Permission modes — the 30-second version
+## 4. Live document sync (Phase 13)
+
+The room detail page in the web UI hosts a **SharedNotepad** — a small
+textarea backed by a `Y.Doc` synced through `/yjs`. Open the same
+room in two browser tabs (or two browsers, even cross-machine) and
+type — keystrokes appear live in both. The server persists state to
+SQLite; close the server, restart it, reopen the room — your text is
+still there.
+
+Under the hood:
+- Browser opens `ws://localhost:3200/yjs?token=...&roomId=...`
+- Server validates JWT, looks up the room, hands the socket to
+  `y-websocket`'s `setupWSConnection`
+- `SqliteYjsPersistence` snapshots the encoded Y.Doc state (debounced
+  ~250ms) into a `yjs_docs` table
+
+To wire your own Y.Doc-backed component, use the React hook:
+
+```tsx
+import { useYjsDoc } from '@/lib/use-yjs-doc';
+
+function MyComponent({ baseUrl, token, roomId }) {
+  const { doc, state, revision } = useYjsDoc({ baseUrl, token, roomId });
+  // Read/write doc.getText('myField') etc.
+}
+```
+
+---
+
+## 5. Permission modes — the 30-second version
 
 | Mode | What happens to proposed intents |
 |---|---|
@@ -134,7 +163,7 @@ requires manual approval regardless of mode.
 
 ---
 
-## 5. What's in the box
+## 6. What's in the box
 
 - **Permissioned proposals**: every AI action is an Intent that flows
   through the gateway → mode policy → manual or auto approval

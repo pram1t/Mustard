@@ -10,7 +10,7 @@
  * need server-issued, server-verified session tokens.
  */
 
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 const HEADER: JwtHeader = { alg: 'HS256', typ: 'JWT' };
 const ENCODED_HEADER = base64urlEncode(JSON.stringify(HEADER));
@@ -49,8 +49,12 @@ export function sign(
 ): string {
   const iat = Math.floor(Date.now() / 1000);
   const exp = iat + (options.expiresInSec ?? 3600);
+  // Generate a fresh jti unless the caller already supplied one. This
+  // guarantees every signed token is unique even when iat collides
+  // (e.g. two sign() calls inside the same second on a refresh).
+  const jti = payload.jti ?? randomBytes(8).toString('hex');
 
-  const full: JwtPayload = { ...payload, iat, exp };
+  const full: JwtPayload = { ...payload, iat, exp, jti };
   const encodedPayload = base64urlEncode(JSON.stringify(full));
   const signingInput = `${ENCODED_HEADER}.${encodedPayload}`;
   const signature = hmacSign(signingInput, secret);

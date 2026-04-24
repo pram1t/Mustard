@@ -21,10 +21,28 @@ Issue a JWT for a participant.
 { "token": "eyJ...", "expiresAt": 1734000000, "participantId": "alice", "roomId": "..." }
 ```
 
-JWTs are HS256, signed with `config.jwtSecret`. Default lifetime
-3600s — configurable via `tokenLifetimeSec`.
+JWTs are HS256, signed with `config.jwtSecret`, and carry a unique
+`jti` (so every issue is distinct even in the same second). Default
+lifetime 3600s — configurable via `tokenLifetimeSec`.
 
 Use the token as `Authorization: Bearer <token>` on every other route.
+
+### `POST /auth/refresh`
+
+Issue a new JWT for the same subject + roomId, before the current
+one expires.
+
+```bash
+curl -X POST http://127.0.0.1:3200/auth/refresh \
+  -H "authorization: Bearer $OLD_TOKEN"
+
+# 200
+{ "token": "eyJ...", "expiresAt": 1734000000, "participantId": "alice", "roomId": "..." }
+```
+
+The old token remains valid until its original expiry — there's no
+server-side blacklist in V1. Refusal modes are 401 (missing /
+invalid / expired Bearer token).
 
 ---
 

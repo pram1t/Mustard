@@ -164,20 +164,37 @@ openagent collab tail <roomId>
 
 ---
 
-## Out of scope for V1
+## Shipped in Phase 13 + 14 (closing the largest deferred items)
 
-These are deliberately deferred to the Super-V2 plan or a later
-collab-v2 cycle:
+- **Yjs document sync** — ✅ DONE. `/yjs` upgrade endpoint via
+  y-websocket's `setupWSConnection`. JWT-authenticated. Per-room
+  Y.Doc keyed by roomId. Web UI ships a SharedNotepad demo binding a
+  Y.Text to a textarea — multi-participant live edit with server-side
+  persistence.
+- **Server-side Yjs checkpoint persistence** — ✅ DONE.
+  `SqliteYjsPersistence` stores full encoded Y.Doc state per docName
+  (debounced writes, default 250ms). State survives server restart.
+- **Refresh tokens** — ✅ DONE. `POST /auth/refresh` accepts a
+  still-valid Bearer JWT and returns a new token with a fresh
+  lifetime, preserving sub + roomId. JWTs now include a `jti` so
+  every issued token is unique even within the same second.
 
-- **Yjs document sync** — `setupWSConnection` integration with
-  `@openagent/collab-sync` so `apps/web` can render a Monaco editor
-  with live cursors. The wire protocol is in place; only the document
-  binding is pending.
+## Still out of scope for V1
+
+These remain deferred to the Super-V2 plan or a later collab-v2
+cycle:
+
+- **Monaco editor binding** — SharedNotepad ships a textarea demo;
+  full Monaco with multi-cursor presence is a UX phase
 - **WebRTC signaling / P2P** — Activity 8.6 in the original plan
-- **Checkpoint persistence** — server-side Yjs state snapshots
 - **Multi-server scale-out** — Redis pub/sub bridge between bus
   instances
-- **Production-grade auth** — refresh tokens, RS256, JWKS, key
-  rotation; current HS256 is fine for self-hosted single-server
+- **Production-grade auth hardening** — RS256, JWKS, key rotation
+  (HS256 + refresh is fine for self-hosted single-server)
+- **Server-side token revocation** — refresh issues new tokens but
+  doesn't blacklist old ones; old tokens remain valid until their
+  original expiry
 - **Per-org policy limits** — mode allowlist enforced at the server
   level (currently enforced at the gateway level only)
+- **Conflict-merge prompts in CLI** (needs Yjs CLI client work)
+- **Terminal output sharing**
