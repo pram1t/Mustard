@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { EventBus, type MessageEnvelope } from '@openagent/message-bus';
+import { EventBus, type MessageEnvelope } from '@mustard/message-bus';
 import { RoomRegistry } from '../room-registry.js';
 
 function setup(autoApproval?: ConstructorParameters<typeof RoomRegistry>[0]['autoApproval']) {
@@ -191,7 +191,7 @@ describe('RoomRegistry destroy', () => {
 describe('RoomRegistry adopt', () => {
   it('registers an externally-constructed Room', async () => {
     const { reg } = setup();
-    const { createRoom } = await import('@openagent/collab-core');
+    const { createRoom } = await import('@mustard/collab-core');
     const room = createRoom({ name: 'External' }, 'alice');
     const ctx = reg.adopt(room);
     expect(ctx.room.id).toBe(room.id);

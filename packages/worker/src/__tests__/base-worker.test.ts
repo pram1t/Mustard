@@ -11,7 +11,7 @@ import type { WorkerConfig } from '../types.js';
 // Track what gets registered in the internal ToolRegistry
 const registeredTools: any[] = [];
 
-vi.mock('@openagent/tools', () => {
+vi.mock('@mustard/tools', () => {
   return {
     ToolRegistry: class MockToolRegistry {
       private tools: any[] = [];
@@ -34,7 +34,7 @@ vi.mock('@openagent/tools', () => {
 });
 
 // Mock AgentLoop so it doesn't actually need a real LLM
-vi.mock('@openagent/core', () => {
+vi.mock('@mustard/core', () => {
   return {
     AgentLoop: class MockAgentLoop {
       constructor() {}

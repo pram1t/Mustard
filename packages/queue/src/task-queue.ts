@@ -5,7 +5,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { IMessageBus } from '@openagent/message-bus';
+import type { IMessageBus } from '@mustard/message-bus';
 import type {
   ITaskQueue,
   QueueStats,

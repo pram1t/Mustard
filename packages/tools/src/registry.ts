@@ -13,7 +13,7 @@ import type {
   ExecuteOptions,
   IToolRegistry,
 } from './types.js';
-import { getLogger } from '@openagent/logger';
+import { getLogger } from '@mustard/logger';
 import { auditLog } from './security.js';
 
 // Import built-in tools - Core

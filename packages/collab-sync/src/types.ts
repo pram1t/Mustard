@@ -5,7 +5,7 @@
  */
 
 import type * as Y from 'yjs';
-import type { Range } from '@openagent/collab-core';
+import type { Range } from '@mustard/collab-core';
 
 // ============================================================================
 // Document Structure

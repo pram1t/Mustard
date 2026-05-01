@@ -13,10 +13,10 @@ OpenAgent uses a centralized configuration system with:
 
 ## Package
 
-Configuration is provided by the `@openagent/config` package.
+Configuration is provided by the `@mustard/config` package.
 
 ```typescript
-import { getConfig, loadConfig, validateConfig } from '@openagent/config';
+import { getConfig, loadConfig, validateConfig } from '@mustard/config';
 ```
 
 ## Quick Start
@@ -39,7 +39,7 @@ LOG_LEVEL=debug
 ### Accessing Configuration
 
 ```typescript
-import { getConfig } from '@openagent/config';
+import { getConfig } from '@mustard/config';
 
 const config = getConfig();
 
@@ -99,7 +99,7 @@ import type {
   LogLevel,
   LogFormat,
   LLMProvider,
-} from '@openagent/config';
+} from '@mustard/config';
 ```
 
 ### Config Structure
@@ -140,7 +140,7 @@ interface Config {
 Configuration is validated using Zod schemas:
 
 ```typescript
-import { ConfigSchema, validateConfig, ConfigError } from '@openagent/config';
+import { ConfigSchema, validateConfig, ConfigError } from '@mustard/config';
 
 try {
   const config = validateConfig(userInput);
@@ -156,7 +156,7 @@ try {
 Validate required configuration at application startup:
 
 ```typescript
-import { loadConfig, validateStartup } from '@openagent/config';
+import { loadConfig, validateStartup } from '@mustard/config';
 
 const config = loadConfig();
 
@@ -175,7 +175,7 @@ try {
 You can pass custom configuration programmatically:
 
 ```typescript
-import { ConfigSchema } from '@openagent/config';
+import { ConfigSchema } from '@mustard/config';
 
 const customConfig = ConfigSchema.parse({
   logging: { level: 'debug' },
@@ -188,7 +188,7 @@ const customConfig = ConfigSchema.parse({
 For testing, you can reset the cached configuration:
 
 ```typescript
-import { resetConfig, getConfig } from '@openagent/config';
+import { resetConfig, getConfig } from '@mustard/config';
 
 // Reset cache
 resetConfig();
@@ -202,7 +202,7 @@ const freshConfig = getConfig();
 Configuration supports partial objects with defaults:
 
 ```typescript
-import { ConfigSchema } from '@openagent/config';
+import { ConfigSchema } from '@mustard/config';
 
 // Only override what you need
 const config = ConfigSchema.parse({
@@ -253,7 +253,7 @@ Solution: Check the valid ranges in the schema documentation above.
 If changes to `.env` aren't reflected, the config may be cached:
 
 ```typescript
-import { resetConfig, getConfig } from '@openagent/config';
+import { resetConfig, getConfig } from '@mustard/config';
 
 resetConfig();
 const config = getConfig();

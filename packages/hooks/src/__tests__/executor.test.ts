@@ -10,7 +10,7 @@ import { HookExecutor, createHookExecutor } from '../executor.js';
 import type { HooksConfig, HookConfig, HookContext, HookResult } from '../types.js';
 
 // Mock the logger
-vi.mock('@openagent/logger', () => ({
+vi.mock('@mustard/logger', () => ({
   getLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),

@@ -2,19 +2,19 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
-// @openagent/* workspace packages must be bundled (not externalized) because
-// @openagent/logger uses "type": "module" (ESM) while core/config/etc use CJS.
+// @mustard/* workspace packages must be bundled (not externalized) because
+// @mustard/logger uses "type": "module" (ESM) while core/config/etc use CJS.
 // Electron's require() cannot load ESM, so vite must resolve the mismatch at build time.
 // We alias each package to its TypeScript source so vite can bundle from source directly,
 // avoiding CJS/ESM interop issues with pre-built dist/ output.
 const OPENAGENT_PACKAGES = [
-  '@openagent/config',
-  '@openagent/core',
-  '@openagent/hooks',
-  '@openagent/llm',
-  '@openagent/logger',
-  '@openagent/mcp',
-  '@openagent/tools',
+  '@mustard/config',
+  '@mustard/core',
+  '@mustard/hooks',
+  '@mustard/llm',
+  '@mustard/logger',
+  '@mustard/mcp',
+  '@mustard/tools',
 ];
 
 // Pino uses thread-stream which spawns Worker threads from file paths (lib/worker.js).
@@ -32,7 +32,7 @@ const FORCE_EXTERNAL = [
 const workspaceAliases = Object.fromEntries(
   OPENAGENT_PACKAGES.map((pkg) => [
     pkg,
-    resolve(__dirname, `../../packages/${pkg.replace('@openagent/', '')}/src/index.ts`),
+    resolve(__dirname, `../../packages/${pkg.replace('@mustard/', '')}/src/index.ts`),
   ])
 );
 

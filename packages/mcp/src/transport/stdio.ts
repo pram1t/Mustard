@@ -17,7 +17,7 @@ import type {
 import { TransportError, ConnectionError, TimeoutError } from '../types.js';
 import type { Transport, TransportState } from './types.js';
 import { DEFAULT_TIMEOUT } from './types.js';
-import { filterEnvVars } from '@openagent/core';
+import { filterEnvVars } from '@mustard/core';
 
 /**
  * Pending request tracker

@@ -4,8 +4,8 @@
 
 | Package | Version | Purpose | Security Notes |
 |---------|---------|---------|----------------|
-| @openagent/core | workspace | Agent functionality | Internal package |
-| @openagent/config | workspace | Configuration management | Internal package |
+| @mustard/core | workspace | Agent functionality | Internal package |
+| @mustard/config | workspace | Configuration management | Internal package |
 | react | 19.2.4 | UI framework | Pinned exact, security patch included |
 | react-dom | 19.2.4 | React DOM rendering | Pinned exact, matches React |
 

@@ -4,8 +4,8 @@
  * Types for intent engine, zone claiming, rate limiting, and agent management.
  */
 
-import type { Range } from '@openagent/collab-core';
-import type { ActivityState } from '@openagent/collab-presence';
+import type { Range } from '@mustard/collab-core';
+import type { ActivityState } from '@mustard/collab-presence';
 
 // ============================================================================
 // Intent System

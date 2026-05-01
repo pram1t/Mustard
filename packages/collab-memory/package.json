@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/collab-memory",
+  "name": "@mustard/collab-memory",
   "version": "0.0.0",
   "private": true,
   "description": "4-layer shared memory system for OpenAgent Collab",
@@ -18,10 +18,10 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/logger": "*",
-    "@openagent/collab-core": "*",
-    "@openagent/memory": "*",
-    "@openagent/llm": "*",
+    "@mustard/logger": "*",
+    "@mustard/collab-core": "*",
+    "@mustard/memory": "*",
+    "@mustard/llm": "*",
     "better-sqlite3": "^11.0.0"
   },
   "devDependencies": {

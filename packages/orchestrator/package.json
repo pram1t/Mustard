@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/orchestrator",
+  "name": "@mustard/orchestrator",
   "version": "0.0.0",
   "private": true,
   "description": "Multi-worker orchestrator for OpenAgent V2",
@@ -18,15 +18,15 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/core": "*",
-    "@openagent/llm": "*",
-    "@openagent/tools": "*",
-    "@openagent/logger": "*",
-    "@openagent/message-bus": "*",
-    "@openagent/worker": "*",
-    "@openagent/memory": "*",
-    "@openagent/artifact": "*",
-    "@openagent/queue": "*"
+    "@mustard/core": "*",
+    "@mustard/llm": "*",
+    "@mustard/tools": "*",
+    "@mustard/logger": "*",
+    "@mustard/message-bus": "*",
+    "@mustard/worker": "*",
+    "@mustard/memory": "*",
+    "@mustard/artifact": "*",
+    "@mustard/queue": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

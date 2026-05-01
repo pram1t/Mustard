@@ -9,16 +9,16 @@ import { AgentService } from './agent';
 import { ConfigService, ENV_KEY_MAP } from './config';
 import { MCPService } from './mcp';
 import { CredentialService } from './credentials';
-import { getConfig } from '@openagent/config';
+import { getConfig } from '@mustard/config';
 import {
   LLMRouter,
   OpenAIProvider,
   AnthropicProvider,
   GeminiProvider,
   OllamaProvider,
-} from '@openagent/llm';
-import { MCPRegistry } from '@openagent/mcp';
-import { createDefaultRegistry } from '@openagent/tools';
+} from '@mustard/llm';
+import { MCPRegistry } from '@mustard/mcp';
+import { createDefaultRegistry } from '@mustard/tools';
 
 // ── Singleton instances ──────────────────────────────────────────────────────
 

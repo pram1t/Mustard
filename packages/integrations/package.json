@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/integrations",
+  "name": "@mustard/integrations",
   "version": "0.0.0",
   "private": true,
   "description": "External service integrations for OpenAgent V2 (GitHub, webhooks)",
@@ -26,8 +26,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/logger": "*",
-    "@openagent/message-bus": "*"
+    "@mustard/logger": "*",
+    "@mustard/message-bus": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

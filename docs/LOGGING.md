@@ -13,10 +13,10 @@ OpenAgent uses [Pino](https://getpino.io/) as the logging framework. Pino is a f
 
 ## Package
 
-The logger is provided by the `@openagent/logger` package.
+The logger is provided by the `@mustard/logger` package.
 
 ```typescript
-import { createLogger, getLogger, setDefaultLogger } from '@openagent/logger';
+import { createLogger, getLogger, setDefaultLogger } from '@mustard/logger';
 ```
 
 ## Quick Start
@@ -24,7 +24,7 @@ import { createLogger, getLogger, setDefaultLogger } from '@openagent/logger';
 ### Using the Default Logger
 
 ```typescript
-import { getLogger } from '@openagent/logger';
+import { getLogger } from '@mustard/logger';
 
 const logger = getLogger();
 
@@ -37,7 +37,7 @@ logger.error('Error occurred');
 ### Creating a Custom Logger
 
 ```typescript
-import { createLogger } from '@openagent/logger';
+import { createLogger } from '@mustard/logger';
 
 const logger = createLogger({
   level: 'debug',
@@ -189,7 +189,7 @@ logger.warn('Provider attempt failed', { providerName: 'openai', attempt: 1, max
 Configure logging at application startup:
 
 ```typescript
-import { createLogger, setDefaultLogger } from '@openagent/logger';
+import { createLogger, setDefaultLogger } from '@mustard/logger';
 
 // Create and set custom default logger
 const logger = createLogger({
@@ -205,7 +205,7 @@ setDefaultLogger(logger);
 Other packages import and use the logger:
 
 ```typescript
-import { getLogger } from '@openagent/logger';
+import { getLogger } from '@mustard/logger';
 
 export class MyService {
   private logger = getLogger();
@@ -222,7 +222,7 @@ export class MyService {
 For tests, create a silent logger to suppress output:
 
 ```typescript
-import { createLogger, setDefaultLogger, resetDefaultLogger } from '@openagent/logger';
+import { createLogger, setDefaultLogger, resetDefaultLogger } from '@mustard/logger';
 
 beforeEach(() => {
   setDefaultLogger(createLogger({ level: 'silent' }));

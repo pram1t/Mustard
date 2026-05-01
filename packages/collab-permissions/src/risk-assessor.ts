@@ -13,7 +13,7 @@
  * permission-checker combined with the room's mode.
  */
 
-import type { Intent, RiskLevel } from '@openagent/collab-ai';
+import type { Intent, RiskLevel } from '@mustard/collab-ai';
 import type {
   RiskAssessment,
   RiskAssessmentRules,

@@ -1,5 +1,5 @@
 /**
- * @openagent/collab-core
+ * @mustard/collab-core
  *
  * Room, participant, and shared types for OpenAgent Collab.
  */

@@ -1,17 +1,17 @@
 /**
  * Agent Service
  *
- * Wraps @openagent/core AgentLoop as a thin delegation layer.
+ * Wraps @mustard/core AgentLoop as a thin delegation layer.
  * No business logic — just lifecycle management and event forwarding.
  */
 
-import { AgentLoop, createAgent } from '@openagent/core';
+import { AgentLoop, createAgent } from '@mustard/core';
 import type {
   AgentEvent as CoreAgentEvent,
   AgentConfig,
-} from '@openagent/core';
-import type { LLMRouter } from '@openagent/llm';
-import type { IToolRegistry } from '@openagent/tools';
+} from '@mustard/core';
+import type { LLMRouter } from '@mustard/llm';
+import type { IToolRegistry } from '@mustard/tools';
 import { emitEvent, emitStatus } from '../ipc/event-emitter';
 import { adaptCoreEvent } from './event-adapter';
 import { assessToolRisk } from '../security/tool-security';

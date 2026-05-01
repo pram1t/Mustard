@@ -5,10 +5,10 @@
  *   server start [options]   — Start the HTTP/WebSocket API server
  */
 
-import type { LLMRouter } from '@openagent/llm';
-import type { IToolRegistry } from '@openagent/tools';
-import { EventBus } from '@openagent/message-bus';
-import { startServer } from '@openagent/server';
+import type { LLMRouter } from '@mustard/llm';
+import type { IToolRegistry } from '@mustard/tools';
+import { EventBus } from '@mustard/message-bus';
+import { startServer } from '@mustard/server';
 
 export type ServerAction = 'start';
 

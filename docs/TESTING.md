@@ -104,7 +104,7 @@ describe('MyFeature', () => {
 
 ### Using Mocks
 
-The `@openagent/llm` package provides mock utilities:
+The `@mustard/llm` package provides mock utilities:
 
 ```typescript
 import { MockLLMProvider } from '../__tests__/mocks';
@@ -177,7 +177,7 @@ afterEach(async () => {
 
 ## Test Utilities Package
 
-The `@openagent/test-utils` package provides common utilities:
+The `@mustard/test-utils` package provides common utilities:
 
 ```typescript
 import {
@@ -189,7 +189,7 @@ import {
   measureTime,
   withEnv,
   createTestContext,
-} from '@openagent/test-utils';
+} from '@mustard/test-utils';
 ```
 
 ### Available Utilities

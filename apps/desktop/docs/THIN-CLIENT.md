@@ -2,7 +2,7 @@
 
 ## Principle
 
-The desktop app is a **presentation-only** client. All agent logic, tool execution, LLM routing, and configuration management live in the `@openagent/*` workspace packages. The desktop process delegates to these packages through a minimal service layer.
+The desktop app is a **presentation-only** client. All agent logic, tool execution, LLM routing, and configuration management live in the `@mustard/*` workspace packages. The desktop process delegates to these packages through a minimal service layer.
 
 ## What the Desktop Does
 
@@ -25,9 +25,9 @@ The desktop app is a **presentation-only** client. All agent logic, tool executi
 Three services wrap the workspace packages as thin delegation:
 
 ```
-AgentService  → @openagent/core   (AgentLoop lifecycle, event streaming)
-ConfigService → @openagent/config (read/write config, provider listing)
-MCPService    → @openagent/mcp    (server management, connect/disconnect)
+AgentService  → @mustard/core   (AgentLoop lifecycle, event streaming)
+ConfigService → @mustard/config (read/write config, provider listing)
+MCPService    → @mustard/mcp    (server management, connect/disconnect)
 ```
 
 Services are initialized once at startup (`initializeServices()`) and accessed via getter functions (`getAgentService()`, etc.). They throw if called before initialization.

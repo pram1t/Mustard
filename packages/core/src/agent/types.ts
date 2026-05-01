@@ -4,9 +4,9 @@
  * Types for the agent loop and event streaming.
  */
 
-import type { Message, ToolCall, ToolDefinition } from '@openagent/llm';
-import type { ToolResult, IToolRegistry } from '@openagent/tools';
-import type { HookExecutor, HookEvent as HookEventType } from '@openagent/hooks';
+import type { Message, ToolCall, ToolDefinition } from '@mustard/llm';
+import type { ToolResult, IToolRegistry } from '@mustard/tools';
+import type { HookExecutor, HookEvent as HookEventType } from '@mustard/hooks';
 import type { PermissionManager } from '../permissions/index.js';
 
 // Re-export HookEvent for convenience

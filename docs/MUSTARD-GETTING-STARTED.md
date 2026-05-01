@@ -1,4 +1,4 @@
-# Getting Started — OpenAgent Collab
+# Getting Started — Mustard
 
 Get a local Collab room up and running in ~5 minutes.
 
@@ -7,13 +7,13 @@ Get a local Collab room up and running in ~5 minutes.
 ## Prerequisites
 
 - Node.js ≥ 20
-- The `openagent` monorepo cloned + built once: `npm install && npm run build`
+- The `mustard` monorepo cloned + built once: `npm install && npm run build`
 
 ---
 
 ## 1. Start the Collab server
 
-The Phase-8 server (`@openagent/collab-server`) needs a JWT secret.
+The Phase-8 server (`@mustard/collab-server`) needs a JWT secret.
 Anything random works for dev:
 
 ```js
@@ -172,11 +172,11 @@ requires manual approval regardless of mode.
 - **Cross-room isolation**: WS clients can filter to a single room
 - **JWT auth** with token caching in the CLI
 - **In-memory rooms** by default; persistence and Yjs file sync are
-  on the roadmap (see `docs/COLLAB-INTEGRATION.md` → Out of scope for V1)
+  on the roadmap (see `docs/MUSTARD-INTEGRATION.md` → Out of scope for V1)
 
 ---
 
 ## Next reading
 
-- [`docs/COLLAB-API.md`](./COLLAB-API.md) — REST + WebSocket reference
-- [`docs/COLLAB-INTEGRATION.md`](./COLLAB-INTEGRATION.md) — package map + runtime topology + event flow
+- [`docs/MUSTARD-API.md`](./MUSTARD-API.md) — REST + WebSocket reference
+- [`docs/MUSTARD-INTEGRATION.md`](./MUSTARD-INTEGRATION.md) — package map + runtime topology + event flow

@@ -1,5 +1,5 @@
 /**
- * @openagent/mcp
+ * @mustard/mcp
  *
  * Model Context Protocol (MCP) client for OpenAgent.
  * Allows connecting to external tool servers and using their capabilities.

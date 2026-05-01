@@ -4,7 +4,7 @@ Desktop application for OpenAgent, built with Electron and React.
 
 ## Architecture
 
-- **Main Process**: Node.js runtime with full system access, hosts @openagent/core
+- **Main Process**: Node.js runtime with full system access, hosts @mustard/core
 - **Preload Script**: Isolated bridge between main and renderer
 - **Renderer Process**: Sandboxed React application, communicates only via `window.api`
 

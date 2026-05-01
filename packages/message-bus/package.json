@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/message-bus",
+  "name": "@mustard/message-bus",
   "version": "0.0.0",
   "private": true,
   "description": "In-memory event bus with pattern matching for OpenAgent V2",
@@ -18,7 +18,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/logger": "*"
+    "@mustard/logger": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

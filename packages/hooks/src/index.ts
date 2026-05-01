@@ -1,5 +1,5 @@
 /**
- * @openagent/hooks
+ * @mustard/hooks
  *
  * Hook system for OpenAgent - lifecycle hooks that allow
  * custom scripts to run at various agent events.

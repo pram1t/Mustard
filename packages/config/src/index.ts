@@ -1,5 +1,5 @@
 /**
- * @openagent/config
+ * @mustard/config
  *
  * Configuration management for OpenAgent.
  *

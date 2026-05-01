@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TaskQueue } from '../task-queue.js';
-import { EventBus } from '@openagent/message-bus';
+import { EventBus } from '@mustard/message-bus';
 import type { TaskInput } from '../types.js';
 
 describe('TaskQueue', () => {

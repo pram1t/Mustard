@@ -4,8 +4,8 @@
  * Types for the orchestrator that plans, dispatches, and monitors multi-worker execution.
  */
 
-import type { WorkerRole } from '@openagent/worker';
-import type { TaskPriority } from '@openagent/queue';
+import type { WorkerRole } from '@mustard/worker';
+import type { TaskPriority } from '@mustard/queue';
 
 // =============================================================================
 // PLAN
@@ -122,17 +122,17 @@ export interface OrchestratorConfig {
  */
 export interface OrchestratorDeps {
   /** LLM router for planner */
-  router: import('@openagent/llm').LLMRouter;
+  router: import('@mustard/llm').LLMRouter;
 
   /** Tool registry for workers */
-  tools: import('@openagent/tools').IToolRegistry;
+  tools: import('@mustard/tools').IToolRegistry;
 
   /** Message bus for events */
-  bus: import('@openagent/message-bus').IMessageBus;
+  bus: import('@mustard/message-bus').IMessageBus;
 
   /** Optional memory store */
-  memoryStore?: import('@openagent/memory').IMemoryStore;
+  memoryStore?: import('@mustard/memory').IMemoryStore;
 
   /** Optional artifact store */
-  artifactStore?: import('@openagent/artifact').IArtifactStore;
+  artifactStore?: import('@mustard/artifact').IArtifactStore;
 }

@@ -3,10 +3,10 @@
  */
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { EventBus } from '@openagent/message-bus';
+import { EventBus } from '@mustard/message-bus';
 
-// Mock @openagent/worker
-vi.mock('@openagent/worker', () => {
+// Mock @mustard/worker
+vi.mock('@mustard/worker', () => {
   class MockWorkerRegistry {
     register = vi.fn();
     unregister = vi.fn();
@@ -49,8 +49,8 @@ vi.mock('@openagent/worker', () => {
   return { WorkerRegistry: MockWorkerRegistry, WorkerFactory: MockWorkerFactory };
 });
 
-// Mock @openagent/orchestrator
-vi.mock('@openagent/orchestrator', () => {
+// Mock @mustard/orchestrator
+vi.mock('@mustard/orchestrator', () => {
   class MockOrchestrator {
     config: any;
     deps: any;

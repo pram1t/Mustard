@@ -1,5 +1,5 @@
 /**
- * @openagent/core
+ * @mustard/core
  *
  * Core functionality for OpenAgent.
  * Provides the agent loop, context management, and tool execution orchestration.

@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/llm",
+  "name": "@mustard/llm",
   "version": "0.0.0",
   "description": "LLM abstraction layer for OpenAgent",
   "main": "./dist/index.js",
@@ -27,8 +27,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
     "@google/generative-ai": "^0.24.1",
-    "@openagent/config": "*",
-    "@openagent/logger": "*",
+    "@mustard/config": "*",
+    "@mustard/logger": "*",
     "openai": "^6.16.0",
     "tiktoken": "^1.0.22"
   }

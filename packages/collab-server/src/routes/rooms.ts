@@ -12,7 +12,7 @@ import type {
   PermissionMode,
   RoomConfig,
   RoomVisibility,
-} from '@openagent/collab-core';
+} from '@mustard/collab-core';
 
 interface CreateRoomBody {
   name?: string;

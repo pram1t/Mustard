@@ -14,7 +14,7 @@ import {
   loadProjectConfig,
   loadGlobalConfig,
   findProjectRoot,
-} from '@openagent/config';
+} from '@mustard/config';
 
 export type ConfigAction = 'list' | 'get' | 'set' | 'edit' | 'path';
 

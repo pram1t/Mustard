@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/config",
+  "name": "@mustard/config",
   "version": "0.0.0",
   "description": "Configuration management for OpenAgent",
   "main": "./dist/index.js",

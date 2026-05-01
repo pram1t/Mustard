@@ -4,7 +4,7 @@
  * Initialize .openagent/ folder in a project or globally.
  */
 
-import { initProjectConfig, ensureGlobalConfig } from '@openagent/config';
+import { initProjectConfig, ensureGlobalConfig } from '@mustard/config';
 
 export interface InitOptions {
   global?: boolean;

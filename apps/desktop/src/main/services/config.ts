@@ -1,20 +1,20 @@
 /**
  * Config Service
  *
- * Wraps @openagent/config as a thin delegation layer.
+ * Wraps @mustard/config as a thin delegation layer.
  * Critical: API keys are NEVER exposed to the renderer.
  * API key storage is delegated to CredentialService.
  */
 
-import { getConfig } from '@openagent/config';
-import type { LLMProvider as LLMProviderType } from '@openagent/config';
+import { getConfig } from '@mustard/config';
+import type { LLMProvider as LLMProviderType } from '@mustard/config';
 import {
   type LLMRouter,
   OpenAIProvider,
   AnthropicProvider,
   GeminiProvider,
   OllamaProvider,
-} from '@openagent/llm';
+} from '@mustard/llm';
 import type {
   SafeConfig,
   ProviderInfo,
@@ -85,7 +85,7 @@ export class ConfigService {
         delete updates.apiKey;
       }
 
-      const { saveGlobalConfig, ensureGlobalConfig } = await import('@openagent/config');
+      const { saveGlobalConfig, ensureGlobalConfig } = await import('@mustard/config');
       await ensureGlobalConfig();
       await saveGlobalConfig({
         ...(updates.provider !== undefined ? { provider: updates.provider as LLMProviderType } : {}),

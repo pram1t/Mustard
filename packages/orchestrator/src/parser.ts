@@ -5,7 +5,7 @@
  * Classifies the user request into intent, scope, complexity, and priority.
  */
 
-import type { LLMRouter, TextChunk } from '@openagent/llm';
+import type { LLMRouter, TextChunk } from '@mustard/llm';
 
 // =============================================================================
 // TYPES

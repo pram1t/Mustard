@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/collab-permissions",
+  "name": "@mustard/collab-permissions",
   "version": "0.0.0",
   "private": true,
   "description": "Permission modes and risk assessment for OpenAgent Collab",
@@ -18,10 +18,10 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/logger": "*",
-    "@openagent/collab-core": "*",
-    "@openagent/collab-ai": "*",
-    "@openagent/message-bus": "*"
+    "@mustard/logger": "*",
+    "@mustard/collab-core": "*",
+    "@mustard/collab-ai": "*",
+    "@mustard/message-bus": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

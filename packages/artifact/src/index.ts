@@ -1,5 +1,5 @@
 /**
- * @openagent/artifact
+ * @mustard/artifact
  *
  * Versioned artifact protocol with handoff state machine for OpenAgent V2.
  */

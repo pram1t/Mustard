@@ -25,7 +25,7 @@ import {
   AgentRegistry,
   attachIntentEngineToBus,
   type AutoApprovalPolicy,
-} from '@openagent/collab-ai';
+} from '@mustard/collab-ai';
 import {
   ModeManager,
   ApprovalManager,
@@ -33,17 +33,17 @@ import {
   SensitiveFileDetector,
   PermissionGateway,
   attachModeManagerToBus,
-} from '@openagent/collab-permissions';
-import { EphemeralMemory } from '@openagent/collab-memory';
-import type { IMessageBus } from '@openagent/message-bus';
+} from '@mustard/collab-permissions';
+import { EphemeralMemory } from '@mustard/collab-memory';
+import type { IMessageBus } from '@mustard/message-bus';
 import type {
   CreateRoomRequest,
   Participant,
   PermissionMode,
   ParticipantType,
   Room,
-} from '@openagent/collab-core';
-import { createRoom } from '@openagent/collab-core';
+} from '@mustard/collab-core';
+import { createRoom } from '@mustard/collab-core';
 import { randomUUID } from 'node:crypto';
 
 // ============================================================================

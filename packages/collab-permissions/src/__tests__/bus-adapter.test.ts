@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EventBus, type MessageEnvelope } from '@openagent/message-bus';
+import { EventBus, type MessageEnvelope } from '@mustard/message-bus';
 import { ModeManager } from '../mode-manager.js';
 import {
   attachModeManagerToBus,

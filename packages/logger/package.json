@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/logger",
+  "name": "@mustard/logger",
   "version": "0.0.0",
   "private": true,
   "description": "Logging utilities for OpenAgent",

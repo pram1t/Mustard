@@ -5,10 +5,10 @@
  * Request → Plan → Queue → Dispatch → Monitor → Result
  */
 
-import type { IMessageBus } from '@openagent/message-bus';
-import { EventBus } from '@openagent/message-bus';
-import { TaskQueue } from '@openagent/queue';
-import { WorkerRegistry, WorkerFactory } from '@openagent/worker';
+import type { IMessageBus } from '@mustard/message-bus';
+import { EventBus } from '@mustard/message-bus';
+import { TaskQueue } from '@mustard/queue';
+import { WorkerRegistry, WorkerFactory } from '@mustard/worker';
 import { Planner } from './planner.js';
 import { Dispatcher } from './dispatcher.js';
 import { ProgressMonitor } from './monitor.js';

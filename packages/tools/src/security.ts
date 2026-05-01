@@ -9,8 +9,8 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { getConfig } from '@openagent/config';
-import { getLogger } from '@openagent/logger';
+import { getConfig } from '@mustard/config';
+import { getLogger } from '@mustard/logger';
 
 /**
  * Maximum allowed path length

@@ -1,5 +1,5 @@
 /**
- * @openagent/worker
+ * @mustard/worker
  *
  * Specialized AI worker infrastructure for OpenAgent V2.
  */

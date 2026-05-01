@@ -1,11 +1,11 @@
 /**
  * Event Adapter
  *
- * Maps @openagent/core events (12 flat types) to desktop events (7 versioned types).
+ * Maps @mustard/core events (12 flat types) to desktop events (7 versioned types).
  * Stateless pure function — no side effects except console logging for dropped events.
  */
 
-import type { AgentEvent as CoreAgentEvent } from '@openagent/core';
+import type { AgentEvent as CoreAgentEvent } from '@mustard/core';
 import type { AgentEvent as DesktopAgentEvent, ErrorCode } from '../../shared/event-types';
 import {
   createTextEvent,

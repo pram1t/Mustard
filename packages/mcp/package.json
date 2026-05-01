@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/mcp",
+  "name": "@mustard/mcp",
   "version": "0.0.0",
   "description": "MCP client for OpenAgent",
   "main": "./dist/index.js",
@@ -18,7 +18,7 @@
   "keywords": ["openagent", "mcp"],
   "license": "MIT",
   "dependencies": {
-    "@openagent/core": "*"
+    "@mustard/core": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
