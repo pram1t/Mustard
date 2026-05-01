@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main, master]
 
+# Note: desktop app has its own pipeline (desktop.yml) — this CI only
+# covers the publishable packages + apps/web + the test suite.
+
 jobs:
   build:
     name: Build
@@ -19,7 +22,8 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - run: npm run build
+      - name: Build (excluding desktop)
+        run: npx turbo run build --filter='!@pram1t/mustard-desktop'
 
   test:
     name: Test (${{ matrix.os }})
@@ -39,10 +43,11 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - run: npm run build
+      - name: Build (excluding desktop)
+        run: npx turbo run build --filter='!@pram1t/mustard-desktop'
 
-      - name: Run tests
-        run: npm test
+      - name: Run tests (excluding desktop)
+        run: npx vitest run --exclude='**/apps/desktop/**'
         env:
           CI: true
 
@@ -58,6 +63,7 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - run: npm run build
+      - name: Build (excluding desktop)
+        run: npx turbo run build --filter='!@pram1t/mustard-desktop'
       - run: npm run lint
         continue-on-error: true
