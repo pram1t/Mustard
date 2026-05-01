@@ -1,5 +1,5 @@
 /**
- * @mustard/collab-permissions
+ * @pram1t/mustard-collab-permissions
  *
  * Permission modes and risk assessment for OpenAgent Collab.
  */

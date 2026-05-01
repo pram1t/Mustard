@@ -7,7 +7,7 @@
 
 import type { FastifyInstance } from 'fastify';
 import type { WebSocket } from '@fastify/websocket';
-import type { MessageEnvelope } from '@mustard/message-bus';
+import type { MessageEnvelope } from '@pram1t/mustard-message-bus';
 import type { AppContext } from './server.js';
 
 const EVENT_PATTERNS = ['plan.*', 'task.*', 'worker.*', 'artifact.*'];

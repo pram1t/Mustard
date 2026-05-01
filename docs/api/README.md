@@ -4,10 +4,10 @@ This document provides an overview of OpenAgent's public APIs, interfaces, and e
 
 ## LLM Provider Interface
 
-To create a custom LLM provider, implement the `LLMProvider` interface from `@mustard/llm`:
+To create a custom LLM provider, implement the `LLMProvider` interface from `@pram1t/mustard-llm`:
 
 ```typescript
-import { LLMProvider, ChatMessage, ChatResponse, TokenCount } from '@mustard/llm';
+import { LLMProvider, ChatMessage, ChatResponse, TokenCount } from '@pram1t/mustard-llm';
 
 export class MyProvider implements LLMProvider {
   readonly name = 'my-provider';
@@ -33,7 +33,7 @@ export class MyProvider implements LLMProvider {
 Register the provider in the LLM router so it can be selected via `--provider`:
 
 ```typescript
-import { registerProvider } from '@mustard/llm';
+import { registerProvider } from '@pram1t/mustard-llm';
 import { MyProvider } from './my-provider';
 
 registerProvider('my-provider', () => new MyProvider());
@@ -41,10 +41,10 @@ registerProvider('my-provider', () => new MyProvider());
 
 ## Tool Interface
 
-To create a custom tool, implement the `Tool` interface from `@mustard/tools`:
+To create a custom tool, implement the `Tool` interface from `@pram1t/mustard-tools`:
 
 ```typescript
-import { Tool, ToolResult } from '@mustard/tools';
+import { Tool, ToolResult } from '@pram1t/mustard-tools';
 
 export const myTool: Tool = {
   name: 'my_tool',
@@ -68,7 +68,7 @@ export const myTool: Tool = {
 Register the tool in the tool registry:
 
 ```typescript
-import { registerTool } from '@mustard/tools';
+import { registerTool } from '@pram1t/mustard-tools';
 import { myTool } from './my-tool';
 
 registerTool(myTool);
@@ -171,7 +171,7 @@ OpenAgent emits `AgentEvent` objects during execution. All events share a common
 ### Subscribing to Events
 
 ```typescript
-import { createAgent } from '@mustard/core';
+import { createAgent } from '@pram1t/mustard-core';
 
 const agent = createAgent({ provider: 'openai' });
 
@@ -195,7 +195,7 @@ for await (const event of agent.run('Hello')) {
 
 ## Package Exports
 
-### @mustard/core
+### @pram1t/mustard-core
 
 The main orchestration package. Entry point for creating and running agents.
 
@@ -205,7 +205,7 @@ The main orchestration package. Entry point for creating and running agents.
 - `AgentConfig` -- Configuration type
 - `Session` -- Session management
 
-### @mustard/llm
+### @pram1t/mustard-llm
 
 LLM provider abstraction and routing.
 
@@ -215,7 +215,7 @@ LLM provider abstraction and routing.
 - `createProvider(name, config)` -- Instantiate a provider
 - `TokenCount`, `TokenUsage` -- Token tracking types
 
-### @mustard/tools
+### @pram1t/mustard-tools
 
 Built-in tools and the tool registration system.
 
@@ -225,7 +225,7 @@ Built-in tools and the tool registration system.
 - `getToolRegistry()` -- Get all registered tools
 - Built-in tools: `read_file`, `write_file`, `edit_file`, `shell`, `glob`, `grep`, `list_dir`
 
-### @mustard/mcp
+### @pram1t/mustard-mcp
 
 Model Context Protocol client for connecting to MCP servers.
 
@@ -234,7 +234,7 @@ Model Context Protocol client for connecting to MCP servers.
 - `connectServer(config)` -- Connect to an MCP server
 - `discoverTools(client)` -- List tools from a server
 
-### @mustard/config
+### @pram1t/mustard-config
 
 Configuration loading, merging, and validation.
 
@@ -243,7 +243,7 @@ Configuration loading, merging, and validation.
 - `resolveConfig(overrides)` -- Resolve final config from all sources
 - `getDefaultConfig()` -- Get built-in defaults
 
-### @mustard/logger
+### @pram1t/mustard-logger
 
 Structured logging with configurable levels.
 
@@ -251,7 +251,7 @@ Structured logging with configurable levels.
 - `Logger` -- Logger interface (debug, info, warn, error)
 - `LogLevel` -- Log level enum
 
-### @mustard/hooks
+### @pram1t/mustard-hooks
 
 Lifecycle hook system for pre/post tool and chat events.
 
@@ -259,7 +259,7 @@ Lifecycle hook system for pre/post tool and chat events.
 - `HookConfig` -- Hook configuration type
 - `registerHook(config)` -- Register a hook
 
-### @mustard/test-utils
+### @pram1t/mustard-test-utils
 
 Shared testing utilities for the monorepo.
 

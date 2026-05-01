@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EventBus } from '@mustard/message-bus';
+import { EventBus } from '@pram1t/mustard-message-bus';
 import type { OrchestratorDeps } from '../types.js';
 
-// Mock @mustard/worker so the Orchestrator doesn't create real BaseWorkers/AgentLoops
-vi.mock('@mustard/worker', () => {
+// Mock @pram1t/mustard-worker so the Orchestrator doesn't create real BaseWorkers/AgentLoops
+vi.mock('@pram1t/mustard-worker', () => {
   class MockWorkerRegistry {
     register = vi.fn();
     unregister = vi.fn();

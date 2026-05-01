@@ -6,7 +6,7 @@
  * broadcast to other rooms happens through the bus adapter.
  */
 
-import type { PermissionMode } from '@mustard/collab-core';
+import type { PermissionMode } from '@pram1t/mustard-collab-core';
 import type {
   ModeCapabilities,
   ModeChangeEvent,

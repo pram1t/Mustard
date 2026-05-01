@@ -11,7 +11,7 @@ import {
   validateRegexPattern,
   validateCommand,
 } from '../security';
-import { resetConfig } from '@mustard/config';
+import { resetConfig } from '@pram1t/mustard-config';
 import { WriteTool } from '../builtin/write';
 import { EditTool } from '../builtin/edit';
 import { createTestContext } from '../registry';

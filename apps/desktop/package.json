@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/desktop",
+  "name": "@pram1t/mustard-desktop",
   "version": "0.1.0",
   "private": true,
   "description": "Mustard Desktop application",
@@ -19,18 +19,18 @@
     "audit:security": "npm audit --audit-level=high"
   },
   "dependencies": {
-    "@mustard/config": "*",
-    "@mustard/core": "*",
-    "@mustard/llm": "*",
-    "@mustard/mcp": "*",
-    "@mustard/tools": "*",
     "dompurify": "^3.3.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.11",
+    "@pram1t/mustard-config": "*",
+    "@pram1t/mustard-core": "*",
+    "@pram1t/mustard-llm": "*",
+    "@pram1t/mustard-mcp": "*",
+    "@pram1t/mustard-tools": "*"
   },
   "devDependencies": {
     "@cyclonedx/cyclonedx-npm": "^4.1.2",

@@ -1,0 +1,122 @@
+name: Publish
+
+# Tag-driven publish to npm. Push a `v*` tag to trigger.
+#
+# Setup required (one-time, by maintainer):
+#   1. npmjs.com → Access Tokens → Generate "Automation" token
+#   2. GitHub repo → Settings → Secrets → Actions → New
+#      Name: NPM_TOKEN
+#      Value: <the automation token>
+#   3. Tag a release: `git tag v1.0.0-rc.1 && git push --tags`
+#
+# What it does:
+#   - Builds the entire monorepo
+#   - Runs the full test suite (gate)
+#   - Publishes every public @pram1t/mustard-* package whose version equals
+#     the tag (so re-tagging the same version is a no-op for skipped
+#     packages — npm will reject duplicate-version publishes anyway)
+#
+# Order matters: publishes leaf-deps first (logger, message-bus) before
+# packages that depend on them, so transient `npm install` from a fresh
+# user works correctly with `latest`-tagged dist.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+  # Allow manual invocation for debugging — emits dry-run only.
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: 'dry-run only (no actual publish)'
+        type: boolean
+        default: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write   # for npm provenance (optional, future)
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # for tag → commit lookup
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      - name: Publish (in topological order)
+        if: github.event.inputs.dryRun != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -e
+          # Order: leaf deps first.
+          PACKAGES=(
+            packages/logger
+            packages/message-bus
+            packages/config
+            packages/core
+            packages/llm
+            packages/tools
+            packages/hooks
+            packages/mcp
+            packages/memory
+            packages/queue
+            packages/artifact
+            packages/integrations
+            packages/orchestrator
+            packages/worker
+            packages/server
+            packages/collab-core
+            packages/collab-sync
+            packages/collab-presence
+            packages/collab-ai
+            packages/collab-permissions
+            packages/collab-memory
+            packages/collab-server
+            apps/cli
+          )
+          for pkg in "${PACKAGES[@]}"; do
+            echo ""
+            echo "── publishing $pkg ──"
+            cd "$pkg"
+            # Skip if already published at this version.
+            NAME=$(node -p "require('./package.json').name")
+            VERSION=$(node -p "require('./package.json').version")
+            if npm view "$NAME@$VERSION" version 2>/dev/null > /dev/null; then
+              echo "✓ $NAME@$VERSION already published, skipping"
+            else
+              npm publish --access public
+              echo "✓ $NAME@$VERSION published"
+            fi
+            cd "$GITHUB_WORKSPACE"
+          done
+
+      - name: Dry-run summary
+        if: github.event.inputs.dryRun == 'true'
+        run: |
+          echo "## Dry-run mode — no packages published"
+          echo "Tag: ${{ github.ref_name }}"
+          for pkg in apps/cli packages/*/; do
+            if [ -f "$pkg/package.json" ]; then
+              NAME=$(node -p "require('./$pkg/package.json').name")
+              VERSION=$(node -p "require('./$pkg/package.json').version")
+              PRIVATE=$(node -p "require('./$pkg/package.json').private || false")
+              echo "  - $NAME@$VERSION (private=$PRIVATE)"
+            fi
+          done

@@ -1,7 +1,18 @@
 {
-  "name": "@mustard/hooks",
-  "version": "0.0.0",
-  "description": "Hook system for OpenAgent",
+  "name": "@pram1t/mustard-hooks",
+  "version": "1.0.0-rc.1",
+  "description": "Hook system for Mustard",
+  "author": "pram1t",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/Mustard.git",
+    "directory": "packages/hooks"
+  },
+  "homepage": "https://github.com/pram1t/Mustard#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/Mustard/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,17 +22,29 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
   },
-  "keywords": ["openagent", "hooks"],
-  "license": "MIT",
   "dependencies": {
-    "@mustard/logger": "*"
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
-  }
+  },
+  "keywords": [
+    "openagent",
+    "hooks"
+  ]
 }

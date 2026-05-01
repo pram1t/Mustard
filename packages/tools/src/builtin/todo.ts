@@ -13,7 +13,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { BaseTool } from '../base.js';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
-import { getTodosPath as getConfigTodosPath } from '@mustard/config';
+import { getTodosPath as getConfigTodosPath } from '@pram1t/mustard-config';
 
 /**
  * Todo item structure

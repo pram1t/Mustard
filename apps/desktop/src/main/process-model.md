@@ -10,7 +10,7 @@
 |  | - Node.js runtime                                         ||
 |  | - File system access                                      ||
 |  | - Network requests                                        ||
-|  | - @mustard/core integration                             ||
+|  | - @pram1t/mustard-core integration                             ||
 |  | - IPC handlers (transport only)                           ||
 |  +----------------------------------------------------------+|
 |                              |                                |

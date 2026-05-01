@@ -3,7 +3,7 @@
  * caller-supplied completion callback) and produces a SessionSummary.
  *
  * Test-friendly: the callback contract is just `(prompt) => text`.
- * Consumers can wire it to @mustard/llm or pass a mock.
+ * Consumers can wire it to @pram1t/mustard-llm or pass a mock.
  *
  * Extracts decisions and files-modified deterministically from the
  * entry stream; the LLM is only responsible for the free-form summary

@@ -1,5 +1,5 @@
 /**
- * @mustard/collab-presence
+ * @pram1t/mustard-collab-presence
  *
  * Real-time presence, cursors, and activity tracking for OpenAgent Collab.
  */

@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { randomUUID } from 'crypto';
-import { getLogger } from '@mustard/logger';
+import { getLogger } from '@pram1t/mustard-logger';
 import type { SessionData, SessionListItem, SessionMetadata } from './types.js';
 import type { ContextState } from '../context/types.js';
 

@@ -23,7 +23,7 @@ import type {
 import { MCPError } from './types.js';
 
 /**
- * Tool definition compatible with @mustard/tools
+ * Tool definition compatible with @pram1t/mustard-tools
  */
 export interface AggregatedTool {
   name: string;

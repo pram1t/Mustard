@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import type { PermissionMode } from '@mustard/collab-core';
-import type { Intent, IntentAction, IntentType, RiskLevel } from '@mustard/collab-ai';
+import type { PermissionMode } from '@pram1t/mustard-collab-core';
+import type { Intent, IntentAction, IntentType, RiskLevel } from '@pram1t/mustard-collab-ai';
 import type { RiskAssessment, SensitiveFileMatch } from '../types.js';
 import {
   canPerform,

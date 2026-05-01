@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { adaptCoreEvent, classifyErrorCode } from '../event-adapter';
-import type { AgentEvent as CoreAgentEvent } from '@mustard/core';
+import type { AgentEvent as CoreAgentEvent } from '@pram1t/mustard-core';
 
 const SESSION_ID = 'test-session-123';
 

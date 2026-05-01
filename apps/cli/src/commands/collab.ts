@@ -1,5 +1,5 @@
 /**
- * `openagent collab` — interact with @mustard/collab-server.
+ * `openagent collab` — interact with @pram1t/mustard-collab-server.
  *
  * Subcommands:
  *   collab login                            cache a JWT for future calls

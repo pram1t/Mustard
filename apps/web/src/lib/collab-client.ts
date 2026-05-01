@@ -1,5 +1,5 @@
 /**
- * Typed REST client for @mustard/collab-server.
+ * Typed REST client for @pram1t/mustard-collab-server.
  *
  * Browser-side wrapper around the Phase-8 Fastify endpoints. Stateless
  * per call — pass the JWT every request. Errors throw `CollabApiError`

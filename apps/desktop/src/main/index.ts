@@ -1,7 +1,7 @@
 import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
-import { setDefaultLogger } from '@mustard/logger';
-import type { Logger, LogContext } from '@mustard/logger';
+import { setDefaultLogger } from '@pram1t/mustard-logger';
+import type { Logger, LogContext } from '@pram1t/mustard-logger';
 
 // ── Root cause fix: Electron GUI has no stdout/stderr ────────────────────────
 // When Electron runs as a GUI app (not from terminal), process.stdout and

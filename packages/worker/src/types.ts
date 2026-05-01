@@ -5,7 +5,7 @@
  * with role-specific tools, prompts, and capabilities.
  */
 
-import type { AgentEvent } from '@mustard/core';
+import type { AgentEvent } from '@pram1t/mustard-core';
 
 // =============================================================================
 // WORKER ROLES
@@ -136,10 +136,10 @@ export interface WorkerConfig {
   systemPromptOverride?: string;
 
   /** Message bus for inter-worker communication (Phase 9) */
-  bus?: import('@mustard/message-bus').IMessageBus;
+  bus?: import('@pram1t/mustard-message-bus').IMessageBus;
 
   /** Memory store for cross-session persistence (Phase 11) */
-  memoryStore?: import('@mustard/memory').IMemoryStore;
+  memoryStore?: import('@pram1t/mustard-memory').IMemoryStore;
 
   /** Project ID for scoping memories (Phase 11) */
   projectId?: string;

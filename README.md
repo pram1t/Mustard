@@ -31,7 +31,7 @@ Think of it as an open alternative to Claude Code that **works with the model of
 - [API reference](docs/MUSTARD-API.md) — REST + WebSocket
 - [Integration guide](docs/MUSTARD-INTEGRATION.md) — package map, runtime topology, event flow
 
-The Collab stack ships as `@mustard/collab-core`, `@mustard/collab-sync`, `@mustard/collab-presence`, `@mustard/collab-ai`, `@mustard/collab-permissions`, `@mustard/collab-memory`, and `@mustard/collab-server`. The CLI exposes `mustard collab ...` subcommands; the web app lives at `apps/web` (Next.js 15) with `/collab` and `/collab/[id]` routes.
+The Collab stack ships as `@pram1t/mustard-collab-core`, `@pram1t/mustard-collab-sync`, `@pram1t/mustard-collab-presence`, `@pram1t/mustard-collab-ai`, `@pram1t/mustard-collab-permissions`, `@pram1t/mustard-collab-memory`, and `@pram1t/mustard-collab-server`. The CLI exposes `mustard collab ...` subcommands; the web app lives at `apps/web` (Next.js 15) with `/collab` and `/collab/[id]` routes.
 
 ## Quick Start
 
@@ -74,7 +74,7 @@ npm link --workspace=apps/cli
 
 Then use `mustard` directly from your terminal.
 
-> **Coming soon:** `npm i -g @mustard/cli` for one-line install once polish-v1 ships.
+> **Coming soon:** `npm i -g @pram1t/mustard-cli` for one-line install once polish-v1 ships.
 
 ## Usage
 
@@ -178,7 +178,7 @@ mustard/
 
 ### Key design principles
 
-1. **LLM-agnostic core** — The `@mustard/llm` package provides a unified interface. Adding a new provider means implementing a single adapter.
+1. **LLM-agnostic core** — The `@pram1t/mustard-llm` package provides a unified interface. Adding a new provider means implementing a single adapter.
 2. **Modular packages** — Each concern (tools, config, hooks, MCP, memory, collab) lives in its own package with a clear API boundary.
 3. **Permissioned by default** — Every AI action flows through the permission gateway. Sensitive files always require manual approval.
 4. **CLI-first** — Features land in the CLI first; the desktop and web apps are presentation layers over the same core.
@@ -221,10 +221,10 @@ npm run lint
 
 ### Adding a new package
 
-1. Create a directory under `packages/` with a `package.json` scoped to `@mustard/`.
+1. Create a directory under `packages/` with a `package.json` scoped to `@pram1t/mustard-`.
 2. Add it to the root `workspaces` list if needed.
 3. Run `npm install` from the repo root.
-4. Import from other packages using the `@mustard/<name>` specifier.
+4. Import from other packages using the `@pram1t/mustard-<name>` specifier.
 
 ## Contributing
 

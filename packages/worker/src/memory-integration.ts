@@ -6,8 +6,8 @@
  * and for building context from stored memories.
  */
 
-import type { IMemoryStore, MemoryType, MemoryEntry } from '@mustard/memory';
-import { ContextBuilder } from '@mustard/memory';
+import type { IMemoryStore, MemoryType, MemoryEntry } from '@pram1t/mustard-memory';
+import { ContextBuilder } from '@pram1t/mustard-memory';
 import type { WorkerRole } from './types.js';
 
 /**

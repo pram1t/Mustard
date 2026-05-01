@@ -4,7 +4,7 @@ import type {
   IntentAction,
   IntentType,
   RiskLevel,
-} from '@mustard/collab-ai';
+} from '@pram1t/mustard-collab-ai';
 import { RiskAssessor } from '../risk-assessor.js';
 import { SensitiveFileDetector } from '../sensitive-files.js';
 

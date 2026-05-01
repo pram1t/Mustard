@@ -1,58 +1,71 @@
 {
-  "name": "@mustard/cli",
-  "version": "1.0.0",
-  "description": "LLM-agnostic agentic coding assistant — an open-source alternative to Claude Code that works with any provider",
+  "name": "@pram1t/mustard",
+  "version": "1.0.0-rc.1",
+  "description": "Mustard CLI — an open collaborative IDE for human + AI development. Works with any LLM provider (OpenAI, Anthropic, Gemini, Ollama, OpenAI-compatible).",
   "author": "pram1t",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pram1t/openagent.git",
+    "url": "https://github.com/pram1t/Mustard.git",
     "directory": "apps/cli"
   },
-  "homepage": "https://github.com/pram1t/openagent#readme",
+  "homepage": "https://github.com/pram1t/Mustard#readme",
   "bugs": {
-    "url": "https://github.com/pram1t/openagent/issues"
+    "url": "https://github.com/pram1t/Mustard/issues"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "openagent": "./dist/index.js"
+    "mustard": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "build": "tsc",
     "dev": "tsx --watch src/index.ts",
-    "clean": "rm -rf dist",
-    "start": "tsx src/index.ts"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "start": "tsx src/index.ts",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
-    "openagent",
+    "mustard",
     "cli",
     "agent",
     "ai",
     "coding-assistant",
+    "collaboration",
+    "collab",
     "llm",
     "openai",
     "anthropic",
     "gemini",
     "ollama",
     "mcp",
-    "agentic"
+    "agentic",
+    "ide"
   ],
   "license": "MIT",
   "dependencies": {
-    "@mustard/artifact": "*",
-    "@mustard/config": "*",
-    "@mustard/core": "*",
-    "@mustard/hooks": "*",
-    "@mustard/llm": "*",
-    "@mustard/logger": "*",
-    "@mustard/mcp": "*",
-    "@mustard/memory": "*",
-    "@mustard/message-bus": "*",
-    "@mustard/orchestrator": "*",
-    "@mustard/queue": "*",
-    "@mustard/tools": "*",
-    "@mustard/server": "*",
-    "@mustard/worker": "*"
+    "@pram1t/mustard-artifact": "*",
+    "@pram1t/mustard-config": "*",
+    "@pram1t/mustard-core": "*",
+    "@pram1t/mustard-hooks": "*",
+    "@pram1t/mustard-llm": "*",
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-mcp": "*",
+    "@pram1t/mustard-memory": "*",
+    "@pram1t/mustard-message-bus": "*",
+    "@pram1t/mustard-orchestrator": "*",
+    "@pram1t/mustard-queue": "*",
+    "@pram1t/mustard-tools": "*",
+    "@pram1t/mustard-server": "*",
+    "@pram1t/mustard-worker": "*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

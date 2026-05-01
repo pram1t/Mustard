@@ -1,8 +1,18 @@
 {
-  "name": "@mustard/collab-presence",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Real-time presence, cursors, and activity tracking for OpenAgent Collab",
+  "name": "@pram1t/mustard-collab-presence",
+  "version": "1.0.0-rc.1",
+  "description": "Real-time presence, cursors, and activity tracking for Mustard Collab",
+  "author": "pram1t",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/Mustard.git",
+    "directory": "packages/collab-presence"
+  },
+  "homepage": "https://github.com/pram1t/Mustard#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/Mustard/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,14 +22,24 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/collab-core": "*"
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-collab-core": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

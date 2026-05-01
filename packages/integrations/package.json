@@ -1,8 +1,18 @@
 {
-  "name": "@mustard/integrations",
-  "version": "0.0.0",
-  "private": true,
-  "description": "External service integrations for OpenAgent V2 (GitHub, webhooks)",
+  "name": "@pram1t/mustard-integrations",
+  "version": "1.0.0-rc.1",
+  "description": "External service integrations for Mustard V2 (GitHub, webhooks)",
+  "author": "pram1t",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/Mustard.git",
+    "directory": "packages/integrations"
+  },
+  "homepage": "https://github.com/pram1t/Mustard#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/Mustard/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,14 +30,24 @@
       "default": "./dist/webhooks/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/message-bus": "*"
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-message-bus": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

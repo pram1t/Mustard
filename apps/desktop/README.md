@@ -4,7 +4,7 @@ Desktop application for OpenAgent, built with Electron and React.
 
 ## Architecture
 
-- **Main Process**: Node.js runtime with full system access, hosts @mustard/core
+- **Main Process**: Node.js runtime with full system access, hosts @pram1t/mustard-core
 - **Preload Script**: Isolated bridge between main and renderer
 - **Renderer Process**: Sandboxed React application, communicates only via `window.api`
 
@@ -23,7 +23,7 @@ npm install
 npm run dev --workspace=apps/desktop
 
 # Or via turbo
-npx turbo run dev --filter=@mustard/desktop
+npx turbo run dev --filter=@pram1t/mustard-desktop
 ```
 
 ## Build

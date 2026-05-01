@@ -5,8 +5,8 @@
  * Prevents context overflow by tracking tokens and removing older messages.
  */
 
-import type { Message, LLMProvider } from '@mustard/llm';
-import { getLogger } from '@mustard/logger';
+import type { Message, LLMProvider } from '@pram1t/mustard-llm';
+import { getLogger } from '@pram1t/mustard-logger';
 import type { ContextConfig, ContextState } from './types.js';
 import { DEFAULT_CONTEXT_CONFIG } from './types.js';
 

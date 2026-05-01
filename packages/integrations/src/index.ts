@@ -1,5 +1,5 @@
 /**
- * @mustard/integrations
+ * @pram1t/mustard-integrations
  *
  * External service integrations for OpenAgent V2.
  * Currently supports: GitHub, Webhooks

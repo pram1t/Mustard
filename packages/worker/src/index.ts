@@ -1,5 +1,5 @@
 /**
- * @mustard/worker
+ * @pram1t/mustard-worker
  *
  * Specialized AI worker infrastructure for OpenAgent V2.
  */

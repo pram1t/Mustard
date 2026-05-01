@@ -8,13 +8,13 @@
 
 | Package | Role |
 |---|---|
-| `@mustard/collab-core` | Rooms, participants, invitations, shared types |
-| `@mustard/collab-sync` | Yjs CRDT document + WebSocket sync provider (file-level edits — wired in Phase 12+) |
-| `@mustard/collab-presence` | Cursors, awareness, activity, follow |
-| `@mustard/collab-ai` | IntentEngine, ZoneManager, RateLimiter, AgentRegistry, ContextBridge, bus adapter |
-| `@mustard/collab-permissions` | ModeManager, ApprovalManager, RiskAssessor, SensitiveFileDetector, PermissionGateway |
-| `@mustard/collab-memory` | EphemeralMemory + SQLite-backed Session/Project/Team layers + ContextAssembler + Summarizer |
-| `@mustard/collab-server` | Fastify HTTP + WebSocket server, RoomRegistry, JWT auth |
+| `@pram1t/mustard-collab-core` | Rooms, participants, invitations, shared types |
+| `@pram1t/mustard-collab-sync` | Yjs CRDT document + WebSocket sync provider (file-level edits — wired in Phase 12+) |
+| `@pram1t/mustard-collab-presence` | Cursors, awareness, activity, follow |
+| `@pram1t/mustard-collab-ai` | IntentEngine, ZoneManager, RateLimiter, AgentRegistry, ContextBridge, bus adapter |
+| `@pram1t/mustard-collab-permissions` | ModeManager, ApprovalManager, RiskAssessor, SensitiveFileDetector, PermissionGateway |
+| `@pram1t/mustard-collab-memory` | EphemeralMemory + SQLite-backed Session/Project/Team layers + ContextAssembler + Summarizer |
+| `@pram1t/mustard-collab-server` | Fastify HTTP + WebSocket server, RoomRegistry, JWT auth |
 | `apps/web` | Next.js workspace UI (`/collab`, `/collab/[id]`) — CollabClient + useCollabSocket |
 | `apps/cli` | `openagent collab ...` subcommands + token cache |
 
@@ -41,7 +41,7 @@
 └───────────────────────────────────────────────────────────────────────┘
                                                │
                           ┌────────────────────▼────────────────────┐
-                          │        @mustard/collab-server         │
+                          │        @pram1t/mustard-collab-server         │
                           │                                          │
                           │   Fastify app ┬─ /auth/login            │
                           │               ├─ /rooms/...             │
@@ -70,7 +70,7 @@
 
 ## Auth (JWT)
 
-- HMAC-SHA256, sign + verify in `@mustard/collab-server/jwt`
+- HMAC-SHA256, sign + verify in `@pram1t/mustard-collab-server/jwt`
 - Issued by `POST /auth/login` with `{ participantId, roomId? }`
 - Required on every other route via the `auth: true` route-config flag
 - Tokens carry `sub` (participant id) and optional `roomId`

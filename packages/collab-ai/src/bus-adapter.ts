@@ -1,7 +1,7 @@
 /**
  * Bus adapter for the IntentEngine.
  *
- * Fans IntentEngine events out to an @mustard/message-bus instance so
+ * Fans IntentEngine events out to an @pram1t/mustard-message-bus instance so
  * cross-package consumers (Phase-6 collab-permissions, the web
  * workspace, the Phase-11 agent-loop integration) can subscribe without
  * holding a direct reference to the engine.
@@ -17,7 +17,7 @@
  * event before the calling code regains control.
  */
 
-import type { IMessageBus, MessageType } from '@mustard/message-bus';
+import type { IMessageBus, MessageType } from '@pram1t/mustard-message-bus';
 import type { IntentEngine } from './intent-engine.js';
 import type { Intent } from './types.js';
 

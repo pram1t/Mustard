@@ -5,11 +5,11 @@
  * Supports both sequential (dispatchNext) and parallel (runAll) execution.
  */
 
-import type { IMessageBus } from '@mustard/message-bus';
-import type { IMemoryStore } from '@mustard/memory';
-import type { IArtifactStore, IHandoffManager } from '@mustard/artifact';
-import type { WorkerFactory, IWorker } from '@mustard/worker';
-import type { TaskQueue, QueueTask } from '@mustard/queue';
+import type { IMessageBus } from '@pram1t/mustard-message-bus';
+import type { IMemoryStore } from '@pram1t/mustard-memory';
+import type { IArtifactStore, IHandoffManager } from '@pram1t/mustard-artifact';
+import type { WorkerFactory, IWorker } from '@pram1t/mustard-worker';
+import type { TaskQueue, QueueTask } from '@pram1t/mustard-queue';
 import type { ExecutionPlan, StepResult } from './types.js';
 
 /**

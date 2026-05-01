@@ -4,7 +4,7 @@
  * Types for real-time presence, cursors, and activity tracking.
  */
 
-import type { SelectionRange } from '@mustard/collab-core';
+import type { SelectionRange } from '@pram1t/mustard-collab-core';
 
 // ============================================================================
 // Awareness State

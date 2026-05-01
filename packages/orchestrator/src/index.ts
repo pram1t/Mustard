@@ -1,5 +1,5 @@
 /**
- * @mustard/orchestrator
+ * @pram1t/mustard-orchestrator
  *
  * Multi-worker orchestrator for OpenAgent V2.
  * Coordinates planning, dispatching, monitoring, and result collection.

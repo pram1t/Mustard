@@ -9,8 +9,8 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { getConfig } from '@mustard/config';
-import { getLogger } from '@mustard/logger';
+import { getConfig } from '@pram1t/mustard-config';
+import { getLogger } from '@pram1t/mustard-logger';
 
 /**
  * Maximum allowed path length

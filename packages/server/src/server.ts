@@ -7,9 +7,9 @@
 import Fastify, { type FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import websocket from '@fastify/websocket';
-import { EventBus } from '@mustard/message-bus';
-import { Orchestrator } from '@mustard/orchestrator';
-import { WorkerRegistry } from '@mustard/worker';
+import { EventBus } from '@pram1t/mustard-message-bus';
+import { Orchestrator } from '@pram1t/mustard-orchestrator';
+import { WorkerRegistry } from '@pram1t/mustard-worker';
 import { registerRequestRoutes } from './routes/requests.js';
 import { registerWorkerRoutes } from './routes/workers.js';
 import { registerTaskRoutes } from './routes/tasks.js';

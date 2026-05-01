@@ -4,8 +4,8 @@
  * Types for the orchestrator that plans, dispatches, and monitors multi-worker execution.
  */
 
-import type { WorkerRole } from '@mustard/worker';
-import type { TaskPriority } from '@mustard/queue';
+import type { WorkerRole } from '@pram1t/mustard-worker';
+import type { TaskPriority } from '@pram1t/mustard-queue';
 
 // =============================================================================
 // PLAN
@@ -122,17 +122,17 @@ export interface OrchestratorConfig {
  */
 export interface OrchestratorDeps {
   /** LLM router for planner */
-  router: import('@mustard/llm').LLMRouter;
+  router: import('@pram1t/mustard-llm').LLMRouter;
 
   /** Tool registry for workers */
-  tools: import('@mustard/tools').IToolRegistry;
+  tools: import('@pram1t/mustard-tools').IToolRegistry;
 
   /** Message bus for events */
-  bus: import('@mustard/message-bus').IMessageBus;
+  bus: import('@pram1t/mustard-message-bus').IMessageBus;
 
   /** Optional memory store */
-  memoryStore?: import('@mustard/memory').IMemoryStore;
+  memoryStore?: import('@pram1t/mustard-memory').IMemoryStore;
 
   /** Optional artifact store */
-  artifactStore?: import('@mustard/artifact').IArtifactStore;
+  artifactStore?: import('@pram1t/mustard-artifact').IArtifactStore;
 }

@@ -1,5 +1,5 @@
 /**
- * @mustard/logger
+ * @pram1t/mustard-logger
  *
  * Structured logging for OpenAgent.
  */

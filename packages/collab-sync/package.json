@@ -1,8 +1,18 @@
 {
-  "name": "@mustard/collab-sync",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Yjs CRDT document and WebSocket sync provider for OpenAgent Collab",
+  "name": "@pram1t/mustard-collab-sync",
+  "version": "1.0.0-rc.1",
+  "description": "Yjs CRDT document and WebSocket sync provider for Mustard Collab",
+  "author": "pram1t",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/Mustard.git",
+    "directory": "packages/collab-sync"
+  },
+  "homepage": "https://github.com/pram1t/Mustard#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/Mustard/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,17 +22,27 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/collab-core": "*",
     "yjs": "^13.6.0",
     "y-websocket": "^1.5.0",
-    "lib0": "^0.2.0"
+    "lib0": "^0.2.0",
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-collab-core": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

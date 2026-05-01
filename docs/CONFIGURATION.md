@@ -13,10 +13,10 @@ OpenAgent uses a centralized configuration system with:
 
 ## Package
 
-Configuration is provided by the `@mustard/config` package.
+Configuration is provided by the `@pram1t/mustard-config` package.
 
 ```typescript
-import { getConfig, loadConfig, validateConfig } from '@mustard/config';
+import { getConfig, loadConfig, validateConfig } from '@pram1t/mustard-config';
 ```
 
 ## Quick Start
@@ -39,7 +39,7 @@ LOG_LEVEL=debug
 ### Accessing Configuration
 
 ```typescript
-import { getConfig } from '@mustard/config';
+import { getConfig } from '@pram1t/mustard-config';
 
 const config = getConfig();
 
@@ -99,7 +99,7 @@ import type {
   LogLevel,
   LogFormat,
   LLMProvider,
-} from '@mustard/config';
+} from '@pram1t/mustard-config';
 ```
 
 ### Config Structure
@@ -140,7 +140,7 @@ interface Config {
 Configuration is validated using Zod schemas:
 
 ```typescript
-import { ConfigSchema, validateConfig, ConfigError } from '@mustard/config';
+import { ConfigSchema, validateConfig, ConfigError } from '@pram1t/mustard-config';
 
 try {
   const config = validateConfig(userInput);
@@ -156,7 +156,7 @@ try {
 Validate required configuration at application startup:
 
 ```typescript
-import { loadConfig, validateStartup } from '@mustard/config';
+import { loadConfig, validateStartup } from '@pram1t/mustard-config';
 
 const config = loadConfig();
 
@@ -175,7 +175,7 @@ try {
 You can pass custom configuration programmatically:
 
 ```typescript
-import { ConfigSchema } from '@mustard/config';
+import { ConfigSchema } from '@pram1t/mustard-config';
 
 const customConfig = ConfigSchema.parse({
   logging: { level: 'debug' },
@@ -188,7 +188,7 @@ const customConfig = ConfigSchema.parse({
 For testing, you can reset the cached configuration:
 
 ```typescript
-import { resetConfig, getConfig } from '@mustard/config';
+import { resetConfig, getConfig } from '@pram1t/mustard-config';
 
 // Reset cache
 resetConfig();
@@ -202,7 +202,7 @@ const freshConfig = getConfig();
 Configuration supports partial objects with defaults:
 
 ```typescript
-import { ConfigSchema } from '@mustard/config';
+import { ConfigSchema } from '@pram1t/mustard-config';
 
 // Only override what you need
 const config = ConfigSchema.parse({
@@ -253,7 +253,7 @@ Solution: Check the valid ranges in the schema documentation above.
 If changes to `.env` aren't reflected, the config may be cached:
 
 ```typescript
-import { resetConfig, getConfig } from '@mustard/config';
+import { resetConfig, getConfig } from '@pram1t/mustard-config';
 
 resetConfig();
 const config = getConfig();

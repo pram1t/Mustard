@@ -7,7 +7,7 @@ import {
   formatProgressBar,
   formatPlanSummary,
 } from '../progress.js';
-import type { OrchestratorResult } from '@mustard/orchestrator';
+import type { OrchestratorResult } from '@pram1t/mustard-orchestrator';
 
 describe('Progress Formatters', () => {
   describe('formatPlanCreated', () => {

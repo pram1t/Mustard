@@ -4,8 +4,8 @@
  * Creates worker instances from definitions in the registry.
  */
 
-import type { LLMRouter } from '@mustard/llm';
-import type { IToolRegistry } from '@mustard/tools';
+import type { LLMRouter } from '@pram1t/mustard-llm';
+import type { IToolRegistry } from '@pram1t/mustard-tools';
 import { BaseWorker } from './base-worker.js';
 import { WorkerRegistry } from './registry.js';
 import { WorkerChannel } from './communication.js';

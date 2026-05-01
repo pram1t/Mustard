@@ -19,8 +19,8 @@ import {
   OpenAICompatibleProvider,
   createRouter,
   type LLMProvider,
-} from '@mustard/llm';
-import { createDefaultRegistry, type ToolRegistry } from '@mustard/tools';
+} from '@pram1t/mustard-llm';
+import { createDefaultRegistry, type ToolRegistry } from '@pram1t/mustard-tools';
 import {
   AgentLoop,
   PermissionManager,
@@ -28,16 +28,16 @@ import {
   type PermissionMode,
   type ApprovalCallback,
   type SessionData,
-} from '@mustard/core';
-import { createLogger, setDefaultLogger } from '@mustard/logger';
+} from '@pram1t/mustard-core';
+import { createLogger, setDefaultLogger } from '@pram1t/mustard-logger';
 import {
   loadConfig,
   validateStartup,
   loadResolvedConfig,
   type HooksConfig,
-} from '@mustard/config';
+} from '@pram1t/mustard-config';
 import { initCommand, configCommand, plansCommand, orchestrateCommand, workerCommand, requestCommand, serverCommand } from './commands/index.js';
-import { createHookExecutor, type HookExecutor } from '@mustard/hooks';
+import { createHookExecutor, type HookExecutor } from '@pram1t/mustard-hooks';
 import {
   MCPRegistry,
   createRegistry,
@@ -47,8 +47,8 @@ import {
   type AggregatedTool,
   type CallToolResult,
   type ContentItem,
-} from '@mustard/mcp';
-import type { Tool, ToolParameters, ToolResult, ExecutionContext } from '@mustard/tools';
+} from '@pram1t/mustard-mcp';
+import type { Tool, ToolParameters, ToolResult, ExecutionContext } from '@pram1t/mustard-tools';
 
 const VERSION = '0.0.0';
 
@@ -1204,7 +1204,7 @@ async function main(): Promise<void> {
       }
     }
 
-    // Create agent - system prompt is auto-generated with OS awareness by @mustard/core
+    // Create agent - system prompt is auto-generated with OS awareness by @pram1t/mustard-core
     const agent = new AgentLoop(router, {
       tools,
       cwd: process.cwd(),

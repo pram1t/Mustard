@@ -9,7 +9,7 @@
 
 import type { FastifyInstance } from 'fastify';
 import type { AppContext } from '../server.js';
-import type { ExecutionPlan, OrchestratorResult } from '@mustard/orchestrator';
+import type { ExecutionPlan, OrchestratorResult } from '@pram1t/mustard-orchestrator';
 
 // In-memory plan store (plans live only for this server session)
 const planStore = new Map<string, ExecutionPlan>();

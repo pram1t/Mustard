@@ -1,5 +1,5 @@
 /**
- * @mustard/memory
+ * @pram1t/mustard-memory
  *
  * Persistent memory with SQLite + FTS5 full-text search for OpenAgent V2.
  */

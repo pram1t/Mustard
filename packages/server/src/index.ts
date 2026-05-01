@@ -1,5 +1,5 @@
 /**
- * @mustard/server
+ * @pram1t/mustard-server
  *
  * Fastify HTTP/WebSocket API server for OpenAgent V2.
  */

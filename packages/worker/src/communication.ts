@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { IMessageBus, MessageEnvelope } from '@mustard/message-bus';
+import type { IMessageBus, MessageEnvelope } from '@pram1t/mustard-message-bus';
 import type { WorkerRole } from './types.js';
 
 /**

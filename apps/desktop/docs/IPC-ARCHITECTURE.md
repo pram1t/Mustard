@@ -99,9 +99,9 @@ All handlers currently return stub data. Real service integration by phase:
 
 | Handler Group | Service | Integration Phase |
 |---|---|---|
-| Agent (chat, stop, status) | @mustard/core AgentLoop | Phase 5 |
-| Config (get, set, providers, models) | @mustard/config | Phase 5+ |
-| MCP (list, add, remove, status, restart) | @mustard/mcp | Phase 8+ |
+| Agent (chat, stop, status) | @pram1t/mustard-core AgentLoop | Phase 5 |
+| Config (get, set, providers, models) | @pram1t/mustard-config | Phase 5+ |
+| MCP (list, add, remove, status, restart) | @pram1t/mustard-mcp | Phase 8+ |
 | Window (minimize, maximize, close) | BrowserWindow | Already functional |
 | App (version) | `app.getVersion()` | Already functional |
 | App (checkUpdate) | Auto-updater | Phase 19 |

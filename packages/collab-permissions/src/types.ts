@@ -4,8 +4,8 @@
  * Types for Plan/Code/Ask/Auto modes, risk assessment, and sensitive file detection.
  */
 
-import type { PermissionMode } from '@mustard/collab-core';
-import type { IntentType, RiskLevel } from '@mustard/collab-ai';
+import type { PermissionMode } from '@pram1t/mustard-collab-core';
+import type { IntentType, RiskLevel } from '@pram1t/mustard-collab-ai';
 
 // ============================================================================
 // Mode Rules

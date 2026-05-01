@@ -3,7 +3,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { IMessageBus } from '@mustard/message-bus';
+import type { IMessageBus } from '@pram1t/mustard-message-bus';
 import { WebhookSender } from './sender.js';
 import type { WebhookConfig, WebhookPayload, WebhookRegistration, WebhookResult } from './types.js';
 

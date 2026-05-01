@@ -14,7 +14,7 @@ import {
   loadProjectConfig,
   loadGlobalConfig,
   findProjectRoot,
-} from '@mustard/config';
+} from '@pram1t/mustard-config';
 
 export type ConfigAction = 'list' | 'get' | 'set' | 'edit' | 'path';
 

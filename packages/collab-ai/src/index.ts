@@ -1,5 +1,5 @@
 /**
- * @mustard/collab-ai
+ * @pram1t/mustard-collab-ai
  *
  * AI intent engine, zone claiming, and agent coordination for OpenAgent Collab.
  */

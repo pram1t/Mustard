@@ -5,7 +5,7 @@
  */
 
 import type { CursorState, RemoteCursor, UserInfo, ActivityState } from './types.js';
-import type { SelectionRange } from '@mustard/collab-core';
+import type { SelectionRange } from '@pram1t/mustard-collab-core';
 
 // ============================================================================
 // CursorTracker

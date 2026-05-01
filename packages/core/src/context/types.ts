@@ -4,7 +4,7 @@
  * Types for managing conversation context and token-based compaction.
  */
 
-import type { Message } from '@mustard/llm';
+import type { Message } from '@pram1t/mustard-llm';
 
 /**
  * Configuration for the context manager
