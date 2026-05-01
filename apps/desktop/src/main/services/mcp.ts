@@ -1,11 +1,11 @@
 /**
  * MCP Service
  *
- * Wraps @openagent/mcp MCPRegistry as a thin delegation layer.
+ * Wraps @mustard/mcp MCPRegistry as a thin delegation layer.
  * Manages MCP server connections and tool listings.
  */
 
-import type { MCPRegistry } from '@openagent/mcp';
+import type { MCPRegistry } from '@mustard/mcp';
 import type {
   MCPServerInfo,
   MCPServerInput,

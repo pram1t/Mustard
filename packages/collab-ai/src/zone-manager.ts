@@ -5,7 +5,7 @@
  * Key rule: humans always override AI claims.
  */
 
-import type { Range } from '@openagent/collab-core';
+import type { Range } from '@mustard/collab-core';
 import type { ClaimedZone, ZoneClaimRequest, ZoneClaimResult } from './types.js';
 
 // ============================================================================

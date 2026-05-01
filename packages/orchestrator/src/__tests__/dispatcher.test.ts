@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { EventBus } from '@openagent/message-bus';
-import { TaskQueue } from '@openagent/queue';
+import { EventBus } from '@mustard/message-bus';
+import { TaskQueue } from '@mustard/queue';
 import { Dispatcher } from '../dispatcher.js';
 import type { ExecutionPlan } from '../types.js';
 

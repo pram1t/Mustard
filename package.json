@@ -1,7 +1,7 @@
 {
-  "name": "openagent",
+  "name": "mustard",
   "version": "1.0.0",
-  "description": "An open-source, LLM-agnostic agentic coding assistant",
+  "description": "Mustard — an open collaborative IDE for human + AI development",
   "private": true,
   "type": "module",
   "packageManager": "npm@10.0.0",

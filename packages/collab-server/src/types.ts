@@ -1,5 +1,5 @@
 /**
- * Shared types for @openagent/collab-server.
+ * Shared types for @mustard/collab-server.
  */
 
 export interface CollabServerConfig {

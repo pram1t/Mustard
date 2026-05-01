@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, beforeAll, afterEach } from 'vitest';
 import type { RequestOptions } from '../request.js';
 
-// Mock @openagent/orchestrator
-vi.mock('@openagent/orchestrator', () => {
+// Mock @mustard/orchestrator
+vi.mock('@mustard/orchestrator', () => {
   class MockOrchestrator {
     config: any;
     deps: any;
@@ -51,8 +51,8 @@ vi.mock('@openagent/orchestrator', () => {
   };
 });
 
-vi.mock('@openagent/message-bus', async () => {
-  const actual = await vi.importActual('@openagent/message-bus');
+vi.mock('@mustard/message-bus', async () => {
+  const actual = await vi.importActual('@mustard/message-bus');
   return actual;
 });
 

@@ -24,7 +24,7 @@ Think of it as an open-source alternative to Claude Code that works with the mod
 - [API reference](docs/COLLAB-API.md) — REST + WebSocket
 - [Integration guide](docs/COLLAB-INTEGRATION.md) — package map, runtime topology, event flow
 
-The Collab stack ships as `@openagent/collab-core`, `@openagent/collab-sync`, `@openagent/collab-presence`, `@openagent/collab-ai`, `@openagent/collab-permissions`, `@openagent/collab-memory`, and `@openagent/collab-server`. The CLI exposes `openagent collab ...` subcommands; the web app lives at `apps/web` (Next.js 15) with `/collab` and `/collab/[id]` routes.
+The Collab stack ships as `@mustard/collab-core`, `@mustard/collab-sync`, `@mustard/collab-presence`, `@mustard/collab-ai`, `@mustard/collab-permissions`, `@mustard/collab-memory`, and `@mustard/collab-server`. The CLI exposes `openagent collab ...` subcommands; the web app lives at `apps/web` (Next.js 15) with `/collab` and `/collab/[id]` routes.
 
 ## Quick Start
 
@@ -148,7 +148,7 @@ openagent/
 
 ### Key design principles
 
-1. **LLM-agnostic core** -- The `@openagent/llm` package provides a unified interface. Adding a new provider means implementing a single adapter.
+1. **LLM-agnostic core** -- The `@mustard/llm` package provides a unified interface. Adding a new provider means implementing a single adapter.
 2. **Modular packages** -- Each concern (tools, config, hooks, MCP, memory) lives in its own package with a clear API boundary.
 3. **CLI-first** -- Features land in the CLI first; the desktop app is a thin presentation layer over the same core.
 4. **Extensible via MCP** -- Any MCP-compatible server can add new tools without touching the core codebase.
@@ -190,10 +190,10 @@ npm run lint
 
 ### Adding a new package
 
-1. Create a directory under `packages/` with a `package.json` scoped to `@openagent/`.
+1. Create a directory under `packages/` with a `package.json` scoped to `@mustard/`.
 2. Add it to the root `workspaces` list if needed.
 3. Run `npm install` from the repo root.
-4. Import from other packages using the `@openagent/<name>` specifier.
+4. Import from other packages using the `@mustard/<name>` specifier.
 
 ## Contributing
 

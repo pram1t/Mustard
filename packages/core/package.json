@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/core",
+  "name": "@mustard/core",
   "version": "0.0.0",
   "description": "Core functionality for OpenAgent - Agent Loop and Context Management",
   "main": "./dist/index.js",
@@ -18,11 +18,11 @@
   "keywords": ["openagent", "core", "agent", "llm"],
   "license": "MIT",
   "dependencies": {
-    "@openagent/config": "*",
-    "@openagent/hooks": "*",
-    "@openagent/logger": "*",
-    "@openagent/llm": "*",
-    "@openagent/tools": "*"
+    "@mustard/config": "*",
+    "@mustard/hooks": "*",
+    "@mustard/logger": "*",
+    "@mustard/llm": "*",
+    "@mustard/tools": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

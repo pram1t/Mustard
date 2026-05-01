@@ -1,8 +1,8 @@
 {
-  "name": "openagent-desktop",
+  "name": "@mustard/desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "OpenAgent Desktop application",
+  "description": "Mustard Desktop application",
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -19,11 +19,11 @@
     "audit:security": "npm audit --audit-level=high"
   },
   "dependencies": {
-    "@openagent/config": "*",
-    "@openagent/core": "*",
-    "@openagent/llm": "*",
-    "@openagent/mcp": "*",
-    "@openagent/tools": "*",
+    "@mustard/config": "*",
+    "@mustard/core": "*",
+    "@mustard/llm": "*",
+    "@mustard/mcp": "*",
+    "@mustard/tools": "*",
     "dompurify": "^3.3.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",

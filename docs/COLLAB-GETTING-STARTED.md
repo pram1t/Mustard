@@ -13,7 +13,7 @@ Get a local Collab room up and running in ~5 minutes.
 
 ## 1. Start the Collab server
 
-The Phase-8 server (`@openagent/collab-server`) needs a JWT secret.
+The Phase-8 server (`@mustard/collab-server`) needs a JWT secret.
 Anything random works for dev:
 
 ```js

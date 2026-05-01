@@ -4,9 +4,9 @@
  * Handles parallel execution of tool calls with proper error handling.
  */
 
-import type { ToolCall } from '@openagent/llm';
-import type { ToolResult, IToolRegistry, ExecutionContext } from '@openagent/tools';
-import { getLogger } from '@openagent/logger';
+import type { ToolCall } from '@mustard/llm';
+import type { ToolResult, IToolRegistry, ExecutionContext } from '@mustard/tools';
+import { getLogger } from '@mustard/logger';
 
 /**
  * Execute multiple tool calls in parallel.

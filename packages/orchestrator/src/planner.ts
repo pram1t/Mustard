@@ -6,7 +6,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import type { LLMRouter, TextChunk } from '@openagent/llm';
+import type { LLMRouter, TextChunk } from '@mustard/llm';
 import type { ExecutionPlan, PlanStep } from './types.js';
 
 /**

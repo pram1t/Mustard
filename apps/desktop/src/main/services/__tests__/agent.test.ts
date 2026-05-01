@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock core dependencies
-vi.mock('@openagent/core', () => ({
+vi.mock('@mustard/core', () => ({
   createAgent: vi.fn(() => ({
     getState: vi.fn(() => ({ iteration: 0, toolCallCount: 0, isRunning: false })),
     run: vi.fn(async function* () {
@@ -41,8 +41,8 @@ vi.mock('../../../shared/event-types', () => ({
 }));
 
 import { AgentService } from '../agent';
-import type { LLMRouter } from '@openagent/llm';
-import type { IToolRegistry } from '@openagent/tools';
+import type { LLMRouter } from '@mustard/llm';
+import type { IToolRegistry } from '@mustard/tools';
 
 describe('AgentService', () => {
   let service: AgentService;

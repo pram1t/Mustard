@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EventBus, type MessageEnvelope } from '@openagent/message-bus';
+import { EventBus, type MessageEnvelope } from '@mustard/message-bus';
 import { IntentEngine } from '../intent-engine.js';
 import type { Intent } from '../types.js';
 import {

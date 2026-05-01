@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/collab-ai",
+  "name": "@mustard/collab-ai",
   "version": "0.0.0",
   "private": true,
   "description": "AI intent engine, zone claiming, and agent coordination for OpenAgent Collab",
@@ -18,10 +18,10 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/logger": "*",
-    "@openagent/collab-core": "*",
-    "@openagent/collab-presence": "*",
-    "@openagent/message-bus": "*"
+    "@mustard/logger": "*",
+    "@mustard/collab-core": "*",
+    "@mustard/collab-presence": "*",
+    "@mustard/message-bus": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

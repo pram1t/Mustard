@@ -4,10 +4,10 @@
  * Multi-worker orchestrated execution: plan → queue → dispatch → result.
  */
 
-import type { LLMRouter } from '@openagent/llm';
-import type { IToolRegistry } from '@openagent/tools';
-import { EventBus, type MessageEnvelope } from '@openagent/message-bus';
-import { Orchestrator, type OrchestratorConfig, type OrchestratorDeps } from '@openagent/orchestrator';
+import type { LLMRouter } from '@mustard/llm';
+import type { IToolRegistry } from '@mustard/tools';
+import { EventBus, type MessageEnvelope } from '@mustard/message-bus';
+import { Orchestrator, type OrchestratorConfig, type OrchestratorDeps } from '@mustard/orchestrator';
 import {
   formatPlanCreated,
   formatTaskStarted,

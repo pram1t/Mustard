@@ -1,12 +1,12 @@
 /**
- * CLI-side typed REST client for @openagent/collab-server.
+ * CLI-side typed REST client for @mustard/collab-server.
  *
  * Same shape as the web client (apps/web/src/lib/collab-client.ts) but
  * carries a small token cache that persists JWTs to
  * ~/.openagent/collab/tokens.json keyed by participantId. This lets
  * the CLI re-use a token across invocations until it expires.
  *
- * Future cleanup: extract to a shared @openagent/collab-client package
+ * Future cleanup: extract to a shared @mustard/collab-client package
  * so web + CLI share one implementation. For now duplicated to keep
  * Phase 10 diffs tight.
  */

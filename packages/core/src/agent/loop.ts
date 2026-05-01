@@ -6,12 +6,12 @@
  */
 
 import { randomUUID } from 'crypto';
-import type { Message, ChatParams, ToolCall, StreamChunk, ToolDefinition } from '@openagent/llm';
-import type { LLMRouter } from '@openagent/llm';
-import type { ToolResult, ExecutionContext, ISubagentManager } from '@openagent/tools';
-import type { HookExecutor, HookResult } from '@openagent/hooks';
+import type { Message, ChatParams, ToolCall, StreamChunk, ToolDefinition } from '@mustard/llm';
+import type { LLMRouter } from '@mustard/llm';
+import type { ToolResult, ExecutionContext, ISubagentManager } from '@mustard/tools';
+import type { HookExecutor, HookResult } from '@mustard/hooks';
 import type { PermissionManager } from '../permissions/index.js';
-import { getLogger } from '@openagent/logger';
+import { getLogger } from '@mustard/logger';
 import { ContextManager } from '../context/manager.js';
 import { SubagentManager } from './subagent.js';
 import type {
@@ -585,7 +585,7 @@ export class AgentLoop {
    * Emit hook events as a generator.
    */
   private *emitHookEvents(
-    event: import('@openagent/hooks').HookEvent,
+    event: import('@mustard/hooks').HookEvent,
     hookResult: HookResult,
     hookCount: number
   ): Generator<AgentEvent> {
@@ -598,7 +598,7 @@ export class AgentLoop {
    * Collect hook events into an array.
    */
   private collectHookEvents(
-    event: import('@openagent/hooks').HookEvent,
+    event: import('@mustard/hooks').HookEvent,
     hookResult: HookResult,
     hookCount: number
   ): AgentEvent[] {

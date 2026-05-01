@@ -19,8 +19,8 @@ import {
   OpenAICompatibleProvider,
   createRouter,
   type LLMProvider,
-} from '@openagent/llm';
-import { createDefaultRegistry, type ToolRegistry } from '@openagent/tools';
+} from '@mustard/llm';
+import { createDefaultRegistry, type ToolRegistry } from '@mustard/tools';
 import {
   AgentLoop,
   PermissionManager,
@@ -28,16 +28,16 @@ import {
   type PermissionMode,
   type ApprovalCallback,
   type SessionData,
-} from '@openagent/core';
-import { createLogger, setDefaultLogger } from '@openagent/logger';
+} from '@mustard/core';
+import { createLogger, setDefaultLogger } from '@mustard/logger';
 import {
   loadConfig,
   validateStartup,
   loadResolvedConfig,
   type HooksConfig,
-} from '@openagent/config';
+} from '@mustard/config';
 import { initCommand, configCommand, plansCommand, orchestrateCommand, workerCommand, requestCommand, serverCommand } from './commands/index.js';
-import { createHookExecutor, type HookExecutor } from '@openagent/hooks';
+import { createHookExecutor, type HookExecutor } from '@mustard/hooks';
 import {
   MCPRegistry,
   createRegistry,
@@ -47,8 +47,8 @@ import {
   type AggregatedTool,
   type CallToolResult,
   type ContentItem,
-} from '@openagent/mcp';
-import type { Tool, ToolParameters, ToolResult, ExecutionContext } from '@openagent/tools';
+} from '@mustard/mcp';
+import type { Tool, ToolParameters, ToolResult, ExecutionContext } from '@mustard/tools';
 
 const VERSION = '0.0.0';
 
@@ -1204,7 +1204,7 @@ async function main(): Promise<void> {
       }
     }
 
-    // Create agent - system prompt is auto-generated with OS awareness by @openagent/core
+    // Create agent - system prompt is auto-generated with OS awareness by @mustard/core
     const agent = new AgentLoop(router, {
       tools,
       cwd: process.cwd(),

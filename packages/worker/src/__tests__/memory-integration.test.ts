@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WorkerMemory } from '../memory-integration.js';
-import type { IMemoryStore, MemoryEntry, MemoryInput, MemoryQuery, SearchResult } from '@openagent/memory';
+import type { IMemoryStore, MemoryEntry, MemoryInput, MemoryQuery, SearchResult } from '@mustard/memory';
 
 /**
  * Create a mock MemoryStore for testing.

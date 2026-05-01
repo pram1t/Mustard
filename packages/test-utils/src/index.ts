@@ -1,5 +1,5 @@
 /**
- * @openagent/test-utils
+ * @mustard/test-utils
  *
  * Testing utilities for OpenAgent packages.
  */

@@ -11,7 +11,7 @@ import {
   builtinDefinitions,
   type WorkerDefinition,
   type WorkerRole,
-} from '@openagent/worker';
+} from '@mustard/worker';
 
 export type WorkerAction = 'list' | 'info';
 

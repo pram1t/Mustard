@@ -33,7 +33,7 @@ COPY packages/ packages/
 COPY apps/cli/ apps/cli/
 
 # Build all packages
-RUN npx turbo run build --filter=@openagent/server --filter=openagent-cli
+RUN npx turbo run build --filter=@mustard/server --filter=openagent-cli
 
 # ─── Runtime Stage ───────────────────────────────────────────
 FROM node:22-slim AS runtime

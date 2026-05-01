@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock config package
-vi.mock('@openagent/config', () => ({
+vi.mock('@mustard/config', () => ({
   getConfig: vi.fn(() => ({
     llm: {
       provider: 'openai',
@@ -20,7 +20,7 @@ vi.mock('@openagent/config', () => ({
 }));
 
 import { ConfigService } from '../config';
-import type { LLMRouter, LLMProvider } from '@openagent/llm';
+import type { LLMRouter, LLMProvider } from '@mustard/llm';
 import type { CredentialService } from '../credentials';
 
 describe('ConfigService', () => {
@@ -110,7 +110,7 @@ describe('ConfigService', () => {
     const result = await service.set({ apiKey: 'sk-new-key', model: 'gpt-4' });
     expect(result).toEqual({ success: true });
 
-    const { saveGlobalConfig } = await import('@openagent/config');
+    const { saveGlobalConfig } = await import('@mustard/config');
     expect(saveGlobalConfig).toHaveBeenCalledWith(
       expect.not.objectContaining({ apiKey: 'sk-new-key' }),
     );

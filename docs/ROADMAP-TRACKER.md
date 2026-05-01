@@ -47,7 +47,7 @@ FOUNDATION (Phases 1-6)     PHASE A (MVP)           PHASE B              PHASE C
 | Tool execution pipeline | ✅ Done | Parallel execution support |
 
 **Artifacts:**
-- `@openagent/core` package
+- `@mustard/core` package
 - `AgentLoop` class - main orchestration
 - `ContextManager` class - memory handling
 - Event types: text, tool_call, tool_result, error, done
@@ -68,7 +68,7 @@ FOUNDATION (Phases 1-6)     PHASE A (MVP)           PHASE B              PHASE C
 | Security utilities | ✅ Done | Path sanitization, command validation |
 
 **Artifacts:**
-- `@openagent/tools` package
+- `@mustard/tools` package
 - 6 built-in tools
 - `BaseTool` abstract class for custom tools
 - Security layer preventing path traversal, dangerous commands
@@ -106,7 +106,7 @@ FOUNDATION (Phases 1-6)     PHASE A (MVP)           PHASE B              PHASE C
 | Tool calling | ✅ Done | Unified tool call format |
 
 **Artifacts:**
-- `@openagent/llm` package
+- `@mustard/llm` package
 - 5 provider adapters
 - Unified streaming interface
 - Tool call normalization
@@ -126,7 +126,7 @@ FOUNDATION (Phases 1-6)     PHASE A (MVP)           PHASE B              PHASE C
 | Tool aggregation | ✅ Done | Prefix tools with server name |
 
 **Artifacts:**
-- `@openagent/mcp` package
+- `@mustard/mcp` package
 - `MCPClient` class
 - `MCPRegistry` for multiple servers
 - CLI subcommands for server management
@@ -137,10 +137,10 @@ FOUNDATION (Phases 1-6)     PHASE A (MVP)           PHASE B              PHASE C
 
 | Package | Status | Purpose |
 |---------|--------|---------|
-| `@openagent/config` | ✅ Done | Configuration loading, validation |
-| `@openagent/logger` | ✅ Done | Pino-based structured logging |
-| `@openagent/hooks` | ✅ Done | Lifecycle event hooks |
-| `@openagent/test-utils` | ✅ Done | Shared test utilities |
+| `@mustard/config` | ✅ Done | Configuration loading, validation |
+| `@mustard/logger` | ✅ Done | Pino-based structured logging |
+| `@mustard/hooks` | ✅ Done | Lifecycle event hooks |
+| `@mustard/test-utils` | ✅ Done | Shared test utilities |
 
 ---
 
@@ -176,7 +176,7 @@ openagent mcp add myserver --command "npx @some/mcp-server"
 | CLI integration | ✅ Done | Hooks config loading |
 
 **Artifacts:**
-- `@openagent/hooks` package
+- `@mustard/hooks` package
 - 6 hook event types: session_start, stop, user_prompt_submit, pre_tool_use, post_tool_use, notification
 
 ---

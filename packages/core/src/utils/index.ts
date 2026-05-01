@@ -1,13 +1,13 @@
 /**
  * Utility exports
  *
- * Re-exports from @openagent/logger for backward compatibility.
+ * Re-exports from @mustard/logger for backward compatibility.
  */
 
 export {
   DEFAULT_SAFE_ENV_VARS,
   BLOCKED_ENV_VARS,
   filterEnvVars,
-} from '@openagent/logger';
+} from '@mustard/logger';
 
-export type { FilterEnvOptions } from '@openagent/logger';
+export type { FilterEnvOptions } from '@mustard/logger';

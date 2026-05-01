@@ -6,7 +6,7 @@
  */
 
 import { spawn } from 'child_process';
-import { getLogger, filterEnvVars } from '@openagent/logger';
+import { getLogger, filterEnvVars } from '@mustard/logger';
 import type {
   HookEvent,
   HookConfig,

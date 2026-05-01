@@ -5,7 +5,7 @@ import type { WorkerConfig, WorkerDefinition, WorkerStatus } from '../types.js';
 
 // ─── Mocks ──────────────────────────────────────────────────
 
-vi.mock('@openagent/core', () => ({
+vi.mock('@mustard/core', () => ({
   AgentLoop: vi.fn().mockImplementation(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     run: vi.fn().mockReturnValue({ [Symbol.asyncIterator]: () => ({ next: () => Promise.resolve({ done: true }) }) }),

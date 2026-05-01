@@ -5,7 +5,7 @@
  */
 
 import type { CursorState, RemoteCursor, UserInfo, ActivityState } from './types.js';
-import type { SelectionRange } from '@openagent/collab-core';
+import type { SelectionRange } from '@mustard/collab-core';
 
 // ============================================================================
 // CursorTracker

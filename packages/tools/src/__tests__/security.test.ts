@@ -11,7 +11,7 @@ import {
   validateRegexPattern,
   validateCommand,
 } from '../security';
-import { resetConfig } from '@openagent/config';
+import { resetConfig } from '@mustard/config';
 import { WriteTool } from '../builtin/write';
 import { EditTool } from '../builtin/edit';
 import { createTestContext } from '../registry';

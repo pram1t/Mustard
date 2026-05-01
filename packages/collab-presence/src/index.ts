@@ -1,5 +1,5 @@
 /**
- * @openagent/collab-presence
+ * @mustard/collab-presence
  *
  * Real-time presence, cursors, and activity tracking for OpenAgent Collab.
  */

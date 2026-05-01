@@ -1,6 +1,6 @@
 # OpenAgent Collab — API Reference
 
-REST + WebSocket reference for `@openagent/collab-server`. Every route
+REST + WebSocket reference for `@mustard/collab-server`. Every route
 except `/health` and `/auth/login` requires a Bearer JWT.
 
 Default base URL: `http://127.0.0.1:3200`
@@ -322,8 +322,8 @@ Common failures:
 
 ## Type cheatsheet
 
-The full TypeScript types live in `@openagent/collab-core`,
-`@openagent/collab-ai`, and `@openagent/collab-permissions`. Quick
+The full TypeScript types live in `@mustard/collab-core`,
+`@mustard/collab-ai`, and `@mustard/collab-permissions`. Quick
 reference of the shapes the API surfaces:
 
 ```ts

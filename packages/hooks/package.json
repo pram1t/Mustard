@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/hooks",
+  "name": "@mustard/hooks",
   "version": "0.0.0",
   "description": "Hook system for OpenAgent",
   "type": "module",
@@ -19,7 +19,7 @@
   "keywords": ["openagent", "hooks"],
   "license": "MIT",
   "dependencies": {
-    "@openagent/logger": "*"
+    "@mustard/logger": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/worker",
+  "name": "@mustard/worker",
   "version": "0.0.0",
   "private": true,
   "description": "Specialized AI worker infrastructure for OpenAgent V2",
@@ -18,10 +18,10 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/core": "*",
-    "@openagent/llm": "*",
-    "@openagent/tools": "*",
-    "@openagent/logger": "*"
+    "@mustard/core": "*",
+    "@mustard/llm": "*",
+    "@mustard/tools": "*",
+    "@mustard/logger": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

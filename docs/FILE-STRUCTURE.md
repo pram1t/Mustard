@@ -48,7 +48,7 @@ apps/
 ├── cli/                    # Command-line interface
 │   ├── src/
 │   │   └── index.ts        # Main CLI entry point
-│   ├── package.json        # CLI dependencies (@openagent/* packages)
+│   ├── package.json        # CLI dependencies (@mustard/* packages)
 │   └── tsconfig.json       # TypeScript config extending root
 │
 └── desktop/                # Desktop app (planned - Electron/Tauri)
@@ -413,16 +413,16 @@ docs/
 ## Package Dependencies
 
 ```
-@openagent/cli
-    ├── @openagent/core
-    │       ├── @openagent/llm
-    │       ├── @openagent/tools
-    │       └── @openagent/logger
-    ├── @openagent/llm
-    ├── @openagent/tools
-    ├── @openagent/mcp
-    ├── @openagent/config
-    └── @openagent/logger
+@mustard/cli
+    ├── @mustard/core
+    │       ├── @mustard/llm
+    │       ├── @mustard/tools
+    │       └── @mustard/logger
+    ├── @mustard/llm
+    ├── @mustard/tools
+    ├── @mustard/mcp
+    ├── @mustard/config
+    └── @mustard/logger
 ```
 
 ---
@@ -454,7 +454,7 @@ npm run dev
 ## Adding New Packages
 
 1. Create directory: `packages/my-package/`
-2. Add `package.json` with name `@openagent/my-package`
+2. Add `package.json` with name `@mustard/my-package`
 3. Add `tsconfig.json` extending root config
 4. Add `src/index.ts` as entry point
 5. Run `npm install` to link workspace

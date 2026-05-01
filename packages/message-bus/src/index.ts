@@ -1,5 +1,5 @@
 /**
- * @openagent/message-bus
+ * @mustard/message-bus
  *
  * In-memory event bus with wildcard pattern matching for OpenAgent V2.
  */

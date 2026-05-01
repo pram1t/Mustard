@@ -9,8 +9,8 @@ import type {
   IntentAction,
   IntentType,
   RiskLevel,
-} from '@openagent/collab-ai';
-import type { PermissionMode } from '@openagent/collab-core';
+} from '@mustard/collab-ai';
+import type { PermissionMode } from '@mustard/collab-core';
 
 interface ProposeIntentBody {
   agentId?: string;

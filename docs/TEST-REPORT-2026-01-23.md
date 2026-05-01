@@ -147,14 +147,14 @@
 
 | Package | Build Status |
 |---------|--------------|
-| @openagent/config | Success |
-| @openagent/logger | Success |
-| @openagent/tools | Success |
-| @openagent/core | Success |
-| @openagent/llm | Success |
-| @openagent/mcp | Success |
-| @openagent/hooks | Success |
-| @openagent/test-utils | Success |
+| @mustard/config | Success |
+| @mustard/logger | Success |
+| @mustard/tools | Success |
+| @mustard/core | Success |
+| @mustard/llm | Success |
+| @mustard/mcp | Success |
+| @mustard/hooks | Success |
+| @mustard/test-utils | Success |
 | openagent-cli | Success |
 
 **All 9 packages build successfully with zero TypeScript errors.**

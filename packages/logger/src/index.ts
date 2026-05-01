@@ -1,5 +1,5 @@
 /**
- * @openagent/logger
+ * @mustard/logger
  *
  * Structured logging for OpenAgent.
  */

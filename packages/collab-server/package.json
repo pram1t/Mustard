@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/collab-server",
+  "name": "@mustard/collab-server",
   "version": "0.0.0",
   "private": true,
   "description": "Fastify HTTP+WebSocket server for OpenAgent Collab",
@@ -19,12 +19,12 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@openagent/logger": "*",
-    "@openagent/message-bus": "*",
-    "@openagent/collab-core": "*",
-    "@openagent/collab-ai": "*",
-    "@openagent/collab-permissions": "*",
-    "@openagent/collab-memory": "*",
+    "@mustard/logger": "*",
+    "@mustard/message-bus": "*",
+    "@mustard/collab-core": "*",
+    "@mustard/collab-ai": "*",
+    "@mustard/collab-permissions": "*",
+    "@mustard/collab-memory": "*",
     "fastify": "^5.3.3",
     "@fastify/websocket": "^11.0.2",
     "@fastify/cors": "^11.0.0",

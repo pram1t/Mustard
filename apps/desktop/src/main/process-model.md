@@ -10,7 +10,7 @@
 |  | - Node.js runtime                                         ||
 |  | - File system access                                      ||
 |  | - Network requests                                        ||
-|  | - @openagent/core integration                             ||
+|  | - @mustard/core integration                             ||
 |  | - IPC handlers (transport only)                           ||
 |  +----------------------------------------------------------+|
 |                              |                                |

@@ -5,11 +5,11 @@
  * Supports both sequential (dispatchNext) and parallel (runAll) execution.
  */
 
-import type { IMessageBus } from '@openagent/message-bus';
-import type { IMemoryStore } from '@openagent/memory';
-import type { IArtifactStore, IHandoffManager } from '@openagent/artifact';
-import type { WorkerFactory, IWorker } from '@openagent/worker';
-import type { TaskQueue, QueueTask } from '@openagent/queue';
+import type { IMessageBus } from '@mustard/message-bus';
+import type { IMemoryStore } from '@mustard/memory';
+import type { IArtifactStore, IHandoffManager } from '@mustard/artifact';
+import type { WorkerFactory, IWorker } from '@mustard/worker';
+import type { TaskQueue, QueueTask } from '@mustard/queue';
 import type { ExecutionPlan, StepResult } from './types.js';
 
 /**

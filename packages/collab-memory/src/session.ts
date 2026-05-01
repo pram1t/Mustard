@@ -6,8 +6,8 @@
  * is recorded as a SessionEntry. When the session ends, the caller can
  * store a SessionSummary for future retrieval.
  *
- * Uses better-sqlite3 (same as @openagent/memory, same as
- * @openagent/artifact). All operations are synchronous — SQLite is
+ * Uses better-sqlite3 (same as @mustard/memory, same as
+ * @mustard/artifact). All operations are synchronous — SQLite is
  * local and fast.
  *
  * Schema ships with the class and is idempotent; a new SessionMemory

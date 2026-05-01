@@ -5,7 +5,7 @@
  * with role-specific tools, prompts, and capabilities.
  */
 
-import type { AgentEvent } from '@openagent/core';
+import type { AgentEvent } from '@mustard/core';
 
 // =============================================================================
 // WORKER ROLES
@@ -136,10 +136,10 @@ export interface WorkerConfig {
   systemPromptOverride?: string;
 
   /** Message bus for inter-worker communication (Phase 9) */
-  bus?: import('@openagent/message-bus').IMessageBus;
+  bus?: import('@mustard/message-bus').IMessageBus;
 
   /** Memory store for cross-session persistence (Phase 11) */
-  memoryStore?: import('@openagent/memory').IMemoryStore;
+  memoryStore?: import('@mustard/memory').IMemoryStore;
 
   /** Project ID for scoping memories (Phase 11) */
   projectId?: string;

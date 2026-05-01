@@ -1,5 +1,5 @@
 /**
- * @openagent/collab-server
+ * @mustard/collab-server
  *
  * Fastify HTTP + WebSocket server for OpenAgent Collab.
  */

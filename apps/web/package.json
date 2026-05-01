@@ -1,8 +1,8 @@
 {
-  "name": "openagent-web",
+  "name": "@mustard/web",
   "version": "0.0.0",
   "private": true,
-  "description": "OpenAgent V2 Visual Workspace — Next.js web dashboard",
+  "description": "Mustard Visual Workspace — Next.js web dashboard",
   "scripts": {
     "dev": "next dev --port 3200",
     "build": "next build",

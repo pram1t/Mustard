@@ -1,5 +1,5 @@
 {
-  "name": "@openagent/artifact",
+  "name": "@mustard/artifact",
   "version": "0.0.0",
   "private": true,
   "description": "Versioned artifact protocol with handoff state machine for OpenAgent V2",
@@ -18,7 +18,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@openagent/logger": "*",
+    "@mustard/logger": "*",
     "better-sqlite3": "^11.0.0",
     "zod": "^4.3.6"
   },

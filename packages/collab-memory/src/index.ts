@@ -1,5 +1,5 @@
 /**
- * @openagent/collab-memory
+ * @mustard/collab-memory
  *
  * 4-layer shared memory system for OpenAgent Collab.
  */

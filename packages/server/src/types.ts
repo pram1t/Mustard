@@ -4,11 +4,11 @@
  * Types for the Fastify HTTP/WebSocket API server.
  */
 
-import type { LLMRouter } from '@openagent/llm';
-import type { IToolRegistry } from '@openagent/tools';
-import type { IMessageBus } from '@openagent/message-bus';
-import type { IMemoryStore } from '@openagent/memory';
-import type { IArtifactStore } from '@openagent/artifact';
+import type { LLMRouter } from '@mustard/llm';
+import type { IToolRegistry } from '@mustard/tools';
+import type { IMessageBus } from '@mustard/message-bus';
+import type { IMemoryStore } from '@mustard/memory';
+import type { IArtifactStore } from '@mustard/artifact';
 
 /**
  * Server configuration.

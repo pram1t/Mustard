@@ -1,5 +1,5 @@
 /**
- * @openagent/collab-sync
+ * @mustard/collab-sync
  *
  * Yjs CRDT document and WebSocket sync provider for OpenAgent Collab.
  */

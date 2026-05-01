@@ -15,7 +15,7 @@ import type {
   Message,
   ValidationResult,
 } from './types.js';
-import { getLogger } from '@openagent/logger';
+import { getLogger } from '@mustard/logger';
 
 /**
  * Default router configuration

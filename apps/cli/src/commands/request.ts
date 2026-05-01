@@ -7,16 +7,16 @@
  */
 
 import * as readline from 'readline';
-import type { LLMRouter } from '@openagent/llm';
-import type { IToolRegistry } from '@openagent/tools';
-import { EventBus, type MessageEnvelope } from '@openagent/message-bus';
+import type { LLMRouter } from '@mustard/llm';
+import type { IToolRegistry } from '@mustard/tools';
+import { EventBus, type MessageEnvelope } from '@mustard/message-bus';
 import {
   Orchestrator,
   formatPlanForApproval,
   type OrchestratorConfig,
   type OrchestratorDeps,
   type ExecutionPlan,
-} from '@openagent/orchestrator';
+} from '@mustard/orchestrator';
 import {
   formatPlanCreated,
   formatTaskStarted,

@@ -5,7 +5,7 @@
  * Provides rule matching, approval caching, and user prompt callbacks.
  */
 
-import { getLogger } from '@openagent/logger';
+import { getLogger } from '@mustard/logger';
 import type {
   PermissionMode,
   PermissionDecision,

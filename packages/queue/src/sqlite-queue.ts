@@ -7,7 +7,7 @@
 
 import { randomUUID } from 'node:crypto';
 import Database from 'better-sqlite3';
-import type { IMessageBus } from '@openagent/message-bus';
+import type { IMessageBus } from '@mustard/message-bus';
 import type {
   ITaskQueue,
   QueueStats,

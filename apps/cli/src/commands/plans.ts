@@ -10,8 +10,8 @@ import {
   deletePlan,
   getPlansByStatus,
   findProjectRoot,
-} from '@openagent/config';
-import type { Plan } from '@openagent/config';
+} from '@mustard/config';
+import type { Plan } from '@mustard/config';
 
 export type PlansAction = 'list' | 'show' | 'delete';
 

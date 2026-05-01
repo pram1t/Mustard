@@ -72,7 +72,7 @@ BASH_ALLOWED_ENV_VARS=MY_CUSTOM_VAR,ANOTHER_SAFE_VAR
 Protects against path traversal attacks:
 
 ```typescript
-import { sanitizePath } from '@openagent/tools';
+import { sanitizePath } from '@mustard/tools';
 
 // Safe: Returns normalized path
 sanitizePath('subdir/file.txt', '/base');
@@ -92,7 +92,7 @@ sanitizePath('%2e%2e/etc/passwd', '/base');
 Protects against ReDoS (Regular Expression Denial of Service):
 
 ```typescript
-import { validateRegexPattern } from '@openagent/tools';
+import { validateRegexPattern } from '@mustard/tools';
 
 // Safe: Valid pattern
 validateRegexPattern('hello.*world'); // true
@@ -107,7 +107,7 @@ validateRegexPattern('(.*)+.*');
 Basic validation for shell commands:
 
 ```typescript
-import { validateCommand } from '@openagent/tools';
+import { validateCommand } from '@mustard/tools';
 
 // Safe: Normal command
 validateCommand('git status'); // true
@@ -197,7 +197,7 @@ SANITIZE_INPUTS=false
 - Limit file operations to project directories
 
 ```typescript
-import { sanitizePath } from '@openagent/tools';
+import { sanitizePath } from '@mustard/tools';
 
 const safePath = sanitizePath(userInput, projectRoot);
 ```

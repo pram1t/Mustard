@@ -5,7 +5,7 @@
  * when spawning child processes (Bash, MCP servers, hooks, etc.).
  */
 
-import { getLogger } from '@openagent/logger';
+import { getLogger } from '@mustard/logger';
 
 /**
  * Default safe environment variables that are always allowed.
