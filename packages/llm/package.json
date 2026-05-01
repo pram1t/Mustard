@@ -1,6 +1,6 @@
 {
   "name": "@pram1t/mustard-llm",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "LLM abstraction layer for Mustard",
   "author": "pram1t",
   "license": "MIT",

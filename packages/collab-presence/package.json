@@ -1,6 +1,6 @@
 {
   "name": "@pram1t/mustard-collab-presence",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Real-time presence, cursors, and activity tracking for Mustard Collab",
   "author": "pram1t",
   "license": "MIT",
