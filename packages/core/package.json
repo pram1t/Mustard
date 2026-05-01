@@ -1,7 +1,18 @@
 {
   "name": "@mustard/core",
-  "version": "0.0.0",
-  "description": "Core functionality for OpenAgent - Agent Loop and Context Management",
+  "version": "1.0.0-rc.1",
+  "description": "Core functionality for Mustard - Agent Loop and Context Management",
+  "author": "pram1t",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/Mustard.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/pram1t/Mustard#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/Mustard/issues"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -10,13 +21,21 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
   },
-  "keywords": ["openagent", "core", "agent", "llm"],
-  "license": "MIT",
   "dependencies": {
     "@mustard/config": "*",
     "@mustard/hooks": "*",
@@ -26,5 +45,11 @@
   },
   "devDependencies": {
     "typescript": "^5.9.3"
-  }
+  },
+  "keywords": [
+    "openagent",
+    "core",
+    "agent",
+    "llm"
+  ]
 }

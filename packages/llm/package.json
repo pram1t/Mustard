@@ -1,7 +1,18 @@
 {
   "name": "@mustard/llm",
-  "version": "0.0.0",
-  "description": "LLM abstraction layer for OpenAgent",
+  "version": "1.0.0-rc.1",
+  "description": "LLM abstraction layer for Mustard",
+  "author": "pram1t",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/Mustard.git",
+    "directory": "packages/llm"
+  },
+  "homepage": "https://github.com/pram1t/Mustard#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/Mustard/issues"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -10,19 +21,20 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
-  },
-  "keywords": [
-    "openagent",
-    "llm"
-  ],
-  "license": "MIT",
-  "devDependencies": {
-    "cross-env": "^10.1.0",
-    "typescript": "^5.9.3"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -31,5 +43,13 @@
     "@mustard/logger": "*",
     "openai": "^6.16.0",
     "tiktoken": "^1.0.22"
-  }
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "openagent",
+    "llm"
+  ]
 }

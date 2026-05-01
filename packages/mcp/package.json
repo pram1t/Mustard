@@ -1,7 +1,18 @@
 {
   "name": "@mustard/mcp",
-  "version": "0.0.0",
-  "description": "MCP client for OpenAgent",
+  "version": "1.0.0-rc.1",
+  "description": "MCP client for Mustard",
+  "author": "pram1t",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pram1t/Mustard.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/pram1t/Mustard#readme",
+  "bugs": {
+    "url": "https://github.com/pram1t/Mustard/issues"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -10,17 +21,29 @@
       "default": "./dist/index.js"
     }
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build"
   },
-  "keywords": ["openagent", "mcp"],
-  "license": "MIT",
   "dependencies": {
     "@mustard/core": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
-  }
+  },
+  "keywords": [
+    "openagent",
+    "mcp"
+  ]
 }
