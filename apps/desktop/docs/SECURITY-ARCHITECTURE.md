@@ -83,13 +83,13 @@ src/renderer/
 
 ```bash
 # Type check all security modules
-npm run typecheck --workspace=@mustard/desktop
+npm run typecheck --workspace=@pram1t/mustard-desktop
 
 # Build
-npm run build --workspace=@mustard/desktop
+npm run build --workspace=@pram1t/mustard-desktop
 
 # Dev mode (check console for security verification output)
-npm run dev --workspace=@mustard/desktop
+npm run dev --workspace=@pram1t/mustard-desktop
 ```
 
 Expected console output in dev mode:

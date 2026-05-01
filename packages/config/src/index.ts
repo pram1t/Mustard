@@ -1,5 +1,5 @@
 /**
- * @mustard/config
+ * @pram1t/mustard-config
  *
  * Configuration management for OpenAgent.
  *

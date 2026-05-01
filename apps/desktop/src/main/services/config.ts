@@ -1,20 +1,20 @@
 /**
  * Config Service
  *
- * Wraps @mustard/config as a thin delegation layer.
+ * Wraps @pram1t/mustard-config as a thin delegation layer.
  * Critical: API keys are NEVER exposed to the renderer.
  * API key storage is delegated to CredentialService.
  */
 
-import { getConfig } from '@mustard/config';
-import type { LLMProvider as LLMProviderType } from '@mustard/config';
+import { getConfig } from '@pram1t/mustard-config';
+import type { LLMProvider as LLMProviderType } from '@pram1t/mustard-config';
 import {
   type LLMRouter,
   OpenAIProvider,
   AnthropicProvider,
   GeminiProvider,
   OllamaProvider,
-} from '@mustard/llm';
+} from '@pram1t/mustard-llm';
 import type {
   SafeConfig,
   ProviderInfo,
@@ -85,7 +85,7 @@ export class ConfigService {
         delete updates.apiKey;
       }
 
-      const { saveGlobalConfig, ensureGlobalConfig } = await import('@mustard/config');
+      const { saveGlobalConfig, ensureGlobalConfig } = await import('@pram1t/mustard-config');
       await ensureGlobalConfig();
       await saveGlobalConfig({
         ...(updates.provider !== undefined ? { provider: updates.provider as LLMProviderType } : {}),

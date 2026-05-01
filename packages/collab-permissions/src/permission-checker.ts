@@ -6,8 +6,8 @@
  * consume these helpers.
  */
 
-import type { Intent, RiskLevel } from '@mustard/collab-ai';
-import type { PermissionMode } from '@mustard/collab-core';
+import type { Intent, RiskLevel } from '@pram1t/mustard-collab-ai';
+import type { PermissionMode } from '@pram1t/mustard-collab-core';
 import type {
   ApprovalPolicy,
   ModeCapabilities,

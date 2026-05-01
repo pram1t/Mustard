@@ -1,6 +1,6 @@
 # Mustard — API Reference
 
-REST + WebSocket reference for `@mustard/collab-server`. Every route
+REST + WebSocket reference for `@pram1t/mustard-collab-server`. Every route
 except `/health` and `/auth/login` requires a Bearer JWT.
 
 Default base URL: `http://127.0.0.1:3200`
@@ -322,8 +322,8 @@ Common failures:
 
 ## Type cheatsheet
 
-The full TypeScript types live in `@mustard/collab-core`,
-`@mustard/collab-ai`, and `@mustard/collab-permissions`. Quick
+The full TypeScript types live in `@pram1t/mustard-collab-core`,
+`@pram1t/mustard-collab-ai`, and `@pram1t/mustard-collab-permissions`. Quick
 reference of the shapes the API surfaces:
 
 ```ts

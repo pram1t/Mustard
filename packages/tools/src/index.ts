@@ -1,5 +1,5 @@
 /**
- * @mustard/tools
+ * @pram1t/mustard-tools
  *
  * Tool system for OpenAgent.
  * Provides built-in tools and registry for managing tool execution.

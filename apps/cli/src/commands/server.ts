@@ -5,10 +5,10 @@
  *   server start [options]   — Start the HTTP/WebSocket API server
  */
 
-import type { LLMRouter } from '@mustard/llm';
-import type { IToolRegistry } from '@mustard/tools';
-import { EventBus } from '@mustard/message-bus';
-import { startServer } from '@mustard/server';
+import type { LLMRouter } from '@pram1t/mustard-llm';
+import type { IToolRegistry } from '@pram1t/mustard-tools';
+import { EventBus } from '@pram1t/mustard-message-bus';
+import { startServer } from '@pram1t/mustard-server';
 
 export type ServerAction = 'start';
 

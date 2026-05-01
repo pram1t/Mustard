@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/queue",
+  "name": "@pram1t/mustard-queue",
   "version": "1.0.0-rc.1",
   "description": "In-memory priority task queue with dependency resolution for Mustard V2",
   "author": "pram1t",
@@ -38,9 +38,9 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/message-bus": "*",
-    "better-sqlite3": "^11.0.0"
+    "better-sqlite3": "^11.0.0",
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-message-bus": "*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",

@@ -4,8 +4,8 @@
  * Tracks execution progress across an orchestrated plan.
  */
 
-import type { IMessageBus } from '@mustard/message-bus';
-import type { TaskQueue } from '@mustard/queue';
+import type { IMessageBus } from '@pram1t/mustard-message-bus';
+import type { TaskQueue } from '@pram1t/mustard-queue';
 import type { ExecutionPlan, StepResult } from './types.js';
 
 /**

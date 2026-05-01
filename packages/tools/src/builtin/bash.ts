@@ -12,8 +12,8 @@ import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
 import { BaseTool } from '../base.js';
 import type { ToolResult, ExecutionContext, ToolParameters } from '../types.js';
-import { getConfig } from '@mustard/config';
-import { filterEnvVars } from '@mustard/logger';
+import { getConfig } from '@pram1t/mustard-config';
+import { filterEnvVars } from '@pram1t/mustard-logger';
 import { validateCommand } from '../security.js';
 
 // Maximum timeout: 10 minutes (hard limit)

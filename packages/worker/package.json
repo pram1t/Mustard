@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/worker",
+  "name": "@pram1t/mustard-worker",
   "version": "1.0.0-rc.1",
   "description": "Specialized AI worker infrastructure for Mustard V2",
   "author": "pram1t",
@@ -38,10 +38,10 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/core": "*",
-    "@mustard/llm": "*",
-    "@mustard/tools": "*",
-    "@mustard/logger": "*"
+    "@pram1t/mustard-core": "*",
+    "@pram1t/mustard-llm": "*",
+    "@pram1t/mustard-tools": "*",
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

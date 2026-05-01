@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
-import { EventBus } from '@mustard/message-bus';
+import { EventBus } from '@pram1t/mustard-message-bus';
 import type { OrchestrateOptions } from '../orchestrate.js';
 
-// Mock @mustard/orchestrator so we don't create real LLM connections
-vi.mock('@mustard/orchestrator', () => {
+// Mock @pram1t/mustard-orchestrator so we don't create real LLM connections
+vi.mock('@pram1t/mustard-orchestrator', () => {
   class MockOrchestrator {
     config: any;
     deps: any;
@@ -37,8 +37,8 @@ vi.mock('@mustard/orchestrator', () => {
   };
 });
 
-vi.mock('@mustard/message-bus', async () => {
-  const actual = await vi.importActual('@mustard/message-bus');
+vi.mock('@pram1t/mustard-message-bus', async () => {
+  const actual = await vi.importActual('@pram1t/mustard-message-bus');
   return actual;
 });
 

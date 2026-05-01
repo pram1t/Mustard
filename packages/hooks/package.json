@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/hooks",
+  "name": "@pram1t/mustard-hooks",
   "version": "1.0.0-rc.1",
   "description": "Hook system for Mustard",
   "author": "pram1t",
@@ -38,7 +38,7 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*"
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

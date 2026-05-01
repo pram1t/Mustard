@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/mcp",
+  "name": "@pram1t/mustard-mcp",
   "version": "1.0.0-rc.1",
   "description": "MCP client for Mustard",
   "author": "pram1t",
@@ -37,7 +37,7 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/core": "*"
+    "@pram1t/mustard-core": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

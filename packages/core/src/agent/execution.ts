@@ -4,9 +4,9 @@
  * Handles parallel execution of tool calls with proper error handling.
  */
 
-import type { ToolCall } from '@mustard/llm';
-import type { ToolResult, IToolRegistry, ExecutionContext } from '@mustard/tools';
-import { getLogger } from '@mustard/logger';
+import type { ToolCall } from '@pram1t/mustard-llm';
+import type { ToolResult, IToolRegistry, ExecutionContext } from '@pram1t/mustard-tools';
+import { getLogger } from '@pram1t/mustard-logger';
 
 /**
  * Execute multiple tool calls in parallel.

@@ -158,7 +158,7 @@ npx vitest run packages/tools/src/builtin/__tests__/my-tool.test.ts
 - Use `describe` / `it` blocks with clear, descriptive test names.
 - Mock external dependencies (API calls, file system) rather than making real requests.
 - When mocking file paths on Windows, use `path.join()` instead of hardcoded `/` separators.
-- Use `@mustard/test-utils` for common mocks (`createMockProvider`, `createMockTool`, etc.).
+- Use `@pram1t/mustard-test-utils` for common mocks (`createMockProvider`, `createMockTool`, etc.).
 
 ## Building
 
@@ -175,7 +175,7 @@ npm run build -w packages/core
 npm run typecheck
 ```
 
-Build order is determined by inter-package dependencies. For example, `@mustard/core` depends on `@mustard/llm` and `@mustard/tools`, so those are built first.
+Build order is determined by inter-package dependencies. For example, `@pram1t/mustard-core` depends on `@pram1t/mustard-llm` and `@pram1t/mustard-tools`, so those are built first.
 
 ## Pull Request Process
 

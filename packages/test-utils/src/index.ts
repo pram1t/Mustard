@@ -1,5 +1,5 @@
 /**
- * @mustard/test-utils
+ * @pram1t/mustard-test-utils
  *
  * Testing utilities for OpenAgent packages.
  */

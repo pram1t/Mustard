@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/orchestrator",
+  "name": "@pram1t/mustard-orchestrator",
   "version": "1.0.0-rc.1",
   "description": "Multi-worker orchestrator for Mustard V2",
   "author": "pram1t",
@@ -38,15 +38,15 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/core": "*",
-    "@mustard/llm": "*",
-    "@mustard/tools": "*",
-    "@mustard/logger": "*",
-    "@mustard/message-bus": "*",
-    "@mustard/worker": "*",
-    "@mustard/memory": "*",
-    "@mustard/artifact": "*",
-    "@mustard/queue": "*"
+    "@pram1t/mustard-core": "*",
+    "@pram1t/mustard-llm": "*",
+    "@pram1t/mustard-tools": "*",
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-message-bus": "*",
+    "@pram1t/mustard-worker": "*",
+    "@pram1t/mustard-memory": "*",
+    "@pram1t/mustard-artifact": "*",
+    "@pram1t/mustard-queue": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

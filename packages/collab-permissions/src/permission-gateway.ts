@@ -1,6 +1,6 @@
 /**
  * PermissionGateway — integration layer that bridges the IntentEngine
- * (from @mustard/collab-ai) with this package's mode / risk /
+ * (from @pram1t/mustard-collab-ai) with this package's mode / risk /
  * approval primitives.
  *
  * Wiring model (one gateway per room):
@@ -28,8 +28,8 @@
  * the engine so downstream consumers see the rejection.
  */
 
-import type { Intent } from '@mustard/collab-ai';
-import type { IntentEngine } from '@mustard/collab-ai';
+import type { Intent } from '@pram1t/mustard-collab-ai';
+import type { IntentEngine } from '@pram1t/mustard-collab-ai';
 import type {
   ApprovalPolicy,
   ApprovalRequest,

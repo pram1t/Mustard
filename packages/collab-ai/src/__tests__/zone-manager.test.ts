@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import type { Range } from '@mustard/collab-core';
+import type { Range } from '@pram1t/mustard-collab-core';
 import { ZoneManager } from '../zone-manager.js';
 import type { ZoneClaimRequest } from '../types.js';
 

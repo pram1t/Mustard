@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/collab-presence",
+  "name": "@pram1t/mustard-collab-presence",
   "version": "1.0.0-rc.1",
   "description": "Real-time presence, cursors, and activity tracking for Mustard Collab",
   "author": "pram1t",
@@ -38,8 +38,8 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/collab-core": "*"
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-collab-core": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

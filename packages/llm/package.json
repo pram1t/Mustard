@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/llm",
+  "name": "@pram1t/mustard-llm",
   "version": "1.0.0-rc.1",
   "description": "LLM abstraction layer for Mustard",
   "author": "pram1t",
@@ -39,10 +39,10 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
     "@google/generative-ai": "^0.24.1",
-    "@mustard/config": "*",
-    "@mustard/logger": "*",
     "openai": "^6.16.0",
-    "tiktoken": "^1.0.22"
+    "tiktoken": "^1.0.22",
+    "@pram1t/mustard-config": "*",
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "cross-env": "^10.1.0",

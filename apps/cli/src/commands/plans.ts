@@ -10,8 +10,8 @@ import {
   deletePlan,
   getPlansByStatus,
   findProjectRoot,
-} from '@mustard/config';
-import type { Plan } from '@mustard/config';
+} from '@pram1t/mustard-config';
+import type { Plan } from '@pram1t/mustard-config';
 
 export type PlansAction = 'list' | 'show' | 'delete';
 

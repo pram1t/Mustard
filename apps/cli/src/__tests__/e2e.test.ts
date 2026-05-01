@@ -11,14 +11,14 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import { MockLLMProvider } from '../../../../packages/llm/src/__tests__/mocks';
-import { createRouter, type LLMRouter } from '@mustard/llm';
+import { createRouter, type LLMRouter } from '@pram1t/mustard-llm';
 import {
   AgentLoop,
   PermissionManager,
   SessionManager,
   type AgentEvent,
-} from '@mustard/core';
-import { ToolRegistry, type Tool, type ToolResult, type ExecutionContext, type ToolParameters } from '@mustard/tools';
+} from '@pram1t/mustard-core';
+import { ToolRegistry, type Tool, type ToolResult, type ExecutionContext, type ToolParameters } from '@pram1t/mustard-tools';
 
 // ============================================================================
 // Helpers

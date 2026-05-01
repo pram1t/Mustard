@@ -7,16 +7,16 @@
  */
 
 import * as readline from 'readline';
-import type { LLMRouter } from '@mustard/llm';
-import type { IToolRegistry } from '@mustard/tools';
-import { EventBus, type MessageEnvelope } from '@mustard/message-bus';
+import type { LLMRouter } from '@pram1t/mustard-llm';
+import type { IToolRegistry } from '@pram1t/mustard-tools';
+import { EventBus, type MessageEnvelope } from '@pram1t/mustard-message-bus';
 import {
   Orchestrator,
   formatPlanForApproval,
   type OrchestratorConfig,
   type OrchestratorDeps,
   type ExecutionPlan,
-} from '@mustard/orchestrator';
+} from '@pram1t/mustard-orchestrator';
 import {
   formatPlanCreated,
   formatTaskStarted,

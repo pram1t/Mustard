@@ -12,7 +12,7 @@ import type {
   PermissionMode,
   RoomConfig,
   RoomVisibility,
-} from '@mustard/collab-core';
+} from '@pram1t/mustard-collab-core';
 
 interface CreateRoomBody {
   name?: string;

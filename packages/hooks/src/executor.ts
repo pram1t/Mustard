@@ -6,7 +6,7 @@
  */
 
 import { spawn } from 'child_process';
-import { getLogger, filterEnvVars } from '@mustard/logger';
+import { getLogger, filterEnvVars } from '@pram1t/mustard-logger';
 import type {
   HookEvent,
   HookConfig,

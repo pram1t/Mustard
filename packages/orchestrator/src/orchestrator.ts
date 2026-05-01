@@ -5,10 +5,10 @@
  * Request → Plan → Queue → Dispatch → Monitor → Result
  */
 
-import type { IMessageBus } from '@mustard/message-bus';
-import { EventBus } from '@mustard/message-bus';
-import { TaskQueue } from '@mustard/queue';
-import { WorkerRegistry, WorkerFactory } from '@mustard/worker';
+import type { IMessageBus } from '@pram1t/mustard-message-bus';
+import { EventBus } from '@pram1t/mustard-message-bus';
+import { TaskQueue } from '@pram1t/mustard-queue';
+import { WorkerRegistry, WorkerFactory } from '@pram1t/mustard-worker';
 import { Planner } from './planner.js';
 import { Dispatcher } from './dispatcher.js';
 import { ProgressMonitor } from './monitor.js';

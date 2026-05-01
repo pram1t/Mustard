@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/logger",
+  "name": "@pram1t/mustard-logger",
   "version": "1.0.0-rc.1",
   "description": "Logging utilities for Mustard",
   "author": "pram1t",

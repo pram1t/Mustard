@@ -6,10 +6,10 @@
  */
 
 import { randomUUID } from 'crypto';
-import type { LLMRouter } from '@mustard/llm';
-import type { IToolRegistry, Tool } from '@mustard/tools';
-import { ToolRegistry } from '@mustard/tools';
-import { getLogger } from '@mustard/logger';
+import type { LLMRouter } from '@pram1t/mustard-llm';
+import type { IToolRegistry, Tool } from '@pram1t/mustard-tools';
+import { ToolRegistry } from '@pram1t/mustard-tools';
+import { getLogger } from '@pram1t/mustard-logger';
 import { AgentLoop } from './loop.js';
 import {
   type SubagentConfig,

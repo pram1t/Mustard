@@ -6,11 +6,11 @@
  */
 
 import { randomUUID } from 'node:crypto';
-import { AgentLoop } from '@mustard/core';
-import type { AgentConfig, AgentEvent } from '@mustard/core';
-import type { LLMRouter } from '@mustard/llm';
-import type { IToolRegistry, Tool } from '@mustard/tools';
-import { ToolRegistry } from '@mustard/tools';
+import { AgentLoop } from '@pram1t/mustard-core';
+import type { AgentConfig, AgentEvent } from '@pram1t/mustard-core';
+import type { LLMRouter } from '@pram1t/mustard-llm';
+import type { IToolRegistry, Tool } from '@pram1t/mustard-tools';
+import { ToolRegistry } from '@pram1t/mustard-tools';
 import { buildWorkerPrompt } from './prompt-builder.js';
 import type { WorkerChannel } from './communication.js';
 import type { WorkerMemory } from './memory-integration.js';

@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/message-bus",
+  "name": "@pram1t/mustard-message-bus",
   "version": "1.0.0-rc.1",
   "description": "In-memory event bus with pattern matching for Mustard V2",
   "author": "pram1t",
@@ -38,7 +38,7 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*"
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

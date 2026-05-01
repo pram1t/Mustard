@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/collab-core",
+  "name": "@pram1t/mustard-collab-core",
   "version": "1.0.0-rc.1",
   "description": "Room, participant, and shared types for Mustard Collab",
   "author": "pram1t",
@@ -38,7 +38,7 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*"
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/server",
+  "name": "@pram1t/mustard-server",
   "version": "1.0.0-rc.1",
   "description": "Fastify HTTP/WebSocket API server for Mustard V2",
   "author": "pram1t",
@@ -39,18 +39,18 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/message-bus": "*",
-    "@mustard/orchestrator": "*",
-    "@mustard/worker": "*",
-    "@mustard/queue": "*",
-    "@mustard/artifact": "*",
-    "@mustard/memory": "*",
-    "@mustard/llm": "*",
-    "@mustard/tools": "*",
     "fastify": "^5.3.3",
     "@fastify/websocket": "^11.0.2",
-    "@fastify/cors": "^11.0.0"
+    "@fastify/cors": "^11.0.0",
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-message-bus": "*",
+    "@pram1t/mustard-orchestrator": "*",
+    "@pram1t/mustard-worker": "*",
+    "@pram1t/mustard-queue": "*",
+    "@pram1t/mustard-artifact": "*",
+    "@pram1t/mustard-memory": "*",
+    "@pram1t/mustard-llm": "*",
+    "@pram1t/mustard-tools": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

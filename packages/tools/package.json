@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/tools",
+  "name": "@pram1t/mustard-tools",
   "version": "1.0.0-rc.1",
   "description": "Built-in tools for Mustard",
   "author": "pram1t",
@@ -37,13 +37,13 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/config": "*",
-    "@mustard/logger": "*",
     "@types/prompts": "^2.4.9",
     "@types/turndown": "^5.0.6",
     "duck-duck-scrape": "^2.2.7",
     "prompts": "^2.4.2",
-    "turndown": "^7.2.2"
+    "turndown": "^7.2.2",
+    "@pram1t/mustard-config": "*",
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",

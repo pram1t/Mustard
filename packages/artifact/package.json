@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/artifact",
+  "name": "@pram1t/mustard-artifact",
   "version": "1.0.0-rc.1",
   "description": "Versioned artifact protocol with handoff state machine for Mustard V2",
   "author": "pram1t",
@@ -38,9 +38,9 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
     "better-sqlite3": "^11.0.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",

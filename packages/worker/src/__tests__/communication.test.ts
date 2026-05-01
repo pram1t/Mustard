@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { EventBus } from '@mustard/message-bus';
+import { EventBus } from '@pram1t/mustard-message-bus';
 import { WorkerChannel, type WorkerMessage } from '../communication.js';
 
 describe('WorkerChannel', () => {

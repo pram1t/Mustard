@@ -1,5 +1,5 @@
 /**
- * @mustard/core
+ * @pram1t/mustard-core
  *
  * Core functionality for OpenAgent.
  * Provides the agent loop, context management, and tool execution orchestration.

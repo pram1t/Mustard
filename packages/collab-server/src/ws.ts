@@ -20,7 +20,7 @@
 
 import type { FastifyInstance } from 'fastify';
 import type { WebSocket } from '@fastify/websocket';
-import type { IMessageBus, MessageEnvelope } from '@mustard/message-bus';
+import type { IMessageBus, MessageEnvelope } from '@pram1t/mustard-message-bus';
 import type { CollabServerConfig } from './types.js';
 import { verify } from './jwt.js';
 

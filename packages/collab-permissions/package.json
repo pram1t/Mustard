@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/collab-permissions",
+  "name": "@pram1t/mustard-collab-permissions",
   "version": "1.0.0-rc.1",
   "description": "Permission modes and risk assessment for Mustard Collab",
   "author": "pram1t",
@@ -38,10 +38,10 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/collab-core": "*",
-    "@mustard/collab-ai": "*",
-    "@mustard/message-bus": "*"
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-collab-core": "*",
+    "@pram1t/mustard-collab-ai": "*",
+    "@pram1t/mustard-message-bus": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

@@ -2,7 +2,7 @@
  * Event Type Definitions
  *
  * Unified event protocol for CLI and Desktop.
- * These types are defined in @mustard/core and consumed by both interfaces.
+ * These types are defined in @pram1t/mustard-core and consumed by both interfaces.
  *
  * Design Principles:
  * - Single source of truth: Same events for CLI and Desktop

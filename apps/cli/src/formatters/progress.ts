@@ -4,7 +4,7 @@
  * Terminal output formatting for orchestrated multi-worker execution.
  */
 
-import type { OrchestratorResult } from '@mustard/orchestrator';
+import type { OrchestratorResult } from '@pram1t/mustard-orchestrator';
 
 const COLORS = {
   reset: '\x1b[0m',

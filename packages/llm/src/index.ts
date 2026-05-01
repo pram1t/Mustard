@@ -1,5 +1,5 @@
 /**
- * @mustard/llm
+ * @pram1t/mustard-llm
  *
  * LLM abstraction layer for OpenAgent.
  * Provides a provider-agnostic interface for interacting with any LLM backend.

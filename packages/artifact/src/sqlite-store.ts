@@ -2,7 +2,7 @@
  * OpenAgent V2 - SQLite Artifact Store
  *
  * Persistent artifact storage backed by SQLite.
- * Follows the same pattern as @mustard/memory's MemoryStore.
+ * Follows the same pattern as @pram1t/mustard-memory's MemoryStore.
  */
 
 import { randomUUID } from 'node:crypto';

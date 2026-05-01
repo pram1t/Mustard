@@ -1,5 +1,5 @@
 /**
- * @mustard/collab-memory
+ * @pram1t/mustard-collab-memory
  *
  * 4-layer shared memory system for OpenAgent Collab.
  */

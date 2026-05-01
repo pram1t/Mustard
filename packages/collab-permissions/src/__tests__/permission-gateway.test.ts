@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { IntentEngine, type Intent, type IntentAction, type IntentType, type RiskLevel } from '@mustard/collab-ai';
+import { IntentEngine, type Intent, type IntentAction, type IntentType, type RiskLevel } from '@pram1t/mustard-collab-ai';
 import { ModeManager } from '../mode-manager.js';
 import { ApprovalManager } from '../approval-manager.js';
 import { PermissionGateway } from '../permission-gateway.js';
-import type { PermissionMode } from '@mustard/collab-core';
+import type { PermissionMode } from '@pram1t/mustard-collab-core';
 
 function proposeArgs(overrides?: {
   type?: IntentType;

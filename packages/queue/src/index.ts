@@ -1,5 +1,5 @@
 /**
- * @mustard/queue
+ * @pram1t/mustard-queue
  *
  * In-memory priority task queue with dependency resolution for OpenAgent V2.
  */

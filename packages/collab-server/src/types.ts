@@ -1,5 +1,5 @@
 /**
- * Shared types for @mustard/collab-server.
+ * Shared types for @pram1t/mustard-collab-server.
  */
 
 export interface CollabServerConfig {

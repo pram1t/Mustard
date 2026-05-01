@@ -4,10 +4,10 @@
  * Multi-worker orchestrated execution: plan → queue → dispatch → result.
  */
 
-import type { LLMRouter } from '@mustard/llm';
-import type { IToolRegistry } from '@mustard/tools';
-import { EventBus, type MessageEnvelope } from '@mustard/message-bus';
-import { Orchestrator, type OrchestratorConfig, type OrchestratorDeps } from '@mustard/orchestrator';
+import type { LLMRouter } from '@pram1t/mustard-llm';
+import type { IToolRegistry } from '@pram1t/mustard-tools';
+import { EventBus, type MessageEnvelope } from '@pram1t/mustard-message-bus';
+import { Orchestrator, type OrchestratorConfig, type OrchestratorDeps } from '@pram1t/mustard-orchestrator';
 import {
   formatPlanCreated,
   formatTaskStarted,

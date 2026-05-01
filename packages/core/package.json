@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/core",
+  "name": "@pram1t/mustard-core",
   "version": "1.0.0-rc.1",
   "description": "Core functionality for Mustard - Agent Loop and Context Management",
   "author": "pram1t",
@@ -37,11 +37,11 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/config": "*",
-    "@mustard/hooks": "*",
-    "@mustard/logger": "*",
-    "@mustard/llm": "*",
-    "@mustard/tools": "*"
+    "@pram1t/mustard-config": "*",
+    "@pram1t/mustard-hooks": "*",
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-llm": "*",
+    "@pram1t/mustard-tools": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

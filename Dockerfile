@@ -33,7 +33,7 @@ COPY packages/ packages/
 COPY apps/cli/ apps/cli/
 
 # Build all packages
-RUN npx turbo run build --filter=@mustard/server --filter=@mustard/cli
+RUN npx turbo run build --filter=@pram1t/mustard-server --filter=@pram1t/mustard-cli
 
 # ─── Runtime Stage ───────────────────────────────────────────
 FROM node:22-slim AS runtime

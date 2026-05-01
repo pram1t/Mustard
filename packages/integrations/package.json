@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/integrations",
+  "name": "@pram1t/mustard-integrations",
   "version": "1.0.0-rc.1",
   "description": "External service integrations for Mustard V2 (GitHub, webhooks)",
   "author": "pram1t",
@@ -46,8 +46,8 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/message-bus": "*"
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-message-bus": "*"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

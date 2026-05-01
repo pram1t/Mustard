@@ -1,12 +1,12 @@
 /**
  * Bus adapter for ModeManager.
  *
- * Mirrors the pattern used by @mustard/collab-ai's bus adapter: local
+ * Mirrors the pattern used by @pram1t/mustard-collab-ai's bus adapter: local
  * listeners stay synchronous and typed; the bus is the cross-package
  * fan-out channel.
  */
 
-import type { IMessageBus, MessageType } from '@mustard/message-bus';
+import type { IMessageBus, MessageType } from '@pram1t/mustard-message-bus';
 import type { ModeChangeEvent } from './types.js';
 import type { ModeManager } from './mode-manager.js';
 

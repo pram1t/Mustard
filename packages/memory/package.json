@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/memory",
+  "name": "@pram1t/mustard-memory",
   "version": "1.0.0-rc.1",
   "description": "Persistent memory with SQLite and FTS5 search for Mustard V2",
   "author": "pram1t",
@@ -38,8 +38,8 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "better-sqlite3": "^11.0.0"
+    "better-sqlite3": "^11.0.0",
+    "@pram1t/mustard-logger": "*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",

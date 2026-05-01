@@ -4,9 +4,9 @@
  * Types for the agent loop and event streaming.
  */
 
-import type { Message, ToolCall, ToolDefinition } from '@mustard/llm';
-import type { ToolResult, IToolRegistry } from '@mustard/tools';
-import type { HookExecutor, HookEvent as HookEventType } from '@mustard/hooks';
+import type { Message, ToolCall, ToolDefinition } from '@pram1t/mustard-llm';
+import type { ToolResult, IToolRegistry } from '@pram1t/mustard-tools';
+import type { HookExecutor, HookEvent as HookEventType } from '@pram1t/mustard-hooks';
 import type { PermissionManager } from '../permissions/index.js';
 
 // Re-export HookEvent for convenience

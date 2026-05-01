@@ -12,7 +12,7 @@ name: Publish
 # What it does:
 #   - Builds the entire monorepo
 #   - Runs the full test suite (gate)
-#   - Publishes every public @mustard/* package whose version equals
+#   - Publishes every public @pram1t/mustard-* package whose version equals
 #     the tag (so re-tagging the same version is a no-op for skipped
 #     packages — npm will reject duplicate-version publishes anyway)
 #

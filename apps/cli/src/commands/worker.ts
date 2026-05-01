@@ -11,7 +11,7 @@ import {
   builtinDefinitions,
   type WorkerDefinition,
   type WorkerRole,
-} from '@mustard/worker';
+} from '@pram1t/mustard-worker';
 
 export type WorkerAction = 'list' | 'info';
 

@@ -4,13 +4,13 @@
  * Only the LLM and tools are mocked.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { EventBus } from '@mustard/message-bus';
-import { TaskQueue } from '@mustard/queue';
-import { MemoryStore } from '@mustard/memory';
-import { ArtifactStore, HandoffManager } from '@mustard/artifact';
+import { EventBus } from '@pram1t/mustard-message-bus';
+import { TaskQueue } from '@pram1t/mustard-queue';
+import { MemoryStore } from '@pram1t/mustard-memory';
+import { ArtifactStore, HandoffManager } from '@pram1t/mustard-artifact';
 
 // Mock worker to avoid needing real LLM
-vi.mock('@mustard/worker', () => {
+vi.mock('@pram1t/mustard-worker', () => {
   class MockWorkerRegistry {
     register = vi.fn();
     unregister = vi.fn();

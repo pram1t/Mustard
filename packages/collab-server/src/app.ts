@@ -1,5 +1,5 @@
 /**
- * Fastify app factory for @mustard/collab-server.
+ * Fastify app factory for @pram1t/mustard-collab-server.
  *
  * Composes middleware (CORS, error handler), mounts the health route,
  * wires JWT auth as a preHandler that routes can opt into via the
@@ -27,9 +27,9 @@ import {
   type YjsRouteHandle,
 } from './yjs-route.js';
 import type { SqliteYjsPersistenceOptions } from './yjs-persistence.js';
-import type { IMessageBus } from '@mustard/message-bus';
-import { EventBus } from '@mustard/message-bus';
-import type { AutoApprovalPolicy } from '@mustard/collab-ai';
+import type { IMessageBus } from '@pram1t/mustard-message-bus';
+import { EventBus } from '@pram1t/mustard-message-bus';
+import type { AutoApprovalPolicy } from '@pram1t/mustard-collab-ai';
 
 // ============================================================================
 // Augmentations

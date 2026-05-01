@@ -1,5 +1,5 @@
 {
-  "name": "@mustard/collab-memory",
+  "name": "@pram1t/mustard-collab-memory",
   "version": "1.0.0-rc.1",
   "description": "4-layer shared memory system for Mustard Collab",
   "author": "pram1t",
@@ -38,11 +38,11 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@mustard/logger": "*",
-    "@mustard/collab-core": "*",
-    "@mustard/memory": "*",
-    "@mustard/llm": "*",
-    "better-sqlite3": "^11.0.0"
+    "better-sqlite3": "^11.0.0",
+    "@pram1t/mustard-logger": "*",
+    "@pram1t/mustard-collab-core": "*",
+    "@pram1t/mustard-memory": "*",
+    "@pram1t/mustard-llm": "*"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
