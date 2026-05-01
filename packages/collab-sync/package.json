@@ -1,6 +1,6 @@
 {
   "name": "@pram1t/mustard-collab-sync",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "description": "Yjs CRDT document and WebSocket sync provider for Mustard Collab",
   "author": "pram1t",
   "license": "MIT",

@@ -50,8 +50,14 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install
-        run: npm install
+      # Delete the lockfile to force fresh platform-specific resolution.
+      # Without this, @rollup/rollup-linux-x64-gnu (an optional dep that
+      # only resolves on Linux) is missing — the lockfile was generated
+      # on Windows. See npm/cli#4828.
+      - name: Install (regenerate lockfile for Linux)
+        run: |
+          rm -f package-lock.json
+          npm install
 
       # Build only publishable packages — desktop has its own Electron
       # pipeline (desktop.yml), web is a deployable Next.js app (not on npm).
