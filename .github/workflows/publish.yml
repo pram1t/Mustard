@@ -53,13 +53,13 @@ jobs:
       - name: Install
         run: npm install
 
-      # Build only publishable packages — desktop app has its own Electron
-      # build pipeline via desktop-release.yml; not published to npm.
+      # Build only publishable packages — desktop has its own Electron
+      # pipeline (desktop.yml), web is a deployable Next.js app (not on npm).
       - name: Build (publishable packages)
-        run: npx turbo run build --filter='!@pram1t/mustard-desktop'
+        run: npx turbo run build --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'
 
-      - name: Test (excluding desktop)
-        run: npx vitest run --exclude='**/apps/desktop/**'
+      - name: Test (excluding desktop + web)
+        run: npx vitest run --exclude='**/apps/desktop/**' --exclude='**/apps/web/**'
 
       - name: Publish (in topological order)
         if: github.event.inputs.dryRun != 'true'

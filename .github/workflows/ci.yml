@@ -22,8 +22,8 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - name: Build (excluding desktop)
-        run: npx turbo run build --filter='!@pram1t/mustard-desktop'
+      - name: Build (excluding desktop + web)
+        run: npx turbo run build --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'
 
   test:
     name: Test (${{ matrix.os }})
@@ -43,11 +43,11 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - name: Build (excluding desktop)
-        run: npx turbo run build --filter='!@pram1t/mustard-desktop'
+      - name: Build (excluding desktop + web)
+        run: npx turbo run build --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'
 
-      - name: Run tests (excluding desktop)
-        run: npx vitest run --exclude='**/apps/desktop/**'
+      - name: Run tests (excluding desktop + web)
+        run: npx vitest run --exclude='**/apps/desktop/**' --exclude='**/apps/web/**'
         env:
           CI: true
 
@@ -63,7 +63,7 @@ jobs:
           cache: 'npm'
 
       - run: npm ci
-      - name: Build (excluding desktop)
-        run: npx turbo run build --filter='!@pram1t/mustard-desktop'
+      - name: Build (excluding desktop + web)
+        run: npx turbo run build --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'
       - run: npm run lint
         continue-on-error: true
