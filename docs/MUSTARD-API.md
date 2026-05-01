@@ -1,4 +1,4 @@
-# OpenAgent Collab — API Reference
+# Mustard — API Reference
 
 REST + WebSocket reference for `@mustard/collab-server`. Every route
 except `/health` and `/auth/login` requires a Bearer JWT.

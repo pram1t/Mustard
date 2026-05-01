@@ -1,4 +1,4 @@
-# OpenAgent Collab — Integration Guide
+# Mustard — Integration Guide
 
 > How the Collab-V1 packages plug together end-to-end.
 
