@@ -49,7 +49,7 @@ jobs:
         run: npm run build
 
       - name: Type check desktop
-        run: npm run typecheck --workspace=openagent-desktop
+        run: npm run typecheck --workspace=@mustard/desktop
 
       - name: Run desktop tests
         run: npx vitest run --config apps/desktop/vitest.config.ts

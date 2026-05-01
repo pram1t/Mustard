@@ -28,7 +28,7 @@ export class WebhookSender {
       try {
         const headers: Record<string, string> = {
           'Content-Type': 'application/json',
-          'User-Agent': 'openagent-webhook/1.0',
+          'User-Agent': 'mustard-webhook/1.0',
           'X-OpenAgent-Event': payload.event,
           ...this.config.headers,
         };

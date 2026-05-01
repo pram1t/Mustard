@@ -33,13 +33,13 @@ jobs:
         run: npm run build
 
       - name: Type check desktop
-        run: npm run typecheck --workspace=openagent-desktop
+        run: npm run typecheck --workspace=@mustard/desktop
 
       - name: Run desktop tests
         run: npx vitest run --config apps/desktop/vitest.config.ts
 
       - name: Generate SBOM
-        run: npm run sbom --workspace=openagent-desktop
+        run: npm run sbom --workspace=@mustard/desktop
         continue-on-error: true
 
       - name: Build & Publish (macOS)

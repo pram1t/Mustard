@@ -23,7 +23,7 @@ npm install
 npm run dev --workspace=apps/desktop
 
 # Or via turbo
-npx turbo run dev --filter=openagent-desktop
+npx turbo run dev --filter=@mustard/desktop
 ```
 
 ## Build

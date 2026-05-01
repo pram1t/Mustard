@@ -83,13 +83,13 @@ src/renderer/
 
 ```bash
 # Type check all security modules
-npm run typecheck --workspace=openagent-desktop
+npm run typecheck --workspace=@mustard/desktop
 
 # Build
-npm run build --workspace=openagent-desktop
+npm run build --workspace=@mustard/desktop
 
 # Dev mode (check console for security verification output)
-npm run dev --workspace=openagent-desktop
+npm run dev --workspace=@mustard/desktop
 ```
 
 Expected console output in dev mode:
