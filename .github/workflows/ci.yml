@@ -23,7 +23,10 @@ jobs:
 
       # Force fresh resolve to pick up @rollup/rollup-linux-x64-gnu
       # (optional dep that's missing from a Windows-generated lockfile).
-      - run: rm -f package-lock.json && npm install
+      # `shell: bash` so `rm -f` works on Windows runners (default is PS).
+      - name: Install (regenerate lockfile)
+        shell: bash
+        run: rm -f package-lock.json && npm install
       - name: Build (excluding desktop + web)
         run: npx turbo run build --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'
 
@@ -46,7 +49,10 @@ jobs:
 
       # Force fresh resolve to pick up @rollup/rollup-linux-x64-gnu
       # (optional dep that's missing from a Windows-generated lockfile).
-      - run: rm -f package-lock.json && npm install
+      # `shell: bash` so `rm -f` works on Windows runners (default is PS).
+      - name: Install (regenerate lockfile)
+        shell: bash
+        run: rm -f package-lock.json && npm install
       - name: Build (excluding desktop + web)
         run: npx turbo run build --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'
 
@@ -68,7 +74,10 @@ jobs:
 
       # Force fresh resolve to pick up @rollup/rollup-linux-x64-gnu
       # (optional dep that's missing from a Windows-generated lockfile).
-      - run: rm -f package-lock.json && npm install
+      # `shell: bash` so `rm -f` works on Windows runners (default is PS).
+      - name: Install (regenerate lockfile)
+        shell: bash
+        run: rm -f package-lock.json && npm install
       - name: Build (excluding desktop + web)
         run: npx turbo run build --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'
       - run: npm run lint
