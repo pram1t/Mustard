@@ -116,7 +116,7 @@ export async function startServer(
 
   await app.listen({ port: mergedConfig.port, host: mergedConfig.host });
 
-  console.log(`OpenAgent API server listening on http://${mergedConfig.host}:${mergedConfig.port}`);
+  console.log(`Mustard API server listening on http://${mergedConfig.host}:${mergedConfig.port}`);
 
   return app;
 }

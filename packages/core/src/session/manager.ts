@@ -2,7 +2,7 @@
  * Session Manager
  *
  * Manages session persistence to the filesystem.
- * Sessions are stored as JSON files in ~/.openagent/sessions/
+ * Sessions are stored as JSON files in ~/.mustard/sessions/
  */
 
 import * as fs from 'fs';
@@ -27,7 +27,7 @@ export class SessionManager {
    * @param baseDir - Optional custom base directory for sessions
    */
   constructor(baseDir?: string) {
-    this.sessionDir = baseDir || path.join(os.homedir(), '.openagent', 'sessions');
+    this.sessionDir = baseDir || path.join(os.homedir(), '.mustard', 'sessions');
   }
 
   /**

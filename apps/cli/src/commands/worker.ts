@@ -1,5 +1,5 @@
 /**
- * OpenAgent CLI - Worker Command
+ * Mustard CLI - Worker Command
  *
  * Manage V2 worker definitions and instances.
  *   worker list              — Show all built-in worker roles
@@ -46,7 +46,7 @@ export async function workerCommand(
     case 'info':
       if (!options.role) {
         console.error('Error: Worker role is required for "worker info"');
-        console.error('Usage: openagent worker info <role>');
+        console.error('Usage: mustard worker info <role>');
         process.exit(1);
       }
       showWorkerInfo(options.role);
@@ -85,7 +85,7 @@ function listWorkers(): void {
   }
 
   console.log(`${COLORS.dim}Total: ${definitions.length} role(s)${COLORS.reset}`);
-  console.log(`${COLORS.dim}Use "openagent worker info <role>" for details.${COLORS.reset}\n`);
+  console.log(`${COLORS.dim}Use "mustard worker info <role>" for details.${COLORS.reset}\n`);
 }
 
 /**

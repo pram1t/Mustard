@@ -21,7 +21,7 @@ export function Router(): ReactNode {
     case '/about':
       return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)' }}>
-          About — OpenAgent Desktop
+          About — Mustard Desktop
         </div>
       );
     default:

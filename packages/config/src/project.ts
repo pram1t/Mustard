@@ -22,7 +22,7 @@ import type {
 /**
  * OpenAgent configuration directory name
  */
-export const CONFIG_DIR_NAME = '.openagent';
+export const CONFIG_DIR_NAME = '.mustard';
 
 /**
  * Configuration file name

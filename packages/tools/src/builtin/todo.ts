@@ -6,7 +6,7 @@
  *
  * Todos are stored in:
  * - .openagent/todos.json (if in a project)
- * - ~/.openagent/todos.json (global fallback)
+ * - ~/.mustard/todos.json (global fallback)
  */
 
 import * as fs from 'fs/promises';

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * OpenAgent CLI
+ * Mustard CLI
  *
- * Command-line interface for interacting with OpenAgent.
+ * Command-line interface for interacting with Mustard.
  * Connects the agent loop with LLM providers and tools.
  */
 
@@ -50,12 +50,18 @@ import {
 } from '@pram1t/mustard-mcp';
 import type { Tool, ToolParameters, ToolResult, ExecutionContext } from '@pram1t/mustard-tools';
 
-const VERSION = '0.0.0';
+// Read version from our own package.json so `--version` always reflects
+// the published version. CLI compiles to CommonJS, so __dirname is a
+// global at runtime. dist/index.js → ../package.json.
+const PKG_JSON = JSON.parse(
+  fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'),
+);
+const VERSION: string = PKG_JSON.version ?? '0.0.0';
 
 /**
  * MCP config file location
  */
-const MCP_CONFIG_DIR = path.join(os.homedir(), '.openagent');
+const MCP_CONFIG_DIR = path.join(os.homedir(), '.mustard');
 const MCP_CONFIG_FILE = path.join(MCP_CONFIG_DIR, 'mcp.json');
 
 /**
@@ -453,16 +459,16 @@ function parseArgs(): {
  */
 function printHelp(): void {
   console.log(`
-OpenAgent CLI v${VERSION}
+Mustard CLI v${VERSION}
 
-Usage: openagent [options] <prompt>
-       openagent init [options]
-       openagent config <subcommand> [options]
-       openagent plans [subcommand] [options]
-       openagent worker [subcommand] [options]
-       openagent request <subcommand> <prompt> [options]
-       openagent mcp <subcommand> [options]
-       openagent session <subcommand> [options]
+Usage: mustard [options] <prompt>
+       mustard init [options]
+       mustard config <subcommand> [options]
+       mustard plans [subcommand] [options]
+       mustard worker [subcommand] [options]
+       mustard request <subcommand> <prompt> [options]
+       mustard mcp <subcommand> [options]
+       mustard session <subcommand> [options]
 
 Options:
   -h, --help                    Show this help message
@@ -493,8 +499,8 @@ Permission Modes:
   strict            Ask for everything not explicitly allowed
 
 Init Subcommand:
-  init                                  Create .openagent/ in current directory
-  init --global                         Create ~/.openagent/ if missing
+  init                                  Create .mustard/ in current directory
+  init --global                         Create ~/.mustard/ if missing
   init --model <model>                  Set default model
   init --provider <provider>            Set default provider
 
@@ -552,38 +558,38 @@ Environment Variables:
   LOG_LEVEL          Logging level (trace, debug, info, warn, error)
 
 Examples:
-  openagent "Hello, who are you?"
-  openagent --provider anthropic "Explain this code"
-  openagent --provider gemini -m gemini-1.5-flash "Hello"
-  openagent --provider ollama --model llama3.2 "Hello"
-  openagent --provider openai-compatible --base-url http://localhost:1234/v1 "Hi"
-  openagent --permission-mode strict "read package.json"
-  openagent --allow-tool Write --allow-tool Edit "Create a new file"
+  mustard "Hello, who are you?"
+  mustard --provider anthropic "Explain this code"
+  mustard --provider gemini -m gemini-1.5-flash "Hello"
+  mustard --provider ollama --model llama3.2 "Hello"
+  mustard --provider openai-compatible --base-url http://localhost:1234/v1 "Hi"
+  mustard --permission-mode strict "read package.json"
+  mustard --allow-tool Write --allow-tool Edit "Create a new file"
 
 Session Examples:
-  openagent "Remember the number 42"
-  openagent --resume <sessionId> "What number did I mention?"
-  openagent session list
-  openagent session show <sessionId>
-  openagent session delete <sessionId>
+  mustard "Remember the number 42"
+  mustard --resume <sessionId> "What number did I mention?"
+  mustard session list
+  mustard session show <sessionId>
+  mustard session delete <sessionId>
 
 MCP Examples:
-  openagent mcp add filesystem --type stdio --command "npx @modelcontextprotocol/server-filesystem"
-  openagent mcp add api-server --type http --url http://localhost:3000
-  openagent mcp list
-  openagent mcp remove filesystem
+  mustard mcp add filesystem --type stdio --command "npx @modelcontextprotocol/server-filesystem"
+  mustard mcp add api-server --type http --url http://localhost:3000
+  mustard mcp list
+  mustard mcp remove filesystem
 
 V2 Worker/Request Examples:
-  openagent worker                      # List all worker roles
-  openagent worker info architect       # Show architect details
-  openagent request submit "Build a REST API for users"
-  openagent request execute "Add authentication to the API"
+  mustard worker                      # List all worker roles
+  mustard worker info architect       # Show architect details
+  mustard request submit "Build a REST API for users"
+  mustard request execute "Add authentication to the API"
 
 Project Config Examples:
-  openagent init                        # Initialize project config
-  openagent config list                 # Show all settings
-  openagent config set model claude-3-opus
-  openagent plans                       # List plans
+  mustard init                        # Initialize project config
+  mustard config list                 # Show all settings
+  mustard config set model claude-3-opus
+  mustard plans                       # List plans
 `);
 }
 
@@ -663,7 +669,7 @@ async function handleMCPSubcommand(subcommand: MCPSubcommand): Promise<void> {
       const servers = Object.entries(mcpConfig.servers);
       if (servers.length === 0) {
         console.log('No MCP servers configured.');
-        console.log('Use "openagent mcp add <name> ..." to add a server.');
+        console.log('Use "mustard mcp add <name> ..." to add a server.');
       } else {
         console.log('Configured MCP servers:\n');
         for (const [name, config] of servers) {
@@ -758,7 +764,7 @@ async function handleSessionSubcommand(subcommand: SessionSubcommand): Promise<v
       const sessions = sessionManager.list();
       if (sessions.length === 0) {
         console.log('No saved sessions found.');
-        console.log('Sessions are automatically saved when you run openagent.');
+        console.log('Sessions are automatically saved when you run mustard.');
       } else {
         console.log('Saved sessions:\n');
         for (const session of sessions) {
@@ -891,7 +897,7 @@ function getMCPTools(registry: MCPRegistry): Tool[] {
  * Main entry point
  */
 async function main(): Promise<void> {
-  // Early intercept for `openagent collab ...` — handles its own argv and
+  // Early intercept for `mustard collab ...` — handles its own argv and
   // exits directly. Avoids threading a new subcommand through the
   // monolithic parseArgs() below.
   const rawArgv = process.argv.slice(2);
@@ -909,7 +915,7 @@ async function main(): Promise<void> {
   }
 
   if (args.version) {
-    console.log(`OpenAgent CLI v${VERSION}`);
+    console.log(`Mustard CLI v${VERSION}`);
     process.exit(0);
   }
 
@@ -971,7 +977,7 @@ async function main(): Promise<void> {
   if (args.requestSubcommand) {
     if (!args.requestSubcommand.prompt) {
       console.error('Error: A prompt is required for request commands.');
-      console.error('Usage: openagent request submit "<prompt>"');
+      console.error('Usage: mustard request submit "<prompt>"');
       process.exit(1);
     }
 
@@ -1004,7 +1010,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  logger.debug('Starting OpenAgent CLI', {
+  logger.debug('Starting Mustard CLI', {
     provider: args.provider,
     model: args.model || '(default)',
     promptLength: args.prompt.length,

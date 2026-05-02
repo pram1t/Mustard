@@ -139,7 +139,7 @@ export async function initProjectConfig(
 
 /**
  * Ensure global configuration directory exists
- * Creates ~/.openagent/ with necessary subdirectories
+ * Creates ~/.mustard/ with necessary subdirectories
  */
 export async function ensureGlobalConfig(): Promise<void> {
   const configDir = getGlobalConfigDir();

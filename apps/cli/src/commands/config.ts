@@ -1,7 +1,7 @@
 /**
  * Config Command
  *
- * Manage OpenAgent configuration from CLI.
+ * Manage Mustard configuration from CLI.
  */
 
 import * as fs from 'fs/promises';
@@ -68,7 +68,7 @@ export async function configCommand(
 async function listConfig(cwd: string): Promise<void> {
   const resolved = await loadResolvedConfig({ cwd });
 
-  console.log('OpenAgent Configuration\n');
+  console.log('Mustard Configuration\n');
   console.log('Source Legend: [cli] [env] [project] [global] [default]\n');
 
   // Show effective values with sources
@@ -180,7 +180,7 @@ async function setConfigValue(
     // Update project config
     const projectRoot = await findProjectRoot(cwd);
     if (!projectRoot) {
-      console.error('Error: Not in an OpenAgent project. Run "openagent init" first or use --global.');
+      console.error('Error: Not in an Mustard project. Run "mustard init" first or use --global.');
       process.exit(1);
     }
 
@@ -202,7 +202,7 @@ async function editConfig(cwd: string, global?: boolean): Promise<void> {
   } else {
     const projectRoot = await findProjectRoot(cwd);
     if (!projectRoot) {
-      console.error('Error: Not in an OpenAgent project. Run "openagent init" first or use --global.');
+      console.error('Error: Not in an Mustard project. Run "mustard init" first or use --global.');
       process.exit(1);
     }
     configPath = getProjectConfigPath(projectRoot);
@@ -213,7 +213,7 @@ async function editConfig(cwd: string, global?: boolean): Promise<void> {
     await fs.access(configPath);
   } catch {
     console.error(`Config file not found: ${configPath}`);
-    console.error('Run "openagent init" to create it.');
+    console.error('Run "mustard init" to create it.');
     process.exit(1);
   }
 
@@ -238,7 +238,7 @@ async function showConfigPath(cwd: string, global?: boolean): Promise<void> {
   } else {
     const projectRoot = await findProjectRoot(cwd);
     if (!projectRoot) {
-      console.error('Error: Not in an OpenAgent project.');
+      console.error('Error: Not in an Mustard project.');
       process.exit(1);
     }
     console.log(getProjectConfigPath(projectRoot));

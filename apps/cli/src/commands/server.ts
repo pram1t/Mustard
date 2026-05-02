@@ -1,7 +1,7 @@
 /**
- * OpenAgent CLI - Server Command
+ * Mustard CLI - Server Command
  *
- * Start the OpenAgent API server.
+ * Start the Mustard API server.
  *   server start [options]   — Start the HTTP/WebSocket API server
  */
 
@@ -42,7 +42,7 @@ export async function serverCommand(
 async function startServerCommand(options: ServerCommandOptions): Promise<void> {
   const bus = new EventBus();
 
-  console.log('Starting OpenAgent API server...\n');
+  console.log('Starting Mustard API server...\n');
 
   try {
     const app = await startServer(

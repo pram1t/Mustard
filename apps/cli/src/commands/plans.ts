@@ -1,7 +1,7 @@
 /**
  * Plans Command
  *
- * Manage OpenAgent plans from CLI.
+ * Manage Mustard plans from CLI.
  */
 
 import {

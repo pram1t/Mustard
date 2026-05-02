@@ -17,7 +17,7 @@ export function AboutSettings(): ReactNode {
   return (
     <div className="about-settings">
       <div className="settings-section">
-        <h3>OpenAgent Desktop</h3>
+        <h3>Mustard Desktop</h3>
         <dl className="about-info">
           <dt>Version</dt>
           <dd>{appInfo.version}</dd>

@@ -1,5 +1,5 @@
 /**
- * `openagent collab` — interact with @pram1t/mustard-collab-server.
+ * `mustard collab` — interact with @pram1t/mustard-collab-server.
  *
  * Subcommands:
  *   collab login                            cache a JWT for future calls
@@ -296,7 +296,7 @@ async function tailCmd(roomId: string | undefined, ctx: Ctx): Promise<number> {
   await getAuthenticatedClient(ctx.baseUrl, ctx.participantId);
   const cached = await getCachedToken(ctx.participantId);
   if (!cached) {
-    ctx.err('no cached token — run `openagent collab login` first');
+    ctx.err('no cached token — run `mustard collab login` first');
     return 1;
   }
 
@@ -412,7 +412,7 @@ function printRoomLine(room: Room, ctx: Ctx): void {
 // Help text
 // ============================================================================
 
-const USAGE = `usage: openagent collab <subcommand>
+const USAGE = `usage: mustard collab <subcommand>
 
 Subcommands:
   login                              cache a JWT for future calls

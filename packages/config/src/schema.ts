@@ -150,7 +150,7 @@ export const HistoryConfigSchema = z.object({
 
 /**
  * Project-specific configuration
- * Stored in .openagent/config.json or ~/.openagent/config.json
+ * Stored in .openagent/config.json or ~/.mustard/config.json
  */
 export const ProjectConfigSchema = z.object({
   // Model defaults

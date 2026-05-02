@@ -395,7 +395,7 @@ describe('collab help', () => {
       err: r.writeErr,
     });
     expect(code).toBe(0);
-    expect(r.out.join('\n')).toMatch(/usage: openagent collab/);
+    expect(r.out.join('\n')).toMatch(/usage: mustard collab/);
   });
 
   it('returns exit 2 on unknown subcommand', async () => {

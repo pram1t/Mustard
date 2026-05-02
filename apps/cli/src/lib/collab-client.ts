@@ -3,7 +3,7 @@
  *
  * Same shape as the web client (apps/web/src/lib/collab-client.ts) but
  * carries a small token cache that persists JWTs to
- * ~/.openagent/collab/tokens.json keyed by participantId. This lets
+ * ~/.mustard/collab/tokens.json keyed by participantId. This lets
  * the CLI re-use a token across invocations until it expires.
  *
  * Future cleanup: extract to a shared @pram1t/mustard-collab-client package
@@ -120,7 +120,7 @@ interface TokenStore {
   tokens: Record<string, CachedToken>;
 }
 
-const DEFAULT_TOKEN_PATH = path.join(homedir(), '.openagent', 'collab', 'tokens.json');
+const DEFAULT_TOKEN_PATH = path.join(homedir(), '.mustard', 'collab', 'tokens.json');
 
 export async function loadTokenStore(file = DEFAULT_TOKEN_PATH): Promise<TokenStore> {
   try {

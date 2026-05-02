@@ -1,5 +1,5 @@
 /**
- * OpenAgent CLI - Orchestrate Command
+ * Mustard CLI - Orchestrate Command
  *
  * Multi-worker orchestrated execution: plan → queue → dispatch → result.
  */

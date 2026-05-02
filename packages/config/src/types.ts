@@ -37,7 +37,7 @@ export interface ResolvedConfig {
   /** Project-specific configuration (from .openagent/config.json) */
   projectConfig: ProjectConfig | null;
 
-  /** Global user configuration (from ~/.openagent/config.json) */
+  /** Global user configuration (from ~/.mustard/config.json) */
   globalConfig: ProjectConfig | null;
 
   /** Path to the project root (where .openagent/ was found) */

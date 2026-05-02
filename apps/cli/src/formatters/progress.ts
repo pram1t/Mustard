@@ -1,5 +1,5 @@
 /**
- * OpenAgent CLI - Progress Formatters
+ * Mustard CLI - Progress Formatters
  *
  * Terminal output formatting for orchestrated multi-worker execution.
  */

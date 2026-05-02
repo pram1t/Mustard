@@ -88,10 +88,10 @@ describe('SessionManager', () => {
       expect(manager.getSessionDir()).toBe(testDir);
     });
 
-    it('should default to ~/.openagent/sessions', () => {
+    it('should default to ~/.mustard/sessions', () => {
       const defaultManager = new SessionManager();
       expect(defaultManager.getSessionDir()).toBe(
-        path.join(os.homedir(), '.openagent', 'sessions')
+        path.join(os.homedir(), '.mustard', 'sessions')
       );
     });
   });

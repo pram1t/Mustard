@@ -1,5 +1,5 @@
 /**
- * OpenAgent CLI - Request Command
+ * Mustard CLI - Request Command
  *
  * Submit requests for multi-worker orchestrated execution.
  *   request submit "<prompt>"   — Plan and optionally execute
@@ -56,7 +56,7 @@ export async function requestCommand(
 ): Promise<void> {
   if (!prompt) {
     console.error('Error: A prompt is required.');
-    console.error('Usage: openagent request submit "<prompt>"');
+    console.error('Usage: mustard request submit "<prompt>"');
     process.exit(1);
   }
 

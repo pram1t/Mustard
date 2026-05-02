@@ -1,7 +1,7 @@
 /**
- * OpenAgent CLI - API Client
+ * Mustard CLI - API Client
  *
- * HTTP client for communicating with the OpenAgent API server.
+ * HTTP client for communicating with the Mustard API server.
  */
 
 export interface ApiClientConfig {

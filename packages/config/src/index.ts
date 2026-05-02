@@ -6,7 +6,7 @@
  * Supports:
  * - Environment-based configuration
  * - Project-specific config (.openagent/config.json)
- * - Global user config (~/.openagent/config.json)
+ * - Global user config (~/.mustard/config.json)
  * - Plan management
  * - History management
  * - Skills infrastructure (types only)
