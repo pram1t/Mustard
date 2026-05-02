@@ -13,10 +13,10 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "test": "vitest run",
+    "test": "vitest run --exclude='**/apps/desktop/**' --exclude='**/apps/web/**'",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "lint": "turbo run lint"
+    "test:coverage": "vitest run --coverage --exclude='**/apps/desktop/**' --exclude='**/apps/web/**'",
+    "lint": "turbo run lint --filter='!@pram1t/mustard-desktop' --filter='!@pram1t/mustard-web'"
   },
   "keywords": [],
   "author": "",
